@@ -1,0 +1,4 @@
+CDIO-Kolmarden
+==============
+
+Animal classification 

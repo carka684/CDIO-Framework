@@ -1,5 +1,7 @@
 package edu.wildlifesecurity.framework.actuator;
 
-public interface IActuator {
+import edu.wildlifesecurity.framework.IComponent;
+
+public interface IActuator extends IComponent {
 
 }

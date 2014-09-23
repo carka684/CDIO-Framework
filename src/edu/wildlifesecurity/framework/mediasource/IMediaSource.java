@@ -1,5 +1,11 @@
 package edu.wildlifesecurity.framework.mediasource;
 
-public interface IMediaSource {
+import java.awt.Image;
 
+import edu.wildlifesecurity.framework.IComponent;
+
+public interface IMediaSource extends IComponent {
+
+	Image getSnapshot();
+	
 }

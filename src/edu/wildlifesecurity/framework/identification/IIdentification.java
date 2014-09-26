@@ -1,5 +1,7 @@
 package edu.wildlifesecurity.framework.identification;
 
-public interface IIdentification {
+import edu.wildlifesecurity.framework.IComponent;
+
+public interface IIdentification extends IComponent {
 
 }

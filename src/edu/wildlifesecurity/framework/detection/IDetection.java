@@ -1,5 +1,7 @@
 package edu.wildlifesecurity.framework.detection;
 
-public interface IDetection {
+import edu.wildlifesecurity.framework.IComponent;
+
+public interface IDetection extends IComponent {
 
 }

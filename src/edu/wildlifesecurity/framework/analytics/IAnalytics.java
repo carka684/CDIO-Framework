@@ -1,5 +1,7 @@
 package edu.wildlifesecurity.framework.analytics;
 
-public interface IAnalytics {
+import edu.wildlifesecurity.framework.IComponent;
+
+public interface IAnalytics extends IComponent {
 
 }

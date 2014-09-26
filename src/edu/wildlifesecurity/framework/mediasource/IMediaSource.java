@@ -1,13 +1,15 @@
 package edu.wildlifesecurity.framework.mediasource;
 
+import org.opencv.core.Mat;
 
-import java.awt.Image;
-
+import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IComponent;
+import edu.wildlifesecurity.framework.IEventHandler;
 
 public interface IMediaSource extends IComponent {
 
-	Image getSnapshot();
+	void addEventHandler(EventType type, IEventHandler<MediaEvent> handler);
 	
-	
+	Mat takeSnapshot();
+
 }

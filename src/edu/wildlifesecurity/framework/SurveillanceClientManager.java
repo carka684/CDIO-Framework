@@ -1,26 +1,55 @@
 package edu.wildlifesecurity.framework;
 
-import edu.wildlifesecurity.framework.actuator.IActuator;
-import edu.wildlifesecurity.framework.analytics.IAnalytics;
+import org.opencv.core.Mat;
+
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
 import edu.wildlifesecurity.framework.detection.IDetection;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
-import edu.wildlifesecurity.framework.repository.IRepository;
+import edu.wildlifesecurity.framework.mediasource.MediaEvent;
 
 public class SurveillanceClientManager extends SurveillanceManager {
 	
+	private IMediaSource mediaSource;
+	private IDetection detection;
+	private IIdentification identification;
+	private ICommunicatorClient communicator;
+	
 	public SurveillanceClientManager(IMediaSource mediaSource, IDetection detection, IIdentification identification,
-									 IAnalytics analytics, IActuator actuator, IRepository repository, ICommunicatorClient communicator){
-		
-
+									 ICommunicatorClient communicator){
+		super();
 	}
 	
 	/*
-	 * Implements the 
+	 * Starts the client manager
 	 */
 	@Override
-	public void process(){
+	public void start(){
+		
+		// TODO: Load all components' configuration
+		
+		// Start listening for images from the MediaSource component
+		mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
+
+			@Override
+			public void handle(MediaEvent event) {
+				processImage(event.getImage());				
+			}
+			
+		});
+		
+	}
+	
+	/**
+	 * Processes as image
+	 */
+	private void processImage(Mat image){
+		
+		// TODO: Use detection component to detect stuff in the image
+		
+		// TODO: Use identification component to identify stuff in the image
+		
+		// TODO: Use communication component to send and proceed the processing on the server
 		
 	}
 	

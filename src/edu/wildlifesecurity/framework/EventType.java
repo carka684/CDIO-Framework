@@ -1,6 +1,6 @@
 package edu.wildlifesecurity.framework;
 
-public abstract class EventType {
+public class EventType {
 
 	protected String typeName;
 	

@@ -18,6 +18,11 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	public SurveillanceClientManager(IMediaSource mediaSource, IDetection detection, IIdentification identification,
 									 ICommunicatorClient communicator){
 		super();
+		
+		this.mediaSource = mediaSource;
+		this.detection = detection;
+		this.identification = identification;
+		this.communicator = communicator;
 	}
 	
 	/*
@@ -38,6 +43,9 @@ public class SurveillanceClientManager extends SurveillanceManager {
 			
 		});
 		
+		// 
+		processImage(mediaSource.takeSnapshot());
+		
 	}
 	
 	/**
@@ -48,6 +56,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		// TODO: Use detection component to detect stuff in the image
 		
 		// TODO: Use identification component to identify stuff in the image
+		identification.extractFeatures(image);
 		
 		// TODO: Use communication component to send and proceed the processing on the server
 		

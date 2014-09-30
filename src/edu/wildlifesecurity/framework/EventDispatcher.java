@@ -19,7 +19,7 @@ public class EventDispatcher<T extends IEvent> {
 
 			@Override
 			public void removeHandler() {
-				handlers.get(type).remove(handler);
+				//handlers.get(type).remove(handler);
 			}
 
 		};

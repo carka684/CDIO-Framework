@@ -1,3 +1,8 @@
 # Eclipse project files and folders to ignore
 
 bin/
+Framework.jar
+
+# Windows files
+
+Thumbs.db

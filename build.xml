@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Framework.makejar" default="makejar" basedir=".">
+  <target name ="makejar" description="Create a jar for the Framework project">
+    <jar jarfile="Framework.jar" basedir="bin"/>
+  </target>
+</project>

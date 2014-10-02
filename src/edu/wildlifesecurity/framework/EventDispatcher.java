@@ -8,7 +8,7 @@ public class EventDispatcher<T extends IEvent> {
 	
 	private HashMap<EventType, List<IEventHandler<T>>> handlers = new HashMap<EventType, List<IEventHandler<T>>>();
 
-	public ISubscription addEventHandler(EventType type, IEventHandler<T> handler){
+	public ISubscription addEventHandler(final EventType type, final IEventHandler<T> handler){
 
 		if(!handlers.containsKey(type)){
 			handlers.put(type, new ArrayList<IEventHandler<T>>());
@@ -19,7 +19,7 @@ public class EventDispatcher<T extends IEvent> {
 
 			@Override
 			public void removeHandler() {
-				//handlers.get(type).remove(handler);
+				handlers.get(type).remove(handler);
 			}
 
 		};

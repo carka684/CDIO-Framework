@@ -7,6 +7,6 @@ public class MyClass {
 	public static void main(String[] args){
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		Mat mat = new Mat(1);
-		System.out.println("Heeej");
+		System.out.println("Heeeeej");
 	}
 }

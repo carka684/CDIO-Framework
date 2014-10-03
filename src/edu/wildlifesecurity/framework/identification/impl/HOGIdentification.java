@@ -28,7 +28,6 @@ public class HOGIdentification implements IIdentification {
 		MatOfFloat features = new MatOfFloat();
 		MatOfPoint locations = new MatOfPoint();
 		descriptor.compute(inputImage, features, new Size(32,32), new Size(0,0), locations);
-		
 		return features;
 	}
 

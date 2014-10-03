@@ -34,14 +34,14 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		// TODO: Load all components' configuration
 		
 		// Start listening for images from the MediaSource component
-		mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
+		/*mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
 
 			@Override
 			public void handle(MediaEvent event) {
 				processImage(event.getImage());				
 			}
 			
-		});
+		});*/
 		
 		// 
 		processImage(mediaSource.takeSnapshot());

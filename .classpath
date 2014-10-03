@@ -4,8 +4,10 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="opencv/opencv-249.jar">
 		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="CDIO-Kolmarden/opencv/native"/>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Framework/opencv/native"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="opencv/JFeatureLib-1.6.0.jar"/>
+	<classpathentry kind="lib" path="opencv/ij.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -3,7 +3,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.highgui.VideoCapture;
-import org.opencv.imgproc.Imgproc;
+import org.opencv.imgproc.*;
 import org.opencv.video.BackgroundSubtractorMOG2;
 
 import com.atul.JavaOpenCV.Imshow;
@@ -46,27 +46,45 @@ public class MyClass {
 			morphKernel = Mat.ones(3, 3, CvType.CV_8U);
 			Mat fgMaskMod = new Mat();
 			Imgproc.erode(fgMask, fgMaskMod, morphKernel);
-			//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
-			//Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel); 
 			Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
 			
-			Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel); 
+			/*Mat distMap = new Mat();
+			Imgproc.distanceTransform(fgMaskMod, distMap, 1, 3);
+			int threshType = Imgproc.THRESH_BINARY;
+			Mat threshDist = new Mat();
+			Imgproc.threshold(distMap, threshDist, 4, 1, threshType);
+			
+			Imgproc.dilate(threshDist, threshDist, morphKernel);
+			Imgproc.dilate(threshDist, threshDist, morphKernel);
+			Imgproc.dilate(threshDist, threshDist, morphKernel);
+			Imgproc.dilate(threshDist, threshDist, morphKernel);
+			Imgproc.dilate(threshDist, threshDist, morphKernel);
+			Imgproc.dilate(threshDist, threshDist, morphKernel);
+			
+			Imgproc.threshold(fgMaskMod, fgMaskMod, 250, 1, threshType);
+			*/
+			//Mat resIm = new Mat(CvType.CV_8U);
+			//resIm = fgMaskMod.mul(threshDist);
+			
+			//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
+			//Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel); 
+			
+			
+			//	Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel); 
 			//Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
 			//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
-			Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
+			//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
 
-			Mat convKernel = new Mat();
+			/*Mat convKernel = new Mat();
 			convKernel = Mat.ones(5, 5, CvType.CV_8U);
-		
 			convKernel.mul(convKernel,0.04);
 			
 			Imgproc.filter2D(fgMaskMod, fgMaskMod, 0, convKernel);
 			int threshType = Imgproc.THRESH_BINARY;
-			Imgproc.threshold(fgMaskMod, fgMaskMod, 254, 255, threshType);
+			Imgproc.threshold(fgMaskMod, fgMaskMod, 254, 255, threshType);*/
 			
-			
-			window1.showImage(fgMask);
-			window2.showImage(fgMaskMod);
+			window1.showImage(fgMaskMod);
+			//window2.showImage(threshDist);
 		}
 	}
 }

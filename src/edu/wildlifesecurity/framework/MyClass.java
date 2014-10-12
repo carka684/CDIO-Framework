@@ -5,6 +5,7 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.Rect;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
@@ -43,12 +44,12 @@ public class MyClass {
 			}
 			//System.out.println(frameNr + "  ");
 			
-			
 			Mat morphKernel = new Mat();
 			morphKernel = Mat.ones(3, 3, CvType.CV_8U);
 			Mat fgMaskMod = new Mat();
 			Imgproc.erode(fgMask, fgMaskMod, morphKernel);
 			Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
+			
 			Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
 			Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
 			
@@ -58,19 +59,30 @@ public class MyClass {
 			Mat contourHierarchy = new Mat();
 			Imgproc.findContours(contourIm, contours, contourHierarchy, 3, 1);
 			
+			
+			double th = 500;
 			double maxArea = 0;
+		
 			
 			for (int i = 0; i < contours.size(); i++)
 			{
+				
 				double area;
 				area = Imgproc.contourArea(contours.get(i));
-				if (area > maxArea)
+				if (area > th && area > maxArea)
 				{
 					maxArea = area;
+					Rect boundBox = Imgproc.boundingRect(contours.get(i));
+					Mat obj = fgMaskMod.submat(boundBox).clone();
+					window1.showImage(obj);
+					Mat bgdModel = Mat.zeros(1, 65, CvType.CV_64FC1);
+					Mat fgdModel = Mat.zeros(1, 65, CvType.CV_64FC1);
+					Imgproc.threshold(fgMaskMod, fgMaskMod, 100, 1, CvType.CV_8U);
+					Imgproc.grabCut(img, fgMaskMod, boundBox, bgdModel, fgdModel, 5, Imgproc.GC_INIT_WITH_MASK);
+					window2.showImage(img);
 				}
-			}
+			}	
 			
-			System.out.println(maxArea + "  ");
 			/*Mat distMap = new Mat();
 			Imgproc.distanceTransform(fgMaskMod, distMap, 1, 3);
 			int threshType = Imgproc.THRESH_BINARY;
@@ -106,8 +118,7 @@ public class MyClass {
 			int threshType = Imgproc.THRESH_BINARY;
 			Imgproc.threshold(fgMaskMod, fgMaskMod, 254, 255, threshType);*/
 			
-			window1.showImage(fgMask);
-			window2.showImage(fgMaskMod);
+			
 		}
 	}
 }

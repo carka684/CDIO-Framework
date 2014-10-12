@@ -82,34 +82,6 @@ public class MyClass {
 					window2.showImage(img);
 				}
 			}	
-			
-			/*Mat distMap = new Mat();
-			Imgproc.distanceTransform(fgMaskMod, distMap, 1, 3);
-			int threshType = Imgproc.THRESH_BINARY;
-			Mat threshDist = new Mat();
-			Imgproc.threshold(distMap, threshDist, 4, 1, threshType);
-			
-			Imgproc.dilate(threshDist, threshDist, morphKernel);
-			Imgproc.dilate(threshDist, threshDist, morphKernel);
-			Imgproc.dilate(threshDist, threshDist, morphKernel);
-			Imgproc.dilate(threshDist, threshDist, morphKernel);
-			Imgproc.dilate(threshDist, threshDist, morphKernel);
-			Imgproc.dilate(threshDist, threshDist, morphKernel);
-			
-			Imgproc.threshold(fgMaskMod, fgMaskMod, 250, 1, threshType);
-			*/
-			//Mat resIm = new Mat(CvType.CV_8U);
-			//resIm = fgMaskMod.mul(threshDist);
-			
-			//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
-			//Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel); 
-			
-			
-			//	Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel); 
-			//Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
-			//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
-			//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
-
 			/*Mat convKernel = new Mat();
 			convKernel = Mat.ones(5, 5, CvType.CV_8U);
 			convKernel.mul(convKernel,0.04);

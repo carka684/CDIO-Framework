@@ -8,6 +8,8 @@ import java.util.Map;
  * 
  */
 public interface IComponent {
+	
+	void init();
 
 	void loadConfiguration(Map<String, Object> config);
 	

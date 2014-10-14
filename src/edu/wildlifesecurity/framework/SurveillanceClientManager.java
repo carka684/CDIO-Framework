@@ -34,6 +34,12 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	@Override
 	public void start(){
 		
+		// Init all components
+		mediaSource.init();
+		/*detection.init();
+		identification.init();
+		communicator.init();*/
+		
 		// TODO: Load all components' configuration
 		loadComponentsConfigutation();
 		
@@ -48,7 +54,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		});
 		
 		// 
-		processImage(mediaSource.takeSnapshot());
+		mediaSource.takeSnapshot();
 		
 	}
 	
@@ -60,7 +66,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		// TODO: Use detection component to detect stuff in the image
 		
 		// TODO: Use identification component to identify stuff in the image
-		identification.extractFeatures(image);
+		//identification.extractFeatures(image);
 		
 		// TODO: Use communication component to send and proceed the processing on the server
 		

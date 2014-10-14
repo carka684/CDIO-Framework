@@ -17,12 +17,12 @@ public class MyClass {
 	public static void main(String[] args){
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
-		VideoCapture vc = new VideoCapture("bilder/Rhinoshort.avi");
+		VideoCapture vc = new VideoCapture("bilder/CDIO_projek_filmer/im%04d.png");
 		Imshow window1 = new Imshow("Background model");
 		Imshow window2 = new Imshow("Filtered background model");
 		System.out.println("Is opened: " + vc.isOpened());
-		BackgroundSubtractorMOG2 bgs = new BackgroundSubtractorMOG2(0, 60, true);
-		bgs.setInt("nmixtures", 3);
+		BackgroundSubtractorMOG2 bgs = new BackgroundSubtractorMOG2(0, 20, false);
+		bgs.setInt("nmixtures", 5);
 		bgs.setDouble("backgroundRatio", 0.9);
 		
 		for(int frameNr = 0; frameNr < 2776; frameNr++)
@@ -35,13 +35,13 @@ public class MyClass {
 			
 			Mat fgMask = new Mat();
 			//bgs.setInt(name, value);
-			if(frameNr < 1000)
+			if(frameNr < 500)
 			{
 				bgs.apply(img, fgMask, 0.01);
 			}
 			else
 			{
-				bgs.apply(img, fgMask, 0.00001);
+				bgs.apply(img, fgMask, 0.0001);
 			}
 			System.out.println(frameNr + "  ");
 			

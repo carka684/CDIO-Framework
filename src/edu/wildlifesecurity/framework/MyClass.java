@@ -17,15 +17,18 @@ public class MyClass {
 	public static void main(String[] args){
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
-		VideoCapture vc = new VideoCapture("/Users/jonasforsner/Documents/TSBB11/Matlab/CalleHundLong/im%04d.png");
-		 Imshow window1 = new Imshow("Background model");
+		VideoCapture vc = new VideoCapture("/Users/jonasforsner/Documents/TSBB11/Filmer/Rhinoshort.avi");
+		Imshow window1 = new Imshow("Background model");
 		Imshow window2 = new Imshow("Filtered background model");
 		System.out.println("Is opened: " + vc.isOpened());
-		BackgroundSubtractorMOG2 bgs = new BackgroundSubtractorMOG2(0, 60, true);
-		bgs.setInt("nmixtures", 3);
+		BackgroundSubtractorMOG2 bgs = new BackgroundSubtractorMOG2(0, 30, false);
+		bgs.setInt("nmixtures", 5);
 		bgs.setDouble("backgroundRatio", 0.9);
 		
-		for(int frameNr = 0; frameNr < 2776; frameNr++)
+		int CV_CAP_PROP_FRAME_COUNT = 7;
+		//System.out.println("Number of Frames =  " + vc.get(CV_CAP_PROP_FRAME_COUNT));
+		
+		for(int frameNr = 0; frameNr < vc.get(CV_CAP_PROP_FRAME_COUNT) - 1; frameNr++)
 		{
 			// Grab & retrieve the next frame
 			Mat img = new Mat();
@@ -35,13 +38,13 @@ public class MyClass {
 			
 			Mat fgMask = new Mat();
 			//bgs.setInt(name, value);
-			if(frameNr < 1000)
+			if(frameNr < 580)
 			{
 				bgs.apply(img, fgMask, 0.01);
 			}
 			else
 			{
-				bgs.apply(img, fgMask, 0.00001);
+				bgs.apply(img, fgMask, 0.0001);
 			}
 			System.out.println(frameNr + "  ");
 			
@@ -52,19 +55,20 @@ public class MyClass {
 			Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
 			
 			Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
+			//Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
+			//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
 			Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
 			
 			Mat contourIm = fgMaskMod.clone();
 			
 			Vector <MatOfPoint> contours = new Vector <MatOfPoint>();
 			Mat contourHierarchy = new Mat();
-			Imgproc.findContours(contourIm, contours, contourHierarchy, 3, 1);
 			
+			Imgproc.findContours(contourIm, contours, contourHierarchy, 3, 1);
 			
 			double th = 500;
 			double maxArea = 0;
 		
-			
 			for (int i = 0; i < contours.size(); i++)
 			{
 				
@@ -90,8 +94,9 @@ public class MyClass {
 					
 					window1.showImage(resultIm);
 				}
-			}	
-			window2.showImage(img);
+			}
+			
+			window2.showImage(fgMaskMod);
 			
 			/*Mat convKernel = new Mat();
 			convKernel = Mat.ones(5, 5, CvType.CV_8U);

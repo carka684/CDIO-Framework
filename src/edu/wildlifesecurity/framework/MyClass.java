@@ -6,6 +6,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
+import org.opencv.core.Size;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
@@ -42,7 +43,7 @@ public class MyClass {
 			{
 				bgs.apply(img, fgMask, 0.00001);
 			}
-			//System.out.println(frameNr + "  ");
+			System.out.println(frameNr + "  ");
 			
 			Mat morphKernel = new Mat();
 			morphKernel = Mat.ones(3, 3, CvType.CV_8U);
@@ -73,15 +74,25 @@ public class MyClass {
 				{
 					maxArea = area;
 					Rect boundBox = Imgproc.boundingRect(contours.get(i));
-					Mat obj = fgMaskMod.submat(boundBox).clone();
-					window1.showImage(obj);
-					Mat bgdModel = Mat.zeros(1, 65, CvType.CV_64FC1);
-					Mat fgdModel = Mat.zeros(1, 65, CvType.CV_64FC1);
-					Imgproc.threshold(fgMaskMod, fgMaskMod, 100, 1, CvType.CV_8U);
-					Imgproc.grabCut(img, fgMaskMod, boundBox, bgdModel, fgdModel, 5, Imgproc.GC_INIT_WITH_MASK);
-					window2.showImage(img);
+					Mat obj = img.submat(boundBox).clone();
+					Mat mask = fgMaskMod.submat(boundBox).clone();
+					Imgproc.threshold(mask, mask, 200, 1, CvType.CV_8U);
+					Vector <Mat> channel  = new Vector <Mat>();
+					Core.split(obj, channel);
+					Vector <Mat> choppedIm = new Vector <Mat>();
+					choppedIm.add(channel.get(0).mul(mask));
+					choppedIm.add(channel.get(1).mul(mask));
+					choppedIm.add(channel.get(2).mul(mask));
+					
+					Mat resultIm = new Mat();
+					Core.merge(choppedIm, resultIm);
+					Imgproc.resize(resultIm, resultIm, new Size(480, 480));
+					
+					window1.showImage(resultIm);
 				}
 			}	
+			window2.showImage(img);
+			
 			/*Mat convKernel = new Mat();
 			convKernel = Mat.ones(5, 5, CvType.CV_8U);
 			convKernel.mul(convKernel,0.04);

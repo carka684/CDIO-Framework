@@ -11,10 +11,12 @@ import org.opencv.ml.CvSVM;
 import org.opencv.ml.CvSVMParams;
 import org.opencv.objdetect.HOGDescriptor;
 
+import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 
-public class HOGIdentification implements IIdentification {
+
+public class HOGIdentification extends AbstractComponent implements IIdentification {
 
 	/**
 	 * Extracts HOG features 
@@ -24,6 +26,15 @@ public class HOGIdentification implements IIdentification {
 	CvSVM SVM;
 	CvSVMParams params;
 	Size s;
+	
+	@Override
+	public void init(){
+		s = new Size(480,480);
+		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9,-1,0.2,1,1,false,64);
+		SVM = new CvSVM();
+		params = new CvSVMParams();
+	    params.set_kernel_type(CvSVM.LINEAR);
+	}
 	@Override
 	public Mat extractFeatures(Mat inputImage) {
 		MatOfFloat features = new MatOfFloat();

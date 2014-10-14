@@ -1,5 +1,8 @@
 package edu.wildlifesecurity.framework;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.opencv.core.Mat;
 
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
@@ -31,7 +34,14 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	@Override
 	public void start(){
 		
+		// Init all components
+		mediaSource.init();
+		/*detection.init();
+		identification.init();
+		communicator.init();*/
+		
 		// TODO: Load all components' configuration
+		loadComponentsConfigutation();
 		
 		// Start listening for images from the MediaSource component
 		mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
@@ -44,7 +54,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		});
 		
 		// 
-		processImage(mediaSource.takeSnapshot());
+		mediaSource.takeSnapshot();
 		
 	}
 	
@@ -59,6 +69,18 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		//identification.extractFeatures(image);
 		
 		// TODO: Use communication component to send and proceed the processing on the server
+		
+	}
+	
+	/**
+	 *  Fetches components' configuration entries from server using CommunicatorClient component
+	 */
+	private void loadComponentsConfigutation(){
+		
+		/// TEMPORARY! Hardcoded MediaSource configuration
+		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
+		mediaSourceConfig.put("MediaSource_FrameRate", 10); // Sets the frame rate when the component should take pictures
+		mediaSource.loadConfiguration(mediaSourceConfig);
 		
 	}
 	

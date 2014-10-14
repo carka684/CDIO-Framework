@@ -9,6 +9,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="opencv/JFeatureLib-1.6.0.jar"/>
 	<classpathentry kind="lib" path="opencv/ij.jar"/>
-	<classpathentry kind="lib" path="/Users/jonasforsner/Documents/TSBB11/Imshow.jar"/>
+	<classpathentry kind="lib" path="opencv/Imshow.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

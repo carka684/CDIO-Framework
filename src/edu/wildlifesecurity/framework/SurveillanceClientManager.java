@@ -56,7 +56,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		// TODO: Use detection component to detect stuff in the image
 		
 		// TODO: Use identification component to identify stuff in the image
-		identification.extractFeatures(image);
+		//identification.extractFeatures(image);
 		
 		// TODO: Use communication component to send and proceed the processing on the server
 		

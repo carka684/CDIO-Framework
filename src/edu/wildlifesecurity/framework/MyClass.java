@@ -17,7 +17,11 @@ public class MyClass {
 	public static void main(String[] args){
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
+
 		VideoCapture vc = new VideoCapture("/Users/jonasforsner/Documents/TSBB11/Filmer/Rhinoshort.avi");
+
+		// VideoCapture vc = new VideoCapture("bilder/Rhinoshort.avi");
+
 		Imshow window1 = new Imshow("Background model");
 		Imshow window2 = new Imshow("Filtered background model");
 		System.out.println("Is opened: " + vc.isOpened());

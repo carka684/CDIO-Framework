@@ -14,7 +14,7 @@ public interface IIdentification extends IComponent {
 
 	Mat extractFeatures(Mat inputImage);
 	Mat extractFeaturesFromFiles(Vector<String> strVec);
-	CvSVM trainClassifier(Mat trainFeatures,Mat classes);//Unnecessary, only one line
+	void trainClassifier(Mat trainFeatures,Mat classes);//Unnecessary, only one line
 	IClassificationResult classify(Mat features);
 	
 }

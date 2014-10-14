@@ -29,7 +29,6 @@ public class HOGIdentification implements IIdentification {
 		MatOfFloat features = new MatOfFloat();
 		Imgproc.resize(inputImage, inputImage, s);
 		hog.compute(inputImage, features);			
-		
 		return features;
 	}
 	
@@ -53,9 +52,8 @@ public class HOGIdentification implements IIdentification {
 	}
 
 	@Override
-	public CvSVM trainClassifier(Mat trainFeatures, Mat classes) {
+	public void trainClassifier(Mat trainFeatures, Mat classes) {
 		SVM.train(trainFeatures,classes,new Mat(),new Mat(),params);
-		return SVM;
 	}
 
 }

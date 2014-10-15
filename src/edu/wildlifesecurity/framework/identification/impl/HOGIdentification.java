@@ -117,8 +117,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	
 	@Override
 	public void loadClassifierFromFile(String file) {
-		// TODO Auto-generated method stub
-		
+			SVM.load(file);
 	}
 
 	

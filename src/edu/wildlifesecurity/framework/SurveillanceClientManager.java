@@ -1,5 +1,8 @@
 package edu.wildlifesecurity.framework;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.opencv.core.Mat;
 
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
@@ -30,8 +33,15 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	@Override
 	public void start(){
-		
+			
 		// TODO: Load all components' configuration
+		loadComponentsConfigutation();
+		
+		// Init all components
+		mediaSource.init();
+		/*detection.init();
+		identification.init();
+		communicator.init();*/
 		
 		// Start listening for images from the MediaSource component
 		/*mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
@@ -44,7 +54,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		});*/
 		
 		// 
-		processImage(mediaSource.takeSnapshot());
+		mediaSource.takeSnapshot();
 		
 	}
 	
@@ -56,9 +66,25 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		// TODO: Use detection component to detect stuff in the image
 		
 		// TODO: Use identification component to identify stuff in the image
-		identification.extractFeatures(image);
+		//identification.extractFeatures(image);
 		
 		// TODO: Use communication component to send and proceed the processing on the server
+		
+	}
+	
+	/**
+	 *  Fetches components' configuration entries from server using CommunicatorClient component
+	 */
+	private void loadComponentsConfigutation(){
+		
+		/// TEMPORARY! Hardcoded MediaSource configuration
+		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
+		mediaSourceConfig.put("MediaSource_FrameRate", 3000); // Sets the frame rate when the component should take pictures
+		mediaSource.loadConfiguration(mediaSourceConfig);
+		
+		Map<String, Object> detectionConfig = new HashMap<String, Object>();
+		mediaSourceConfig.put("Detection_InitTime", 500); // Sets the frame rate when the component should take pictures
+		detection.loadConfiguration(detectionConfig);
 		
 	}
 	

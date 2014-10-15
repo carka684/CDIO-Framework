@@ -1,11 +1,14 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
+import java.util.Map;
+
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Size;
 import org.opencv.objdetect.HOGDescriptor;
 
+import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 
@@ -15,7 +18,7 @@ import edu.wildlifesecurity.framework.identification.IIdentification;
  * @author Tobias
  *
  */
-public class HOGIdentification implements IIdentification {
+public class HOGIdentification extends AbstractComponent implements IIdentification {
 
 	/**
 	 * Extracts HOG features 
@@ -37,5 +40,12 @@ public class HOGIdentification implements IIdentification {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public void loadConfiguration(Map<String, Object> config) {
+		// TODO Auto-generated method stub
+		
+	}
+
 
 }

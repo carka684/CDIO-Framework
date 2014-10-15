@@ -1,6 +1,6 @@
 package edu.wildlifesecurity.framework;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.opencv.core.Core;
@@ -9,7 +9,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
-import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
@@ -21,20 +20,18 @@ public class MyClass {
 	public static void main(String[] args){
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
-
 		VideoCapture vc = new VideoCapture("/Users/jonasforsner/Documents/TSBB11/Filmer/DjurEntre.avi");
-
-		// VideoCapture vc = new VideoCapture("bilder/Rhinoshort.avi");
 
 		Imshow window1 = new Imshow("Background model");
 		Imshow window2 = new Imshow("Filtered background model");
 		System.out.println("Is opened: " + vc.isOpened());
 		BackgroundSubtractorMOG2 bgs = new BackgroundSubtractorMOG2(0, 50, false);
+
 		bgs.setInt("nmixtures", 5);
 		bgs.setDouble("backgroundRatio", 0.9);
 		
 		int CV_CAP_PROP_FRAME_COUNT = 7;
-		//System.out.println("Number of Frames =  " + vc.get(CV_CAP_PROP_FRAME_COUNT));
+
 		int NrOfSavedIm = 0;
 		for(int frameNr = 0; frameNr < vc.get(CV_CAP_PROP_FRAME_COUNT) - 1; frameNr++)
 		{
@@ -54,7 +51,7 @@ public class MyClass {
 			{
 				bgs.apply(img, fgMask, 0.0001);
 			}
-			System.out.println(frameNr + "  ");
+			System.out.println(frameNr + " ");
 			
 			Mat morphKernel = new Mat();
 			morphKernel = Mat.ones(3, 3, CvType.CV_8U);
@@ -113,7 +110,8 @@ public class MyClass {
 				
 					Mat mask = fgMaskMod.submat(boundBox).clone();
 					Imgproc.threshold(mask, mask, 200, 1, CvType.CV_8U);
-					Vector <Mat> channel  = new Vector <Mat>();
+					
+					Vector<Mat> channel = new Vector<Mat>();
 					Core.split(objIm, channel);
 					Vector <Mat> choppedIm = new Vector <Mat>();
 					choppedIm.add(channel.get(0).mul(mask));
@@ -125,12 +123,10 @@ public class MyClass {
 					String imNr = String.format("%05d", NrOfSavedIm);
 					// System.out.println(imNr + " ");
 					Highgui.imwrite("DjurEntre/im" + imNr + ".jpg", objIm);
-					
 				}
 			}
-			//window1.showImage(img);
-			//window2.showImage(fgMaskMod);
-			
+			window1.showImage(img);
+			//window2.showImage(fgMaskMod);			
 		}
 	}
 }

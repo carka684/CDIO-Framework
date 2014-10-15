@@ -2,7 +2,6 @@ package edu.wildlifesecurity.framework.detection.impl;
 
 import java.util.Vector;
 
-import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
@@ -55,7 +54,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		return modifiedImage;
 	}
 	
-	
+		
 	@Override
 	public Vector<Mat> getAnimalsInImage(Mat img, int frameNr)
 	{
@@ -84,5 +83,3 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		return result;
 	}
 }
-
-

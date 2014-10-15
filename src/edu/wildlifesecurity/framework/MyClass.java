@@ -18,7 +18,7 @@ public class MyClass {
 	public static void main(String[] args){
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		
-		VideoCapture vc = new VideoCapture("bilder/CDIO_projek_filmer/im%04d.png");
+		VideoCapture vc = new VideoCapture("bilder/animalEntre.avi");
 		Imshow window1 = new Imshow("Background model");
 		Imshow window2 = new Imshow("Filtered background model");
 		System.out.println("Is opened: " + vc.isOpened());
@@ -104,7 +104,6 @@ public class MyClass {
 					String imNr = String.format("%05d",NrOfPicturesSaved);
 					System.out.println(imNr);
 					System.out.println("hej");
-					Imgproc.resize(obj, obj, new Size(480, 480));
 					Highgui.imwrite("BilderRes/im" + imNr + ".jpg", obj);
 					
 				}

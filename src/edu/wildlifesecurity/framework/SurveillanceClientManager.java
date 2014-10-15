@@ -82,6 +82,10 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		mediaSourceConfig.put("MediaSource_FrameRate", 3000); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
+		Map<String, Object> detectionConfig = new HashMap<String, Object>();
+		mediaSourceConfig.put("Detection_InitTime", 500); // Sets the frame rate when the component should take pictures
+		detection.loadConfiguration(detectionConfig);
+		
 	}
 	
 }

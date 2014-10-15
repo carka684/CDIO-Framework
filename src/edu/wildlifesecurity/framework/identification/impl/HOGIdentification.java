@@ -47,4 +47,5 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		
 	}
 
+
 }

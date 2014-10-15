@@ -6,6 +6,7 @@ import org.opencv.core.MatOfPoint;
 import org.opencv.core.Size;
 import org.opencv.objdetect.HOGDescriptor;
 
+import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 
@@ -15,7 +16,7 @@ import edu.wildlifesecurity.framework.identification.IIdentification;
  * @author Tobias
  *
  */
-public class HOGIdentification implements IIdentification {
+public class HOGIdentification extends AbstractComponent implements IIdentification {
 
 	/**
 	 * Extracts HOG features 

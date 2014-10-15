@@ -33,15 +33,15 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	@Override
 	public void start(){
+			
+		// TODO: Load all components' configuration
+		loadComponentsConfigutation();
 		
 		// Init all components
 		mediaSource.init();
 		/*detection.init();
 		identification.init();
 		communicator.init();*/
-		
-		// TODO: Load all components' configuration
-		loadComponentsConfigutation();
 		
 		// Start listening for images from the MediaSource component
 		mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
@@ -79,7 +79,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		/// TEMPORARY! Hardcoded MediaSource configuration
 		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
-		mediaSourceConfig.put("MediaSource_FrameRate", 10); // Sets the frame rate when the component should take pictures
+		mediaSourceConfig.put("MediaSource_FrameRate", 3000); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
 	}

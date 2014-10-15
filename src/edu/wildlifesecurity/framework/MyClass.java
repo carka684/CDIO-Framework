@@ -91,7 +91,7 @@ public class MyClass {
 						boundBox.x = boundBox.x - 10;
 					}
 					
-					if (boundBox.x - 10 + boundBox.width + 20 < img.width())
+					if (boundBox.x + boundBox.width + 20 < img.width())
 					{
 						boundBox.width = boundBox.width + 20;
 					}
@@ -101,7 +101,7 @@ public class MyClass {
 						boundBox.y = boundBox.y - 10;
 					}
 					
-					if (boundBox.y - 10 + boundBox.height + 20 < img.height())
+					if (boundBox.y + boundBox.height + 20 < img.height())
 					{
 						boundBox.height = boundBox.height + 20;
 					}
@@ -124,7 +124,6 @@ public class MyClass {
 					Core.merge(choppedIm, resultIm);
 					String imNr = String.format("%05d", NrOfSavedIm);
 					// System.out.println(imNr + " ");
-					Imgproc.resize(objIm, objIm, new Size(480, 480));
 					Highgui.imwrite("DjurEntre/im" + imNr + ".jpg", objIm);
 					
 				}

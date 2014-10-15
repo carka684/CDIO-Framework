@@ -1,5 +1,7 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
+import java.util.Map;
+
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.MatOfPoint;
@@ -37,6 +39,12 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public IClassificationResult classify(Mat features) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void loadConfiguration(Map<String, Object> config) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

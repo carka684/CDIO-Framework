@@ -5,10 +5,11 @@ import org.opencv.core.Mat;
 import ij.process.ColorProcessor;
 import ij.process.ImageProcessor;
 import de.lmu.ifi.dbs.jfeaturelib.features.LocalBinaryPatterns;
+import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 
-public class LBPIdentification implements IIdentification {
+public class LBPIdentification extends AbstractComponent implements IIdentification {
 
 	@Override
 	public Mat extractFeatures(Mat inputImage) {

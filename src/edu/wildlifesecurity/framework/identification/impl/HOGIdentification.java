@@ -1,5 +1,6 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
+import java.util.Map;
 import java.util.Vector;
 
 import org.opencv.core.Core;

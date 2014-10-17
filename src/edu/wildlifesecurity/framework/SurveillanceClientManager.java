@@ -44,14 +44,14 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		communicator.init();*/
 		
 		// Start listening for images from the MediaSource component
-		mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
+		/*mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
 
 			@Override
 			public void handle(MediaEvent event) {
 				processImage(event.getImage());				
 			}
 			
-		});
+		});*/
 		
 		// 
 		mediaSource.takeSnapshot();
@@ -81,6 +81,10 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
 		mediaSourceConfig.put("MediaSource_FrameRate", 3000); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);
+		
+		Map<String, Object> detectionConfig = new HashMap<String, Object>();
+		mediaSourceConfig.put("Detection_InitTime", 500); // Sets the frame rate when the component should take pictures
+		detection.loadConfiguration(detectionConfig);
 		
 	}
 	

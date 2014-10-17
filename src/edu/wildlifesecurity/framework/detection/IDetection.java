@@ -10,6 +10,6 @@ import edu.wildlifesecurity.framework.IComponent;
 //output: image of animal 
 public interface IDetection extends IComponent {
 	 
-	Vector<Mat> getAnimalsInImage(Mat image, int frameNr);
+	Vector<Mat> getObjInImage(Mat image);
 
 }

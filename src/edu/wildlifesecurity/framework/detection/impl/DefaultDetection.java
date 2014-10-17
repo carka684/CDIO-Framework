@@ -16,6 +16,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 {
 	private BackgroundSubtractorMOG2 bgs;
 	private int InitTime;
+	private int age;
 	
 	@Override
 	public void init()
@@ -56,12 +57,13 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	
 		
 	@Override
-	public Vector<Mat> getAnimalsInImage(Mat img, int frameNr)
+	public Vector<Mat> getObjInImage(Mat img)
 	{
+		age++;
 		Vector <Mat> result;
 		Mat fgMask = new Mat();
 	
-		if(frameNr < InitTime)	
+		if(age < InitTime)	
 		{
 			bgs.apply(img, fgMask, 0.01);
 		}
@@ -72,11 +74,10 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		
 		Mat fgMaskMod = openAndClose(fgMask);
 		
-		Mat contourIm = fgMaskMod.clone();
 		Vector <MatOfPoint> contours = new Vector <MatOfPoint>();
 		Mat contourHierarchy = new Mat();
 	
-		Imgproc.findContours(contourIm, contours, contourHierarchy, 3, 1);
+		Imgproc.findContours(fgMaskMod, contours, contourHierarchy, 3, 1);
 		
 		int MinimalSizeOfObjets = 500;
 		result = getImagesInsideContours(contours, img, MinimalSizeOfObjets);

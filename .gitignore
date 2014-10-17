@@ -3,6 +3,9 @@
 bin/
 Framework.jar
 
+.metadata/
+RemoteSystemsTempFiles/
+
 # Windows files
 
 Thumbs.db

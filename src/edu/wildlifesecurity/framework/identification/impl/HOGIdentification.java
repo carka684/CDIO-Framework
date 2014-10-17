@@ -15,6 +15,7 @@ import org.opencv.ml.CvSVMParams;
 import org.opencv.objdetect.HOGDescriptor;
 
 import edu.wildlifesecurity.framework.AbstractComponent;
+import edu.wildlifesecurity.framework.identification.Classes;
 import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 
@@ -49,10 +50,13 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	}
 	
 	@Override
-	public IClassificationResult classify(Mat features) {
-		Mat results = new Mat();
-		SVM.predict_all(features,results);
-		return null;
+	public IClassificationResult classify(Mat image) {
+
+		Mat features = extractFeatures(image);
+		float res = SVM.predict(features);
+		Classes resClass = (res < 0)?Classes.UNIDENTIFIED:Classes.RHINO;
+		
+		return new ClassificationResult(resClass);
 	}
 
 	public Mat extractFeaturesFromFiles(Vector<String> trainFiles){

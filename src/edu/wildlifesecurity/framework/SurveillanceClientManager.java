@@ -1,12 +1,17 @@
 package edu.wildlifesecurity.framework;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 import org.opencv.core.Mat;
 
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
 import edu.wildlifesecurity.framework.detection.IDetection;
+import edu.wildlifesecurity.framework.identification.Classes;
+import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.framework.mediasource.MediaEvent;
@@ -39,19 +44,19 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		// Init all components
 		mediaSource.init();
-		/*detection.init();
+		detection.init();
 		identification.init();
-		communicator.init();*/
+		//communicator.init();
 		
 		// Start listening for images from the MediaSource component
-		/*mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
+		mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
 
 			@Override
 			public void handle(MediaEvent event) {
 				processImage(event.getImage());				
 			}
 			
-		});*/
+		});
 		
 		// 
 		mediaSource.takeSnapshot();
@@ -63,10 +68,16 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	private void processImage(Mat image){
 		
-		// TODO: Use detection component to detect stuff in the image
+		// Use detection component to detect stuff in the image
+		Vector<Mat> objects = detection.getObjInImage(image);
 		
-		// TODO: Use identification component to identify stuff in the image
-		//identification.extractFeatures(image);
+		// Use identification component to identify things in the image
+		List<IClassificationResult> results = new LinkedList<IClassificationResult>();
+		for(Mat obj : objects){
+			IClassificationResult result = identification.classify(obj);
+			if(result.getResultingClass() != Classes.UNIDENTIFIED)
+				results.add(result);
+		}
 		
 		// TODO: Use communication component to send and proceed the processing on the server
 		
@@ -77,7 +88,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	private void loadComponentsConfigutation(){
 		
-		/// TEMPORARY! Hardcoded MediaSource configuration
+		/// TEMPORARY! Hardcoded configuration
 		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
 		mediaSourceConfig.put("MediaSource_FrameRate", 3000); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);

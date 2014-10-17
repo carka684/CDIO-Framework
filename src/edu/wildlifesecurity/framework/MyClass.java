@@ -51,61 +51,63 @@ public class MyClass {
 			}
 			//System.out.println(frameNr + "  ");
 			
-			Mat morphKernel = new Mat();
-			morphKernel = Mat.ones(3, 3, CvType.CV_8U);
-			Mat fgMaskMod = new Mat();
-			Imgproc.erode(fgMask, fgMaskMod, morphKernel);
-			Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
-			
-			Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
-			//Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
-			//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
-			Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
-			
-			Mat contourIm = fgMaskMod.clone();
-			
-			Vector <MatOfPoint> contours = new Vector <MatOfPoint>();
-			Mat contourHierarchy = new Mat();
-			
-			Imgproc.findContours(contourIm, contours, contourHierarchy, 3, 1);
-			
-			double th = 500;
-			double maxArea = 0;
-		
-			for (int i = 0; i < contours.size(); i++)
-			{
+			if((frameNr % 40) == 0);
+			{	
+				Mat morphKernel = new Mat();
+				morphKernel = Mat.ones(3, 3, CvType.CV_8U);
+				Mat fgMaskMod = new Mat();
+				Imgproc.erode(fgMask, fgMaskMod, morphKernel);
+				Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
 				
-				double area;
-				area = Imgproc.contourArea(contours.get(i));
-				if (area > th && area > maxArea)
+				Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
+				//Imgproc.dilate(fgMaskMod, fgMaskMod, morphKernel);
+				//Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
+				Imgproc.erode(fgMaskMod, fgMaskMod, morphKernel);
+				
+				Mat contourIm = fgMaskMod.clone();
+				
+				Vector <MatOfPoint> contours = new Vector <MatOfPoint>();
+				Mat contourHierarchy = new Mat();
+				
+				Imgproc.findContours(contourIm, contours, contourHierarchy, 3, 1);
+				
+				double th = 500;
+				double maxArea = 0;
+			
+				for (int i = 0; i < contours.size(); i++)
 				{
-					NrOfPicturesSaved++;
-					Mat c1 = new Mat(img.size(), CvType.CV_8U); 
-					Imgproc.drawContours(c1, contours, i, new Scalar(250, 250, 250), -1);
-					maxArea = area;
-					Rect boundBox = Imgproc.boundingRect(contours.get(i));
-					Mat obj = img.submat(boundBox).clone();
-					Mat mask = c1.submat(boundBox).clone();
-					Imgproc.threshold(mask, mask, 200, 1, CvType.CV_8U);
-					Vector <Mat> channel  = new Vector <Mat>();
-					Core.split(obj, channel);
-					Vector <Mat> choppedIm = new Vector <Mat>();
-					choppedIm.add(channel.get(0).mul(mask));
-					choppedIm.add(channel.get(1).mul(mask));
-					choppedIm.add(channel.get(2).mul(mask));
 					
-					Mat resultIm = new Mat();
-					Core.merge(choppedIm, resultIm);
-					Imgproc.resize(resultIm, resultIm, new Size(480, 480));
-					
-					
-					//window1.showImage(resultIm);
-					
-					String imNr = String.format("%05d",NrOfPicturesSaved);
-					System.out.println(imNr);
-					System.out.println("hej");
-					Highgui.imwrite("BilderRes/im" + imNr + ".jpg", obj);
-					
+					double area;
+					area = Imgproc.contourArea(contours.get(i));
+					if (area > th && area > maxArea)
+					{
+						NrOfPicturesSaved++;
+						Mat c1 = new Mat(img.size(), CvType.CV_8U); 
+						Imgproc.drawContours(c1, contours, i, new Scalar(250, 250, 250), -1);
+						maxArea = area;
+						Rect boundBox = Imgproc.boundingRect(contours.get(i));
+						Mat obj = img.submat(boundBox).clone();
+						Mat mask = c1.submat(boundBox).clone();
+						Imgproc.threshold(mask, mask, 200, 1, CvType.CV_8U);
+						Vector <Mat> channel  = new Vector <Mat>();
+						Core.split(obj, channel);
+						Vector <Mat> choppedIm = new Vector <Mat>();
+						choppedIm.add(channel.get(0).mul(mask));
+						choppedIm.add(channel.get(1).mul(mask));
+						choppedIm.add(channel.get(2).mul(mask));
+						
+						Mat resultIm = new Mat();
+						Core.merge(choppedIm, resultIm);
+						Imgproc.resize(resultIm, resultIm, new Size(480, 480));
+						
+						
+						//window1.showImage(resultIm);
+						
+						String imNr = String.format("%05d",NrOfPicturesSaved);
+						System.out.println(imNr);
+						System.out.println("hej");
+						Highgui.imwrite("BilderRes/im" + imNr + ".jpg", obj);
+					}			
 				}
 			}
 			

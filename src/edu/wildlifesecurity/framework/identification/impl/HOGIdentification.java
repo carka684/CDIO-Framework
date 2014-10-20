@@ -73,7 +73,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	}
 
 	@Override
-	public void trainClassifier(String pos, String neg) {
+	public void trainClassifier(String pos, String neg, String outputFile) {
 		ImageReader trainReader = new ImageReader();
 		trainReader.readImages(pos,neg);
 		Vector<String> trainFiles = trainReader.getFiles();
@@ -81,6 +81,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Mat featMat = extractFeaturesFromFiles(trainFiles);
 		
 		SVM.train(featMat,classes,new Mat(),new Mat(),params);
+		SVM.save(outputFile);
 	}
 	
 	@Override

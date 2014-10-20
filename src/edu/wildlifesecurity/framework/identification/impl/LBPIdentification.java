@@ -18,7 +18,7 @@ public class LBPIdentification extends AbstractComponent implements IIdentificat
 	}
 
 	@Override
-	public void trainClassifier(String pos, String neg) {
+	public void trainClassifier(String pos, String neg, String outputFile) {
 		// TODO Auto-generated method stub
 		
 	}

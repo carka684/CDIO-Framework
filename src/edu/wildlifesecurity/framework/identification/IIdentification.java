@@ -6,7 +6,7 @@ import edu.wildlifesecurity.framework.IComponent;
 
 public interface IIdentification extends IComponent {
 	
-	void trainClassifier(String pos, String neg);
+	void trainClassifier(String pos, String neg, String outputFile);
 	
 	void evaluateClassifier(String pos, String neg);
 	

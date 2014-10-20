@@ -1,4 +1,5 @@
 package edu.wildlifesecurity.framework;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -9,6 +10,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 import org.opencv.imgproc.Imgproc;
@@ -19,7 +21,7 @@ import com.atul.JavaOpenCV.Imshow;
 public class MyClass {
 	public static void main(String[] args){
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		VideoCapture vc = new VideoCapture("bilder/animalEntre.avi");
+		VideoCapture vc = new VideoCapture("C:/Users/Tobias/Videos/animalEntre.avi");
 
 		Imshow window1 = new Imshow("Background model");
 		Imshow window2 = new Imshow("Filtered background model");
@@ -102,6 +104,7 @@ public class MyClass {
 						boundBox.height = boundBox.height + 20;
 					}
 					
+					boundBox = squarify(boundBox, img.width(), img.height());
 					Mat objIm = img.submat(boundBox).clone();
 					
 					Mat cIm = new Mat(img.size(), CvType.CV_8U);
@@ -121,11 +124,37 @@ public class MyClass {
 					Core.merge(choppedIm, resultIm);
 					String imNr = String.format("%05d", NrOfSavedIm);
 					// System.out.println(imNr + " ");
-					Highgui.imwrite("DjurEntre/im" + imNr + ".jpg", objIm);
+					Highgui.imwrite("C:/Users/Tobias/Pictures/DjurEntre/im" + imNr + ".jpg", objIm);
 				}
 			}
-			window1.showImage(img);
-			//window2.showImage(fgMaskMod);			
+			Mat imgsmall = new Mat();
+			Imgproc.resize(img, imgsmall, new Size(img.width()/3, img.height()/3));
+			window1.showImage(imgsmall);
+			Imgproc.resize(fgMaskMod, imgsmall, new Size(fgMaskMod.width()/3, fgMaskMod.height()/3));
+			window2.showImage(imgsmall);			
 		}
+	}
+	
+	private static Rect squarify(Rect rect, int imWidth, int imHeight){
+		int side = Math.max(rect.width, rect.height);
+		if(side > Math.min(imWidth, imHeight))
+			side = Math.min(imWidth, imHeight);
+		
+		rect.x += rect.width/2 - side/2;
+		rect.y += rect.height/2 - side/2;
+		
+		if(rect.x < 0)
+			rect.x = 0;
+		if(rect.y < 0)
+			rect.y = 0;
+		if(rect.x + side > imWidth)
+			rect.x = imWidth - side;
+		if(rect.y + side > imHeight)
+			rect.y = imHeight - side;
+		
+		rect.width = side;
+		rect.height = side;
+		
+		return rect;
 	}
 }

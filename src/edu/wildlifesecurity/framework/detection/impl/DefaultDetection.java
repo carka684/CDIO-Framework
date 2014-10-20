@@ -6,6 +6,7 @@ import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
 
@@ -34,10 +35,34 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 			if (area > minAreaOnImage)
 			{
 				Rect boundBox = Imgproc.boundingRect(contours.get(i));
+				boundBox = squarify(boundBox, img.width(), img.height());
 				result.add(img.submat(boundBox).clone());
 			}
 		}
 		return result;
+	}
+	
+	private Rect squarify(Rect rect, int imWidth, int imHeight){
+		int side = Math.max(rect.width, rect.height);
+		if(side > Math.min(imWidth, imHeight))
+			side = Math.min(imWidth, imHeight);
+		
+		rect.x += rect.width/2 - side/2;
+		rect.y += rect.height/2 - side/2;
+		
+		if(rect.x < 0)
+			rect.x = 0;
+		if(rect.y < 0)
+			rect.y = 0;
+		if(rect.x + side > imWidth)
+			rect.x = imWidth - side;
+		if(rect.y + side > imHeight)
+			rect.y = imHeight - side;
+		
+		rect.width = side;
+		rect.height = side;
+		
+		return rect;
 	}
 	
 	private Mat openAndClose(Mat binaryImage)

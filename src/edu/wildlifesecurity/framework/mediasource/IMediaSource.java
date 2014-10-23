@@ -12,5 +12,7 @@ public interface IMediaSource extends IComponent {
 	ISubscription addEventHandler(EventType type, IEventHandler<MediaEvent> handler);
 	
 	Mat takeSnapshot();
+	
+	void destroy();
 
 }

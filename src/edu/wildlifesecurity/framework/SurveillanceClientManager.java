@@ -53,7 +53,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 
 			@Override
 			public void handle(MediaEvent event) {
-				processImage(event.getImage());				
+				//processImage(event.getImage());				
 			}
 			
 		});
@@ -90,11 +90,11 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		/// TEMPORARY! Hardcoded configuration
 		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
-		mediaSourceConfig.put("MediaSource_FrameRate", 3000); // Sets the frame rate when the component should take pictures
+		mediaSourceConfig.put("MediaSource_FrameRate", 500); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
 		Map<String, Object> detectionConfig = new HashMap<String, Object>();
-		mediaSourceConfig.put("Detection_InitTime", 500); // Sets the frame rate when the component should take pictures
+		detectionConfig.put("Detection_InitTime", 500);
 		detection.loadConfiguration(detectionConfig);
 		
 	}

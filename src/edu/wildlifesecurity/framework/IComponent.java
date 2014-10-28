@@ -13,4 +13,6 @@ public interface IComponent {
 
 	void loadConfiguration(Map<String, Object> config);
 	
+	void loadLogger(ILogger logger);
+	
 }

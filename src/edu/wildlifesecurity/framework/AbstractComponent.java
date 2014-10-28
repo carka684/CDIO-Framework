@@ -5,6 +5,7 @@ import java.util.Map;
 public abstract class AbstractComponent implements IComponent {
 	
 	protected Map<String, Object> configuration;
+	protected ILogger log;
 	
 	public void init(){
 		
@@ -13,6 +14,11 @@ public abstract class AbstractComponent implements IComponent {
 	@Override
 	public void loadConfiguration(Map<String, Object> config) {
 		configuration = config;
+	}
+	
+	@Override
+	public void loadLogger(ILogger logger){
+		log = logger;
 	}
 
 }

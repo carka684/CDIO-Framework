@@ -21,7 +21,7 @@ import com.atul.JavaOpenCV.Imshow;
 public class MyClass {
 	public static void main(String[] args){
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		VideoCapture vc = new VideoCapture("C:/Users/Tobias/Videos/animalEntre.avi");
+		VideoCapture vc = new VideoCapture("C:/Users/Tobias/Videos/test.mp4");
 
 		Imshow window1 = new Imshow("Background model");
 		Imshow window2 = new Imshow("Filtered background model");

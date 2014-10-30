@@ -37,7 +37,7 @@ public class SurveillanceServerManager extends SurveillanceManager {
 		for(ISystemInterface sysInt : systemInterfaces)
 			sysInt.link(repository);
 		
-		
+		// Init components
 		
 	}
 

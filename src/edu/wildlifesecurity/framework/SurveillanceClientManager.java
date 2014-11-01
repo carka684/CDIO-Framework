@@ -38,6 +38,11 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	@Override
 	public void start(){
+		
+		// Set logger (CommunicatorClient instance)
+		mediaSource.loadLogger(communicator);
+		detection.loadLogger(communicator);
+		identification.loadLogger(communicator);
 			
 		// TODO: Load all components' configuration
 		loadComponentsConfigutation();

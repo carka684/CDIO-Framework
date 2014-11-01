@@ -10,7 +10,7 @@ import edu.wildlifesecurity.framework.MessageEvent;
 public interface ICommunicatorServer extends IComponent {
 	
 	/*
-	 * Enables other classes to listen for messages. For example, a Repository implementation should listen to log messages.
+	 * Enables consumers to listen for messages. For example, a Repository implementation should listen to log messages.
 	 */
 	ISubscription addEventHandler(EventType type, IEventHandler<MessageEvent> handler);
 	

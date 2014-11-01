@@ -1,6 +1,5 @@
 package edu.wildlifesecurity.framework;
 
-import edu.wildlifesecurity.framework.analytics.IAnalytics;
 import edu.wildlifesecurity.framework.repository.IRepository;
 
 /*

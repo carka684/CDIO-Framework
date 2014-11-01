@@ -6,7 +6,7 @@ public class LogEvent extends Event {
 	public static EventType WARN = new EventType("LogEvent.Warn");
 	public static EventType ERROR = new EventType("LogEvent.Error");
 
-	protected LogEvent(EventType type, String message) {
+	public LogEvent(EventType type, String message) {
 		super(type);
 		this.message = message;
 	}

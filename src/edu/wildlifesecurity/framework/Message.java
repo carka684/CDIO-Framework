@@ -2,6 +2,20 @@ package edu.wildlifesecurity.framework;
 
 public class Message {
 	
+	public enum Commands {
+		HANDSHAKE_REQ("HANDSHAKE_REQ"),
+		HANDSHAKE_ACK("HANDSHAKE_ACK"),
+		LOG("LOG");
+		
+		private final String name;       
+	    private Commands(String s) {
+	        name = s;
+	    }
+	    public String toString(){
+	       return name;
+	    }
+	}
+	
 	private int receiver;
 	private int sender;
 	private String message;

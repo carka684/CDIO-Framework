@@ -30,10 +30,11 @@ public class EventDispatcher<T extends IEvent> {
 		
 		List<IEventHandler<T>> handl = handlers.get(event.getType());
 		
-		for(IEventHandler<T> handler : handl){
-			handler.handle(event);
+		if(handl != null){
+			for(IEventHandler<T> handler : handl){
+				handler.handle(event);
+			}
 		}
-		
 	}
 	
 }

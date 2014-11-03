@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import org.opencv.core.Mat;
 
+import edu.wildlifesecurity.framework.Message.Commands;
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
 import edu.wildlifesecurity.framework.detection.IDetection;
 import edu.wildlifesecurity.framework.identification.Classes;
@@ -39,33 +40,49 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	@Override
 	public void start(){
 		
-		// Set logger (CommunicatorClient instance)
-		mediaSource.loadLogger(communicator);
-		detection.loadLogger(communicator);
-		identification.loadLogger(communicator);
-			
-		// TODO: Load all components' configuration
-		loadComponentsConfigutation();
-		
-		// Init all components
-		mediaSource.init();
-		detection.init();
-		identification.init();
+		// First, connect to backend server to fetch components' configuration
 		communicator.init();
-		
-		// Start listening for images from the MediaSource component
-		mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
+		communicator.addEventHandler(MessageEvent.getEventType(Commands.HANDSHAKE_ACK), new IEventHandler<MessageEvent>(){
 
 			@Override
-			public void handle(MediaEvent event) {
-				//processImage(event.getImage());				
+			public void handle(MessageEvent event) {
+				
+				// Set logger (CommunicatorClient instance)
+				mediaSource.loadLogger(communicator);
+				detection.loadLogger(communicator);
+				identification.loadLogger(communicator);
+					
+				// TODO: Load all components' configuration
+				loadComponentsConfigutation();
+				
+				// Init all other components
+				mediaSource.init();
+				detection.init();
+				identification.init();
+				
+				// TODO: Connect components
+				
+				communicator.info("Yes jag är connectad!");
+				
+				/*
+				// Start listening for images from the MediaSource component
+				mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
+		
+					@Override
+					public void handle(MediaEvent event) {
+						//processImage(event.getImage());				
+					}
+					
+				});
+				 */
 			}
 			
 		});
-		
-		// 
-		mediaSource.takeSnapshot();
-		
+	}
+	
+	@Override
+	public void stop(){
+		mediaSource.destroy();
 	}
 	
 	/**

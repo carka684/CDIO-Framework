@@ -15,6 +15,11 @@ public abstract class SurveillanceManager {
 	 * Abstract method to start the manager operation
 	 * 
 	 */
-	abstract void start();
+	abstract public void start();
+	
+	/**
+	 * Abstract method to stop the manager operation
+	 */
+	abstract public void stop();
 	
 }

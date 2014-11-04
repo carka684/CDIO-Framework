@@ -21,7 +21,7 @@ import com.atul.JavaOpenCV.Imshow;
 public class MyClass {
 	public static void main(String[] args){
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		VideoCapture vc = new VideoCapture("C:/Users/Tobias/Videos/test.mp4");
+		VideoCapture vc = new VideoCapture("/Users/jonasforsner/Documents/TSBB11/Filmer/DjurEntre.avi");
 
 		Imshow window1 = new Imshow("Background model");
 		Imshow window2 = new Imshow("Filtered background model");
@@ -124,7 +124,7 @@ public class MyClass {
 					Core.merge(choppedIm, resultIm);
 					String imNr = String.format("%05d", NrOfSavedIm);
 					// System.out.println(imNr + " ");
-					Highgui.imwrite("C:/Users/Tobias/Pictures/DjurEntre/im" + imNr + ".jpg", objIm);
+					//Highgui.imwrite("C:/Users/Tobias/Pictures/DjurEntre/im" + imNr + ".jpg", objIm);
 				}
 			}
 			Mat imgsmall = new Mat();

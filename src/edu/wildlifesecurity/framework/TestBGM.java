@@ -20,6 +20,7 @@ public class TestBGM {
 		// TODO Auto-generated method stub
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		int NrOfSavedIm = 0; 
+		Vector <Integer> imageHeight = new Vector <Integer>();
 
 		
 		VideoCapture vc = new VideoCapture("/Users/jonasforsner/Documents/TSBB11/Filmer/DjurEntre.avi");
@@ -53,18 +54,19 @@ public class TestBGM {
 					for(int i = 0; i < animalIm.size(); i++)
 					{
 						
+						if(frameNr % 50 == 0)
 						{
-							if(frameNr % 50 == 0)
-							{
-								NrOfSavedIm++;
-								System.out.println(frameNr + " ");
-								String imNr = String.format("%05d", NrOfSavedIm);
-								Highgui.imwrite("/Users/jonasforsner/Documents/TSBB11/DjurEntre/im" + imNr + ".jpg", animalIm.get(i));
-							}
+							NrOfSavedIm++;
+							imageHeight.add(animalIm.get(i).height());
+							System.out.println(frameNr + " ");
+							String imNr = String.format("%05d", NrOfSavedIm);
+							Highgui.imwrite("/Users/jonasforsner/Documents/TSBB11/DjurEntre/im" + imNr + ".jpg", animalIm.get(i));
 						}
+					
 					}
 				}
 			}
 		}
+		// System.out.println("Image height mean: " + imageHeight.);
 	}
 }

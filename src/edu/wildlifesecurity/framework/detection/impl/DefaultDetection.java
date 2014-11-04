@@ -22,7 +22,9 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	@Override
 	public void init()
 	{
-		bgs = new BackgroundSubtractorMOG2(0, 20, false);
+		bgs = new BackgroundSubtractorMOG2(0, 50, false);
+		bgs.setInt("nmixtures", 5);
+		bgs.setDouble("backgroundRatio", 0.9);
 		InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
 	}
 	
@@ -42,27 +44,46 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		return result;
 	}
 	
-	private Rect squarify(Rect rect, int imWidth, int imHeight){
-		int side = Math.max(rect.width, rect.height);
+	private Rect squarify(Rect boundBox, int imWidth, int imHeight){
+		if (boundBox.x - 10 > 0)
+		{
+			boundBox.x = boundBox.x - 10;
+		}
+		
+		if (boundBox.x + boundBox.width + 20 < imWidth)
+		{
+			boundBox.width = boundBox.width + 20;
+		}
+		
+		if (boundBox.y - 10 > 0)
+		{
+			boundBox.y = boundBox.y - 10;
+		}
+		
+		if (boundBox.y + boundBox.height + 20 < imHeight)
+		{
+			boundBox.height = boundBox.height + 20;
+		}
+		int side = Math.max(boundBox.width, boundBox.height);
 		if(side > Math.min(imWidth, imHeight))
 			side = Math.min(imWidth, imHeight);
 		
-		rect.x += rect.width/2 - side/2;
-		rect.y += rect.height/2 - side/2;
+		boundBox.x += boundBox.width/2 - side/2;
+		boundBox.y += boundBox.height/2 - side/2;
 		
-		if(rect.x < 0)
-			rect.x = 0;
-		if(rect.y < 0)
-			rect.y = 0;
-		if(rect.x + side > imWidth)
-			rect.x = imWidth - side;
-		if(rect.y + side > imHeight)
-			rect.y = imHeight - side;
+		if(boundBox.x < 0)
+			boundBox.x = 0;
+		if(boundBox.y < 0)
+			boundBox.y = 0;
+		if(boundBox.x + side > imWidth)
+			boundBox.x = imWidth - side;
+		if(boundBox.y + side > imHeight)
+			boundBox.y = imHeight - side;
 		
-		rect.width = side;
-		rect.height = side;
+		boundBox.width = side;
+		boundBox.height = side;
 		
-		return rect;
+		return boundBox;
 	}
 	
 	private Mat openAndClose(Mat binaryImage)
@@ -94,7 +115,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		}
 		else
 		{
-			bgs.apply(img, fgMask, 0.0001);
+			bgs.apply(img, fgMask, 0.001);
 		}
 		
 		Mat fgMaskMod = openAndClose(fgMask);

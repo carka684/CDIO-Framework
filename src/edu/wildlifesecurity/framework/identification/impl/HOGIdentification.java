@@ -40,7 +40,6 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		params = new CvSVMParams();
 	    params.set_kernel_type(CvSVM.LINEAR);
 	    
-	    // TODO: Load pre-trained classifier
 	}
 
 	public Mat extractFeatures(Mat inputImage) {

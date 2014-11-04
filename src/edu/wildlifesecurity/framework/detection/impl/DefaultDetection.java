@@ -23,7 +23,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	public void init()
 	{
 		bgs = new BackgroundSubtractorMOG2(0, 20, false);
-		InitTime = (Integer)configuration.get("Detection_InitTime");
+		InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
 	}
 	
 	private Vector<Mat> getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)

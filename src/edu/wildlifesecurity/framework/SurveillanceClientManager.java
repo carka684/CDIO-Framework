@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import org.opencv.core.Mat;
@@ -15,7 +16,6 @@ import edu.wildlifesecurity.framework.identification.Classes;
 import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
-import edu.wildlifesecurity.framework.mediasource.MediaEvent;
 
 public class SurveillanceClientManager extends SurveillanceManager {
 	
@@ -110,6 +110,29 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	private void loadComponentsConfigutation(){
 		
+		HashMap<String,Object> mediasourceConfig = new HashMap<String,Object>();
+		HashMap<String,Object> detectionConfig = new HashMap<String,Object>();
+		HashMap<String,Object> identificationConfig = new HashMap<String,Object>();
+		
+		for(Entry<String,Object> entry : communicator.getConfiguration().entrySet()){
+			switch(entry.getKey().split("_")[0]){
+			case "MediaSource":
+				mediasourceConfig.put(entry.getKey(), entry.getValue());
+				break;
+			case "Detection":
+				detectionConfig.put(entry.getKey(), entry.getValue());
+				break;
+			case "Identification":
+				identificationConfig.put(entry.getKey(), entry.getValue());
+				break;
+			}
+		}
+		
+		mediaSource.loadConfiguration(mediasourceConfig);
+		detection.loadConfiguration(detectionConfig);
+		identification.loadConfiguration(identificationConfig);
+		
+		/*
 		/// TEMPORARY! Hardcoded configuration
 		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
 		mediaSourceConfig.put("MediaSource_FrameRate", 3000); // Sets the frame rate when the component should take pictures
@@ -118,7 +141,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		Map<String, Object> detectionConfig = new HashMap<String, Object>();
 		detectionConfig.put("Detection_InitTime", 500);
 		detection.loadConfiguration(detectionConfig);
-		
+		*/
 	}
 	
 }

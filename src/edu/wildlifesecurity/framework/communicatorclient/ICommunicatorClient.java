@@ -1,5 +1,7 @@
 package edu.wildlifesecurity.framework.communicatorclient;
 
+import java.util.Map;
+
 import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IComponent;
 import edu.wildlifesecurity.framework.IEventHandler;
@@ -23,5 +25,10 @@ public interface ICommunicatorClient extends IComponent, ILogger {
 	 */
 	void sendMessage(Message message);
 
+	/**
+	 * Returns the configuration that has been loaded from the server
+	 * @return
+	 */
+	Map<String,Object> getConfiguration();
 	
 }

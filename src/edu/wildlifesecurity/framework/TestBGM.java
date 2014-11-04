@@ -22,7 +22,7 @@ public class TestBGM {
 		int NrOfSavedIm = 0; 
 
 		
-		VideoCapture vc = new VideoCapture("bilder/animalEntre.avi");
+		VideoCapture vc = new VideoCapture("/Users/jonasforsner/Documents/TSBB11/Filmer/DjurEntre.avi");
 
 		Imshow window1 = new Imshow("Background model");
 		Imshow window2 = new Imshow("Filtered background model");
@@ -39,13 +39,31 @@ public class TestBGM {
 			// Grab & retrieve the next frame
 			Mat img = new Mat();
 			vc.read(img);
-			Vector<Mat> animalIm= detec.getObjInImage(img);
 			
-			for(int i = 0; i <animalIm.size(); i++)
+			if(frameNr < 500)
 			{
-				NrOfSavedIm++;
-				String imNr = String.format("%05d", NrOfSavedIm);
-				Highgui.imwrite("DjurEntre/im" + imNr + ".jpg", animalIm.get(i));	
+				Vector<Mat> animalIm = detec.getObjInImage(img);
+			}
+			else
+			{
+				if(frameNr % 10 == 0)
+				{
+					Vector<Mat> animalIm = detec.getObjInImage(img);
+				
+					for(int i = 0; i < animalIm.size(); i++)
+					{
+						
+						{
+							if(frameNr % 50 == 0)
+							{
+								NrOfSavedIm++;
+								System.out.println(frameNr + " ");
+								String imNr = String.format("%05d", NrOfSavedIm);
+								Highgui.imwrite("/Users/jonasforsner/Documents/TSBB11/DjurEntre/im" + imNr + ".jpg", animalIm.get(i));
+							}
+						}
+					}
+				}
 			}
 		}
 	}

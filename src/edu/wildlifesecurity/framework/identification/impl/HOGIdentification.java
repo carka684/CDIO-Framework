@@ -88,7 +88,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public void evaluateClassifier(String pos, String neg) {
 		ImageReader trainReader = new ImageReader();
 		trainReader.readImages(pos,neg);
-		Vector<String> trainFiles = trainReader.getFiles();
+		Vector<String> trainFiles = trainReader.getFiles();  
 		Mat classes = trainReader.getClasses();
 		Mat featMat = extractFeaturesFromFiles(trainFiles);
 		

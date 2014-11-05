@@ -23,9 +23,13 @@ public class TestBGM {
 		int NrOfSavedIm = 0; 
 		Vector <Integer> imageHeight = new Vector <Integer>();
 		File allfiles = new File("bilder");
-		
+		int fileNr = 0;
 		for(File file : allfiles.listFiles())
 		{
+			fileNr++;
+			File imgFolder = new File("imagesFileNr" + fileNr);
+			imgFolder.mkdir();
+			System.out.println(imgFolder.getName());
 			VideoCapture vc = new VideoCapture(file.getPath());
 	
 			Imshow window1 = new Imshow("Background model");
@@ -45,7 +49,7 @@ public class TestBGM {
 				Mat img = new Mat();
 				vc.read(img);
 				
-				if(frameNr < 500)
+				if(frameNr < 100)
 				{
 					animalIm = detec.getObjInImage(img);
 				}
@@ -54,7 +58,7 @@ public class TestBGM {
 					if(frameNr % 10 == 0)
 					{
 						 animalIm = detec.getObjInImage(img);
-					
+						 System.out.println(frameNr + " ");
 						for(int i = 0; i < animalIm.size(); i++)
 						{
 							
@@ -62,9 +66,9 @@ public class TestBGM {
 							{
 								NrOfSavedIm++;
 								imageHeight.add(animalIm.get(i).height());
-								System.out.println(frameNr + " ");
+								System.out.println(NrOfSavedIm + " ");
 								String imNr = String.format("%05d", NrOfSavedIm);
-								Highgui.imwrite("BilderRes/im" + imNr + ".jpg", animalIm.get(i));
+								Highgui.imwrite(imgFolder.getName() + "/im" + imNr + ".jpg", animalIm.get(i));
 							}
 						
 						}

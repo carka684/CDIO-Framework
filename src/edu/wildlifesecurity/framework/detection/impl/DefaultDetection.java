@@ -2,11 +2,11 @@ package edu.wildlifesecurity.framework.detection.impl;
 
 import java.util.Vector;
 
+import org.opencv.core.CvException;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
-import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
 
@@ -123,7 +123,15 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		Vector <MatOfPoint> contours = new Vector <MatOfPoint>();
 		Mat contourHierarchy = new Mat();
 	
-		Imgproc.findContours(fgMaskMod, contours, contourHierarchy, 3, 1);
+		try
+		{
+			Imgproc.findContours(fgMaskMod, contours, contourHierarchy, 3, 1);
+		}
+		catch(CvException e)
+		{
+			System.out.println("Error in findcontoures");
+		}
+		
 		
 		int MinimalSizeOfObjets = 500;
 		result = getImagesInsideContours(contours, img, MinimalSizeOfObjets);

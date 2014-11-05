@@ -73,10 +73,10 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	}
 
 	@Override
-	public void trainClassifier(String pos, String neg, String outputFile) {
+	public void trainClassifier(String trainFolder,String UNUSED, String outputFile) {
 		ImageReader trainReader = new ImageReader();
-		trainReader.readImages(pos,neg);
-		Vector<String> trainFiles = trainReader.getFiles();
+		trainReader.readImages(trainFolder);
+		Vector<String> trainFiles = trainReader.getFilesVec();
 		Mat classes = trainReader.getClasses();
 		Mat featMat = extractFeaturesFromFiles(trainFiles);
 		
@@ -85,18 +85,18 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	}
 	
 	@Override
-	public void evaluateClassifier(String pos, String neg) {
+	public void evaluateClassifier(String valFolder, String UNUSED) {
 		ImageReader trainReader = new ImageReader();
-		trainReader.readImages(pos,neg);
-		Vector<String> trainFiles = trainReader.getFiles();  
+		trainReader.readImages(valFolder);
+		Vector<String> trainFiles = trainReader.getFilesVec();  
 		Mat classes = trainReader.getClasses();
 		Mat featMat = extractFeaturesFromFiles(trainFiles);
 		
 		Mat results = new Mat();
 		SVM.predict_all(featMat, results);
-		
+		System.out.println(results.t().dump());
 		double[] res = getResult(classes, results);
-		System.out.println("TP: " + res[0] + " FN: " + res[1]  + " TN: " + res[2] + " FP: " + res[3]);
+		//System.out.println("TP: " + res[0] + " FN: " + res[1]  + " TN: " + res[2] + " FP: " + res[3]);
 
 	}
 	

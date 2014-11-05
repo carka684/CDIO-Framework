@@ -39,7 +39,6 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		SVM = new CvSVM();
 		params = new CvSVMParams();
 	    params.set_kernel_type(CvSVM.LINEAR);
-	    
 	}
 
 	public Mat extractFeatures(Mat inputImage) {
@@ -51,11 +50,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	
 	@Override
 	public IClassificationResult classify(Mat image) {
-
 		Mat features = extractFeatures(image);
 		float res = SVM.predict(features);
 		Classes resClass = (res < 0)?Classes.UNIDENTIFIED:Classes.RHINO;
-		
 		return new ClassificationResult(resClass);
 	}
 
@@ -94,12 +91,15 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		
 		Mat results = new Mat();
 		SVM.predict_all(featMat, results);
-		System.out.println(results.t().dump());
+		System.out.println("Truth:  " + classes.t().dump());
+		System.out.println("Result: " + results.t().dump());
 		double[] res = getResult(classes, results);
 		//System.out.println("TP: " + res[0] + " FN: " + res[1]  + " TN: " + res[2] + " FP: " + res[3]);
 
 	}
-	
+	/*
+	 * TODO: Get result working as it should for multiclass SVM
+	 */
 	public static  double[] getResult(Mat classes, Mat result)
 	{
 		Mat falseNegMat = new Mat();

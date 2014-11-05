@@ -14,12 +14,14 @@ public class ImageReader
 	private static Mat classes;
 	private static Map<Integer, Vector<String>> filesMap;
 	private static Vector<String> filesVec;
+	private static int numOfClasses;
 
 	public ImageReader()
 	{
 		classes = new Mat();
 		filesMap = new HashMap<Integer, Vector<String>>();
 		filesVec = new Vector<String>();
+		numOfClasses = 0;
 	}
 
 	public void readImages(String folderTrain)
@@ -30,7 +32,7 @@ public class ImageReader
 		try {
 
 			filesMap = listFilesForFolder(folderTrain);
-
+			numOfClasses = filesMap.size();
 			for(int i = 0; i < filesMap.size(); i++)
 			{
 				getClasses().push_back(new Mat(filesMap.get(i).size(),1,CvType.CV_32F, new Scalar(i)));
@@ -39,9 +41,8 @@ public class ImageReader
 					filesVec.add(str);
 				}
 			}		
-			System.out.println(classes.t().dump());
 		} catch (Exception e) {
-			System.out.println("Couldn't load images");
+			System.out.println("ERROR: Couldn't load images");
 			e.printStackTrace();
 		}	
 	}
@@ -79,5 +80,8 @@ public class ImageReader
 	{
 		return filesVec;
 	}
-
+	public int getNumOfClasses()
+	{
+		return numOfClasses;
+	}
 }

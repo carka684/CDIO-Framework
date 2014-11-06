@@ -11,7 +11,7 @@ public class HOGEvaluation {
 		HOGIdentification hogTest = new HOGIdentification(); 
 		hogTest.init();		
 		hogTest.trainClassifier("Dataset/rhino_good/TrainingSet/", "Dataset/other/TrainingSet/", "classifier1.txt");
-		hogTest.evaluateClassifier("Dataset/rhino_good/ValidationSet/", "Dataset/other/validation_only_animal/");
+		hogTest.evaluateClassifier("Dataset/rhino_good/ValidationSet/", "Dataset/other/ValidationSet/");
 		
 	}
 

@@ -103,32 +103,16 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		SVM.predict_all(featMat, results);
 		System.out.println("Truth:  " + classes.t().dump());
 		System.out.println("Result: " + results.t().dump());
-		double[] res = getResult(classes, results);
+		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
 		//System.out.println("TP: " + res[0] + " FN: " + res[1]  + " TN: " + res[2] + " FP: " + res[3]);
 
 	}
 	/*
 	 * TODO: Get result working as it should for multiclass SVM
 	 */
-	public static  double[] getResult(Mat classes, Mat result)
+	public static  double[] getResult(Mat classes, Mat result, int numOfClasses,int[] numOfEachClass)
 	{
-		Mat falseNegMat = new Mat();
-		Mat falsePosMat = new Mat();
-		Mat tempClass = new Mat();
-		Core.add(classes,new Scalar(1),tempClass);
-		int numberOfPos = Core.countNonZero(tempClass);
-		int numberOfNeg = (int) classes.total() - numberOfPos;
-		Core.absdiff(classes.rowRange(0, numberOfPos),result.rowRange(0, numberOfPos),falseNegMat);
-		Core.absdiff(classes.rowRange(numberOfPos,numberOfPos+numberOfNeg),result.rowRange(numberOfPos, numberOfPos+numberOfNeg),falsePosMat);
-		
-		Scalar falseNegRes =  Core.sumElems(falseNegMat);
-		Scalar falsePosRes =  Core.sumElems(falsePosMat);
-		double FN = falseNegRes.mul(new Scalar((double) 1/(2*numberOfPos))).val[0];
-		double TP = 1-FN;
-		double FP = falsePosRes.mul(new Scalar((double) 1/(2*numberOfPos))).val[0];
-		double TN  = 1 - FP;
-		double[] res = {TP,FN,TN,FP};
-		return res;	
+		return null;
 	}
 	
 	@Override

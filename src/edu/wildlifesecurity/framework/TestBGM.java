@@ -62,7 +62,7 @@ public class TestBGM {
 						for(int i = 0; i < animalIm.size(); i++)
 						{
 							
-							if(frameNr % 50 == 0)
+							if(frameNr % 20 == 0)
 							{
 								NrOfSavedIm++;
 								imageHeight.add(animalIm.get(i).height());

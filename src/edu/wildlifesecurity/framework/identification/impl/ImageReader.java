@@ -49,6 +49,7 @@ public class ImageReader
 		for (File file : files) {
 		    if (file.isFile()) {
 		    	filesVec.add(folder+file.getName());
+		    	System.out.println(file.getName());
 		    }
 		}
 		return filesVec;

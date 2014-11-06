@@ -1,6 +1,7 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
 import org.opencv.core.Core;
+import org.opencv.highgui.VideoCapture;
 
 public class HOGEvaluation {
 
@@ -8,10 +9,10 @@ public class HOGEvaluation {
 		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
 		
 		HOGIdentification hogTest = new HOGIdentification(); 
-		hogTest.init();
-		hogTest.trainClassifier("D:/Bilder/DjurEntre/Training/Pos/", "D:/Bilder/DjurEntre/Training/Neg/", "D:/Bilder/DjurEntre/classifier.txt");
-		hogTest.evaluateClassifier("D:/Bilder/DjurEntre/Evaluation/Pos/", "D:/Bilder/DjurEntre/Evaluation/Neg/");
-
+		hogTest.init();		
+		hogTest.trainClassifier("Dataset/rhino_good/TrainingSet/", "Dataset/other/TrainingSet/", "classifier1.txt");
+		hogTest.evaluateClassifier("Dataset/rhino_good/ValidationSet/", "Dataset/other/validation_only_animal/");
+		
 	}
 
 }

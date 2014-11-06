@@ -34,8 +34,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	@Override
 	public void init(){
 		// TODO: Should be loaded from configuration
-		s = new Size(480,480);
-		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9,-1,0.2,1,1,false,64);
+		s = new Size(240,240);
+		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9);
 		SVM = new CvSVM();
 		params = new CvSVMParams();
 	    params.set_kernel_type(CvSVM.LINEAR);

@@ -133,7 +133,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		}
 		
 		
-		int MinimalSizeOfObjets = 500;
+		int MinimalSizeOfObjets = 2000;
 		result = getImagesInsideContours(contours, img, MinimalSizeOfObjets);
 		return result;
 	}

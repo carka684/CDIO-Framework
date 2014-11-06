@@ -45,7 +45,6 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		MatOfFloat features = new MatOfFloat();
 		Imgproc.resize(inputImage, inputImage, s);
 		hog.compute(inputImage, features);	
-		System.out.println(features.size());
 		return features;
 	}
 	

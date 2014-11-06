@@ -1,5 +1,7 @@
 package edu.wildlifesecurity.framework.identification.impl;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import org.opencv.core.CvType;
@@ -8,65 +10,87 @@ import org.opencv.core.Scalar;
 
 public class ImageReader
 {
-	
+
 	private static Mat classes;
-	private static Vector<String> files;
-	private static int numberOfPos;
-	private static int numberOfNeg;
-	
+	private static Map<Integer, Vector<String>> filesMap;
+	private static Vector<String> filesVec;
+	private static int numOfClasses;
+	private static int[] numOfEachClass;
+
 	public ImageReader()
 	{
 		classes = new Mat();
-		files = new Vector<String>();
-		numberOfNeg = 0;
-		numberOfPos = 0;
+		filesMap = new HashMap<Integer, Vector<String>>();
+		filesVec = new Vector<String>();
+		numOfClasses = 0;
+		
 	}
-	
-	public void readImages(String folderPosTrain, String folderNegTrain)
+
+	public void readImages(String folderTrain)
 	{
-		files.clear();
+		filesMap.clear();
 		classes.release();
+		filesVec.clear();
+		
 		try {
-
-			Vector<String> posFiles = listFilesForFolder(folderPosTrain);
-			numberOfPos = posFiles.size();
-
-			Vector<String> negFiles = listFilesForFolder(folderNegTrain);
-			numberOfNeg = negFiles.size();
-			getFiles().addAll(posFiles);
-			getFiles().addAll(negFiles);
-
-			getClasses().push_back(new Mat(numberOfPos,1,CvType.CV_32F, new Scalar(1)));
-			getClasses().push_back(new Mat(numberOfNeg,1,CvType.CV_32F, new Scalar(-1)));
+			filesMap = listFilesForFolder(folderTrain);
+			numOfClasses = filesMap.size();
+			int[] temp = new int[numOfClasses];
+			for(int i = 0; i < filesMap.size(); i++)
+			{
+				temp[i] = filesMap.get(i).size();
+				getClasses().push_back(new Mat(filesMap.get(i).size(),1,CvType.CV_32F, new Scalar(i)));
+				for(String str : filesMap.get(i))
+				{
+					filesVec.add(str);
+				}
+			}
+			numOfEachClass = temp;
 		} catch (Exception e) {
-			System.out.println("Couldn't load images");
+			System.out.println("ERROR: Couldn't load images");
 			e.printStackTrace();
 		}	
 	}
-	public static Vector<String> listFilesForFolder(String folder) {
+	public static Map<Integer, Vector<String>>  listFilesForFolder(String classFolder) {
+		File[] folders = new File(classFolder).listFiles();
+		int classNum = 0;
+		Map<Integer, Vector<String>> map = new HashMap<Integer, Vector<String>>();
+		for (File folder : folders) {
+			if (folder.isDirectory()) {
+				map.put(classNum++,getFiles(folder));
+			}
+		}
+		return map;
+	}
+	public static Vector<String> getFiles(File folder)
+	{		
 		Vector<String> filesVec = new Vector<String>();
-		File[] files = new File(folder).listFiles();
-		for (File file : files) {
-		    if (file.isFile()) {
-		    	filesVec.add(folder+file.getName());
-		    }
+		for (File file : folder.listFiles()) {
+			if (file.isFile()) {
+				filesVec.add(file.getPath());
+			}
 		}
 		return filesVec;
 	}
+
 	public Mat getClasses()
 	{
 		return classes;
 	}
-	public Vector<String> getFiles()
+	public Map<Integer, Vector<String>> getMap()
 	{
-		return files;
+		return filesMap;
 	}
-	public int getPos()
+	public Vector<String> getFilesVec()
 	{
-		return numberOfPos;
+		return filesVec;
 	}
-	public int getNeg()
+	public int getNumOfClasses()
 	{
-		return numberOfNeg;
+		return numOfClasses;
+	}
+	public int[] getNumOfEachClass()
+	{
+		return numOfEachClass;
 	}
 }

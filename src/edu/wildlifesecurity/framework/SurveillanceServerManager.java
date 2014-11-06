@@ -6,18 +6,18 @@ import java.util.Map.Entry;
 
 import edu.wildlifesecurity.framework.Message.Commands;
 import edu.wildlifesecurity.framework.actuator.IActuator;
-import edu.wildlifesecurity.framework.analytics.IAnalytics;
 import edu.wildlifesecurity.framework.communicatorserver.ICommunicatorServer;
 import edu.wildlifesecurity.framework.repository.IRepository;
+import edu.wildlifesecurity.framework.tracking.ITracking;
 
 public class SurveillanceServerManager extends SurveillanceManager {
 	
-	protected IAnalytics analytics;
+	protected ITracking analytics;
 	private IActuator actuator;
 	private IRepository repository;
 	private ICommunicatorServer communicator;
 
-	public SurveillanceServerManager(IAnalytics analytics, IActuator actuator, IRepository repository, ICommunicatorServer communicator) {
+	public SurveillanceServerManager(ITracking analytics, IActuator actuator, IRepository repository, ICommunicatorServer communicator) {
 
 		super();
 		

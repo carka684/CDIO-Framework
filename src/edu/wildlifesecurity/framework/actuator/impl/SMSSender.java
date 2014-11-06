@@ -37,10 +37,10 @@ public class SMSSender extends AbstractComponent implements IActuator {
 		String urlString = "http://" + IP + ":" + port + "/sendsms?phone=" + number + "&text=" +
 				URLmessage + "&password=" + password;
 		
-		System.out.println(getHTML(urlString));
+		System.out.println(sendSMSOverHTTP(urlString));
 	}
 
-	private static String getHTML(String urlToRead) {
+	private static String sendSMSOverHTTP(String urlToRead) {
 		URL url;
 		HttpURLConnection conn;
 		BufferedReader rd;

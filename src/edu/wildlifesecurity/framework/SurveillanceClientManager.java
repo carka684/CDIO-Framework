@@ -11,6 +11,7 @@ import org.opencv.core.Mat;
 
 import edu.wildlifesecurity.framework.Message.Commands;
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
+import edu.wildlifesecurity.framework.detection.DetectionResult;
 import edu.wildlifesecurity.framework.detection.IDetection;
 import edu.wildlifesecurity.framework.identification.Classes;
 import edu.wildlifesecurity.framework.identification.IClassificationResult;
@@ -62,7 +63,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 				
 				// TODO: Connect components
 				
-				communicator.info("Yes jag är connectad!");
+				communicator.info("Yes jag ï¿½r connectad!");
 				
 				/*
 				// Start listening for images from the MediaSource component
@@ -91,11 +92,11 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	private void processImage(Mat image){
 		
 		// Use detection component to detect stuff in the image
-		Vector<Mat> objects = detection.getObjInImage(image);
+		DetectionResult objects = detection.getObjInImage(image);
 		
 		// Use identification component to identify things in the image
 		List<IClassificationResult> results = new LinkedList<IClassificationResult>();
-		for(Mat obj : objects){
+		for(Mat obj : objects.images){
 			IClassificationResult result = identification.classify(obj);
 			if(result.getResultingClass() != Classes.UNIDENTIFIED)
 				results.add(result);

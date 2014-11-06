@@ -5,12 +5,16 @@ import java.util.Vector;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfFloat;
 import org.opencv.core.Rect;
 import org.opencv.core.Size;
+import org.opencv.core.Point;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
+import org.opencv.video.KalmanFilter;
 
 import edu.wildlifesecurity.framework.AbstractComponent;
+import edu.wildlifesecurity.framework.detection.DetectionResult;
 import edu.wildlifesecurity.framework.detection.IDetection;
 
 public class DefaultDetection extends AbstractComponent implements IDetection
@@ -18,7 +22,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	private BackgroundSubtractorMOG2 bgs;
 	private int InitTime;
 	private int age;
-	
+
 	@Override
 	public void init()
 	{
@@ -26,9 +30,9 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
 	}
 	
-	private Vector<Mat> getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)
+	private DetectionResult getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)
 	{
-		Vector <Mat> result = new Vector<Mat>();
+		DetectionResult result = new DetectionResult();
 		for (int i = 0; i < contours.size(); i++)
 		{
 			double area = Imgproc.contourArea(contours.get(i));
@@ -36,7 +40,8 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 			{
 				Rect boundBox = Imgproc.boundingRect(contours.get(i));
 				boundBox = squarify(boundBox, img.width(), img.height());
-				result.add(img.submat(boundBox).clone());
+				result.regions.add(boundBox);
+				result.images.add(img.submat(boundBox).clone());
 			}
 		}
 		return result;
@@ -82,10 +87,10 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	
 		
 	@Override
-	public Vector<Mat> getObjInImage(Mat img)
+	public DetectionResult getObjInImage(Mat img)
 	{
 		age++;
-		Vector <Mat> result;
+		DetectionResult result;
 		Mat fgMask = new Mat();
 	
 		if(age < InitTime)	

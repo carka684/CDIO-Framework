@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.Scalar;
@@ -57,14 +58,23 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	}
 
 	public Mat extractFeaturesFromFiles(Vector<String> trainFiles){
-		Mat featMat = new Mat();
+		int cols  = (int) extractFeatures(Highgui.imread(trainFiles.elementAt(0),Highgui.CV_LOAD_IMAGE_GRAYSCALE)).size().height;
+		int rows = trainFiles.size();
+		Mat featMat =  Mat.zeros(rows,cols,CvType.CV_32F);
+
+		int counter = 0;
 		for(String file : trainFiles)
 		{
 			Mat img = new Mat();
 			Mat feat = new Mat();
 			img = Highgui.imread(file,Highgui.CV_LOAD_IMAGE_GRAYSCALE);
 			feat = extractFeatures(img);
-			featMat.push_back(feat.t());
+			Mat tmp = featMat.submat(counter, counter+1,0,cols);
+			counter++;
+			Core.add(feat.t(), tmp, tmp);
+			tmp.release();
+			img.release();
+			feat.release();
 		}
 		return featMat;
 	}

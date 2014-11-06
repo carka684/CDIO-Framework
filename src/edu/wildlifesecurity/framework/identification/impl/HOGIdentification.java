@@ -110,8 +110,21 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	/*
 	 * TODO: Get result working as it should for multiclass SVM
 	 */
-	public static  double[] getResult(Mat classes, Mat result, int numOfClasses,int[] numOfEachClass)
+	public static  double[] getResult(Mat classes, Mat results, int numOfClasses,int[] numOfEachClass)
 	{
+		int pos = 0;
+		for(int i = 0; i < numOfClasses; i++)
+		{
+			
+			Mat temp = results.submat(pos, pos+numOfEachClass[i], 0, 1).clone();
+			pos += numOfEachClass[i];
+			Core.subtract(temp, new Scalar(i), temp);
+			int numOfTP = numOfEachClass[i] - Core.countNonZero(temp);
+			Core.subtract(results,new Scalar(i),temp);
+			int numOfFP = (classes.rows() - Core.countNonZero(temp)) - numOfTP;
+			System.out.println("TP: " + (double) numOfTP/numOfEachClass[i]);
+			System.out.println("FP: " + (double) numOfFP/(classes.rows()-numOfEachClass[i]));
+		}
 		return null;
 	}
 	

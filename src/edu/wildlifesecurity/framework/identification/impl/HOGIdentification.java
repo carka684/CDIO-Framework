@@ -1,6 +1,5 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
-import java.util.Map;
 import java.util.Vector;
 
 import org.opencv.core.Core;
@@ -36,7 +35,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public void init(){
 		// TODO: Should be loaded from configuration
 		s = new Size(480,480);
-		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9,-1,0.2,1,1,false,64);
+		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9,1,-1,HOGDescriptor.L2Hys,0.2,true,64);
 		SVM = new CvSVM();
 		params = new CvSVMParams();
 	    params.set_kernel_type(CvSVM.LINEAR);
@@ -101,29 +100,26 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		
 		Mat results = new Mat();
 		SVM.predict_all(featMat, results);
-		System.out.println("Truth:  " + classes.t().dump());
-		System.out.println("Result: " + results.t().dump());
-		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
-		//System.out.println("TP: " + res[0] + " FN: " + res[1]  + " TN: " + res[2] + " FP: " + res[3]);
 
+		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
 	}
 	/*
-	 * TODO: Get result working as it should for multiclass SVM
+	 * TODO: How should the result be presented?
 	 */
 	public static  double[] getResult(Mat classes, Mat results, int numOfClasses,int[] numOfEachClass)
 	{
 		int pos = 0;
 		for(int i = 0; i < numOfClasses; i++)
 		{
-			
 			Mat temp = results.submat(pos, pos+numOfEachClass[i], 0, 1).clone();
 			pos += numOfEachClass[i];
 			Core.subtract(temp, new Scalar(i), temp);
 			int numOfTP = numOfEachClass[i] - Core.countNonZero(temp);
 			Core.subtract(results,new Scalar(i),temp);
-			int numOfFP = (classes.rows() - Core.countNonZero(temp)) - numOfTP;
+			int numOfFN = (classes.rows() - Core.countNonZero(temp)) - numOfTP;
+			System.out.println("Class " + i + ":");
 			System.out.println("TP: " + (double) numOfTP/numOfEachClass[i]);
-			System.out.println("FP: " + (double) numOfFP/(classes.rows()-numOfEachClass[i]));
+			System.out.println("FN: " + (double) numOfFN/(classes.rows()-numOfEachClass[i]));
 		}
 		return null;
 	}
@@ -132,8 +128,4 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public void loadClassifierFromFile(String file) {
 			SVM.load(file);
 	}
-
-	
-	
-
 }

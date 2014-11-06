@@ -34,8 +34,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	@Override
 	public void init(){
 		// TODO: Should be loaded from configuration
-		s = new Size(480,480);
-		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9,1,-1,HOGDescriptor.L2Hys,0.2,true,64);
+		s = new Size(240,240);
+		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9);
 		SVM = new CvSVM();
 		params = new CvSVMParams();
 	    params.set_kernel_type(CvSVM.LINEAR);
@@ -44,7 +44,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public Mat extractFeatures(Mat inputImage) {
 		MatOfFloat features = new MatOfFloat();
 		Imgproc.resize(inputImage, inputImage, s);
-		hog.compute(inputImage, features);			
+		hog.compute(inputImage, features);	
+		System.out.println(features.size());
 		return features;
 	}
 	
@@ -66,7 +67,12 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		{
 			Mat img = new Mat();
 			Mat feat = new Mat();
-			img = Highgui.imread(file,Highgui.CV_LOAD_IMAGE_GRAYSCALE);
+			try {
+				img = Highgui.imread(file,Highgui.CV_LOAD_IMAGE_GRAYSCALE);
+			} catch (Exception e) {
+				System.out.println("Försökte läsa in:" + file);
+				e.printStackTrace();
+			}
 			feat = extractFeatures(img);
 			Mat tmp = featMat.submat(counter, counter+1,0,cols);
 			counter++;

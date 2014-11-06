@@ -1,9 +1,9 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
-import java.util.Map;
 import java.util.Vector;
 
 import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfFloat;
 import org.opencv.core.Scalar;
@@ -35,11 +35,10 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public void init(){
 		// TODO: Should be loaded from configuration
 		s = new Size(480,480);
-		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9,-1,0.2,1,1,false,64);
+		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9,1,-1,HOGDescriptor.L2Hys,0.2,true,64);
 		SVM = new CvSVM();
 		params = new CvSVMParams();
 	    params.set_kernel_type(CvSVM.LINEAR);
-	    
 	}
 
 	public Mat extractFeatures(Mat inputImage) {
@@ -51,32 +50,39 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	
 	@Override
 	public IClassificationResult classify(Mat image) {
-
 		Mat features = extractFeatures(image);
 		float res = SVM.predict(features);
 		Classes resClass = (res < 0)?Classes.UNIDENTIFIED:Classes.RHINO;
-		
 		return new ClassificationResult(resClass);
 	}
 
 	public Mat extractFeaturesFromFiles(Vector<String> trainFiles){
-		Mat featMat = new Mat();
+		int cols  = (int) extractFeatures(Highgui.imread(trainFiles.elementAt(0),Highgui.CV_LOAD_IMAGE_GRAYSCALE)).size().height;
+		int rows = trainFiles.size();
+		Mat featMat =  Mat.zeros(rows,cols,CvType.CV_32F);
+
+		int counter = 0;
 		for(String file : trainFiles)
 		{
 			Mat img = new Mat();
 			Mat feat = new Mat();
 			img = Highgui.imread(file,Highgui.CV_LOAD_IMAGE_GRAYSCALE);
 			feat = extractFeatures(img);
-			featMat.push_back(feat.t());
+			Mat tmp = featMat.submat(counter, counter+1,0,cols);
+			counter++;
+			Core.add(feat.t(), tmp, tmp);
+			tmp.release();
+			img.release();
+			feat.release();
 		}
 		return featMat;
 	}
 
 	@Override
-	public void trainClassifier(String pos, String neg, String outputFile) {
+	public void trainClassifier(String trainFolder,String UNUSED, String outputFile) {
 		ImageReader trainReader = new ImageReader();
-		trainReader.readImages(pos,neg);
-		Vector<String> trainFiles = trainReader.getFiles();
+		trainReader.readImages(trainFolder);
+		Vector<String> trainFiles = trainReader.getFilesVec();
 		Mat classes = trainReader.getClasses();
 		Mat featMat = extractFeaturesFromFiles(trainFiles);
 		
@@ -85,48 +91,41 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	}
 	
 	@Override
-	public void evaluateClassifier(String pos, String neg) {
+	public void evaluateClassifier(String valFolder, String UNUSED) {
 		ImageReader trainReader = new ImageReader();
-		trainReader.readImages(pos,neg);
-		Vector<String> trainFiles = trainReader.getFiles();
+		trainReader.readImages(valFolder);
+		Vector<String> trainFiles = trainReader.getFilesVec();  
 		Mat classes = trainReader.getClasses();
 		Mat featMat = extractFeaturesFromFiles(trainFiles);
 		
 		Mat results = new Mat();
 		SVM.predict_all(featMat, results);
-		
-		double[] res = getResult(classes, results);
-		System.out.println("TP: " + res[0] + " FN: " + res[1]  + " TN: " + res[2] + " FP: " + res[3]);
 
+		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
 	}
-	
-	public static  double[] getResult(Mat classes, Mat result)
+	/*
+	 * TODO: How should the result be presented?
+	 */
+	public static  double[] getResult(Mat classes, Mat results, int numOfClasses,int[] numOfEachClass)
 	{
-		Mat falseNegMat = new Mat();
-		Mat falsePosMat = new Mat();
-		Mat tempClass = new Mat();
-		Core.add(classes,new Scalar(1),tempClass);
-		int numberOfPos = Core.countNonZero(tempClass);
-		int numberOfNeg = (int) classes.total() - numberOfPos;
-		Core.absdiff(classes.rowRange(0, numberOfPos),result.rowRange(0, numberOfPos),falseNegMat);
-		Core.absdiff(classes.rowRange(numberOfPos,numberOfPos+numberOfNeg),result.rowRange(numberOfPos, numberOfPos+numberOfNeg),falsePosMat);
-		
-		Scalar falseNegRes =  Core.sumElems(falseNegMat);
-		Scalar falsePosRes =  Core.sumElems(falsePosMat);
-		double FN = falseNegRes.mul(new Scalar((double) 1/(2*numberOfPos))).val[0];
-		double TP = 1-FN;
-		double FP = falsePosRes.mul(new Scalar((double) 1/(2*numberOfPos))).val[0];
-		double TN  = 1 - FP;
-		double[] res = {TP,FN,TN,FP};
-		return res;	
+		int pos = 0;
+		for(int i = 0; i < numOfClasses; i++)
+		{
+			Mat temp = results.submat(pos, pos+numOfEachClass[i], 0, 1).clone();
+			pos += numOfEachClass[i];
+			Core.subtract(temp, new Scalar(i), temp);
+			int numOfTP = numOfEachClass[i] - Core.countNonZero(temp);
+			Core.subtract(results,new Scalar(i),temp);
+			int numOfFN = (classes.rows() - Core.countNonZero(temp)) - numOfTP;
+			System.out.println("Class " + i + ":");
+			System.out.println("TP: " + (double) numOfTP/numOfEachClass[i]);
+			System.out.println("FN: " + (double) numOfFN/(classes.rows()-numOfEachClass[i]));
+		}
+		return null;
 	}
 	
 	@Override
 	public void loadClassifierFromFile(String file) {
 			SVM.load(file);
 	}
-
-	
-	
-
 }

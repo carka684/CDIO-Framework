@@ -9,10 +9,9 @@ public class HOGEvaluation {
 		System.loadLibrary( Core.NATIVE_LIBRARY_NAME );
 		
 		HOGIdentification hogTest = new HOGIdentification(); 
-		hogTest.init();		
+		hogTest.init();	
 		hogTest.trainClassifier("Dataset/Training/", "", "classifier1.txt");
-		hogTest.evaluateClassifier("Dataset/Validation/", "");
-		
+		hogTest.evaluateClassifier("Dataset/Validation/", "");		
 	}
 
 }

@@ -12,16 +12,14 @@ import edu.wildlifesecurity.framework.tracking.ITracking;
 
 public class SurveillanceServerManager extends SurveillanceManager {
 	
-	protected ITracking analytics;
 	private IActuator actuator;
 	private IRepository repository;
 	private ICommunicatorServer communicator;
 
-	public SurveillanceServerManager(ITracking analytics, IActuator actuator, IRepository repository, ICommunicatorServer communicator) {
+	public SurveillanceServerManager(IActuator actuator, IRepository repository, ICommunicatorServer communicator) {
 
 		super();
 		
-		this.analytics = analytics;
 		this.actuator = actuator;
 		this.repository = repository;
 		this.communicator = communicator;
@@ -37,12 +35,10 @@ public class SurveillanceServerManager extends SurveillanceManager {
 		repository.init();
 		
 		// Set logger
-		analytics.loadLogger(repository);
 		actuator.loadLogger(repository);
 		communicator.loadLogger(repository);
 		
 		// Init components
-		analytics.init();
 		actuator.init();
 		communicator.init();
 		
@@ -87,16 +83,12 @@ public class SurveillanceServerManager extends SurveillanceManager {
 		
 		Map<String, Object> allConfiguration = new HashMap<String,Object>();
 		Map<String, Object> communicatorConfig = new HashMap<String,Object>();
-		Map<String, Object> analyticsConfig = new HashMap<String,Object>();
 		Map<String, Object> actuatorConfig = new HashMap<String,Object>();
 		
 		repository.loadConfiguration(allConfiguration);
 		
 		for(Entry<String, Object> e : allConfiguration.entrySet()){
 			switch(e.getKey().split("_")[0]){
-			case "Analytics":
-				analyticsConfig.put(e.getKey(), e.getValue());
-				break;
 			case "Actuator":
 				actuatorConfig.put(e.getKey(), e.getValue());
 				break;
@@ -106,7 +98,6 @@ public class SurveillanceServerManager extends SurveillanceManager {
 			}
 		}
 		
-		analytics.loadConfiguration(analyticsConfig);
 		actuator.loadConfiguration(actuatorConfig);
 		communicator.loadConfiguration(communicatorConfig);
 	}

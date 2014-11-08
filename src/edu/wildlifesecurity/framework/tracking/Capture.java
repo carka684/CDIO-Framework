@@ -5,6 +5,8 @@ import java.util.Date;
 import org.opencv.core.Mat;
 
 public class Capture {
+	
+	public int captureId;
 
 	public Date timeStamp;
 	

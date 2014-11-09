@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="opencv/ij.jar"/>
 	<classpathentry kind="lib" path="opencv/Imshow.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="opencv/libsvm.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

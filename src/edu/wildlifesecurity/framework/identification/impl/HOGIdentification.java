@@ -15,9 +15,14 @@ import org.opencv.ml.CvSVMParams;
 import org.opencv.objdetect.HOGDescriptor;
 
 import edu.wildlifesecurity.framework.AbstractComponent;
+import edu.wildlifesecurity.framework.EventDispatcher;
+import edu.wildlifesecurity.framework.EventType;
+import edu.wildlifesecurity.framework.IEventHandler;
+import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.identification.Classes;
 import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
+import edu.wildlifesecurity.framework.identification.IdentificationEvent;
 
 
 public class HOGIdentification extends AbstractComponent implements IIdentification {
@@ -30,6 +35,13 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	CvSVM SVM;
 	CvSVMParams params;
 	Size s;
+	
+	private EventDispatcher<IdentificationEvent> dispatcher =  new EventDispatcher<IdentificationEvent>();
+	
+	@Override
+	public ISubscription addEventHandler(EventType type, IEventHandler<IdentificationEvent> handler){
+		return dispatcher.addEventHandler(type, handler);
+	}
 	
 	@Override
 	public void init(){
@@ -57,7 +69,10 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Mat features = extractFeatures(image);
 		float res = SVM.predict(features);
 		Classes resClass = (res < 0)?Classes.UNIDENTIFIED:Classes.RHINO;
-		return new ClassificationResult(resClass);
+		
+		ClassificationResult result = new ClassificationResult(resClass, image);
+		dispatcher.dispatch(new IdentificationEvent(IdentificationEvent.NEW_IDENTIFICATION, result));
+		return result;
 	}
 
 	public Mat extractFeaturesFromFiles(Vector<String> trainFiles){
@@ -135,6 +150,6 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	
 	@Override
 	public void loadClassifierFromFile(String file) {
-			SVM.load(file);
+		SVM.load(file);
 	}
 }

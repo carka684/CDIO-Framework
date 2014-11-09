@@ -14,11 +14,18 @@ import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.KalmanFilter;
 
 import edu.wildlifesecurity.framework.AbstractComponent;
+import edu.wildlifesecurity.framework.EventDispatcher;
+import edu.wildlifesecurity.framework.EventType;
+import edu.wildlifesecurity.framework.IEventHandler;
+import edu.wildlifesecurity.framework.ISubscription;
+import edu.wildlifesecurity.framework.detection.DetectionEvent;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
 import edu.wildlifesecurity.framework.detection.IDetection;
 
 public class DefaultDetection extends AbstractComponent implements IDetection
 {
+	private EventDispatcher<DetectionEvent> dispatcher = new EventDispatcher<DetectionEvent>();
+	
 	private BackgroundSubtractorMOG2 bgs;
 	private int InitTime;
 	private int age;
@@ -28,6 +35,10 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	{
 		bgs = new BackgroundSubtractorMOG2(0, 20, false);
 		InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
+	}
+	
+	public ISubscription addEventHandler(EventType type, IEventHandler<DetectionEvent> handler){
+		return dispatcher.addEventHandler(type, handler);
 	}
 	
 	private DetectionResult getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)
@@ -111,6 +122,11 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		
 		int MinimalSizeOfObjets = 500;
 		result = getImagesInsideContours(contours, img, MinimalSizeOfObjets);
+		result.rawDetection = fgMask;
+		
+		// Dispatch event
+		dispatcher.dispatch(new DetectionEvent(DetectionEvent.NEW_DETECTION, result));
+		
 		return result;
 	}
 }

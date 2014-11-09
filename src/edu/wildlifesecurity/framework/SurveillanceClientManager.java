@@ -17,6 +17,7 @@ import edu.wildlifesecurity.framework.identification.Classes;
 import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
+import edu.wildlifesecurity.framework.mediasource.MediaEvent;
 
 public class SurveillanceClientManager extends SurveillanceManager {
 	
@@ -42,7 +43,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	public void start(){
 		
 		// First, connect to backend server to fetch components' configuration
-		communicator.init();
+		/*communicator.init();
 		communicator.addEventHandler(MessageEvent.getEventType(Commands.HANDSHAKE_ACK), new IEventHandler<MessageEvent>(){
 
 			@Override
@@ -51,7 +52,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 				// Set logger (CommunicatorClient instance)
 				mediaSource.loadLogger(communicator);
 				detection.loadLogger(communicator);
-				identification.loadLogger(communicator);
+				identification.loadLogger(communicator);*/
 					
 				// TODO: Load all components' configuration
 				loadComponentsConfigutation();
@@ -60,25 +61,20 @@ public class SurveillanceClientManager extends SurveillanceManager {
 				mediaSource.init();
 				detection.init();
 				identification.init();
-				
-				// TODO: Connect components
-				
-				communicator.info("Yes jag �r connectad!");
-				
-				/*
+
 				// Start listening for images from the MediaSource component
 				mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
 		
 					@Override
 					public void handle(MediaEvent event) {
-						//processImage(event.getImage());				
+						processImage(event.getImage());				
 					}
 					
 				});
-				 */
-			}
+				
+			//}
 			
-		});
+		//});
 	}
 	
 	@Override
@@ -95,14 +91,16 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		DetectionResult objects = detection.getObjInImage(image);
 		
 		// Use identification component to identify things in the image
-		List<IClassificationResult> results = new LinkedList<IClassificationResult>();
+		/*List<IClassificationResult> results = new LinkedList<IClassificationResult>();
 		for(Mat obj : objects.images){
 			IClassificationResult result = identification.classify(obj);
 			if(result.getResultingClass() != Classes.UNIDENTIFIED)
 				results.add(result);
-		}
+		}*/
 		
-		// TODO: Use communication component to send and proceed the processing on the server
+		// TODO: Use tracking component to track identified objects
+		
+		// TODO: Send results of tracking to server using communicator component
 		
 	}
 	
@@ -111,7 +109,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	private void loadComponentsConfigutation(){
 		
-		HashMap<String,Object> mediasourceConfig = new HashMap<String,Object>();
+		/*HashMap<String,Object> mediasourceConfig = new HashMap<String,Object>();
 		HashMap<String,Object> detectionConfig = new HashMap<String,Object>();
 		HashMap<String,Object> identificationConfig = new HashMap<String,Object>();
 		
@@ -131,18 +129,21 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		mediaSource.loadConfiguration(mediasourceConfig);
 		detection.loadConfiguration(detectionConfig);
-		identification.loadConfiguration(identificationConfig);
+		identification.loadConfiguration(identificationConfig);*/
 		
-		/*
+		
 		/// TEMPORARY! Hardcoded configuration
 		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
-		mediaSourceConfig.put("MediaSource_FrameRate", 3000); // Sets the frame rate when the component should take pictures
+		mediaSourceConfig.put("MediaSource_FrameRate", 5000); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
 		Map<String, Object> detectionConfig = new HashMap<String, Object>();
 		detectionConfig.put("Detection_InitTime", 500);
 		detection.loadConfiguration(detectionConfig);
-		*/
+		
+		Map<String, Object> identificationConfig = new HashMap<String, Object>();
+		identificationConfig.put("Identification_Classifier", "/data/data/edu.wildlifesecurity.trapdevice/files/classifier1.txt");
+		identification.loadConfiguration(identificationConfig);
 	}
 	
 }

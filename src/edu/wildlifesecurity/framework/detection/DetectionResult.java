@@ -16,4 +16,6 @@ public class DetectionResult {
 	
 	public Vector<Rect> regions;
 	
+	public Mat rawDetection;
+	
 }

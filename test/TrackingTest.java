@@ -48,7 +48,7 @@ public class TrackingTest {
 			// Ladda in bild till Mat
 			if(k++ > 2)	
 			{
-				
+
 				Thread.sleep(100);
 				for(int i = 0; i < result.regions.size();i++ )//Loopa över regioner
 				{
@@ -60,12 +60,11 @@ public class TrackingTest {
 						kalVec.add(new KalmanFilter(nextID,x,y,80));
 						//setRegionID = nextID++;
 						nextID++;
-					}
+					}	
 					else
 					{
 						boolean match = false;
 						for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
-						//for(KalmanFilter kf : kalVec)
 						{
 							KalmanFilter kf = iterator.next();
 							kf.predict(); //Ska detta ske här eller efter isMatch? Testa noga!
@@ -76,22 +75,20 @@ public class TrackingTest {
 								kf.seen();
 								kf.correct(x, y);
 								match = true;
+								Core.circle(img, new Point(x,y), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);
 							}
 							if(kf.getNumOfUnseen() > 15)
 							{
 								iterator.remove();
-								System.out.println("removed");
+								System.out.println(kf.getId() + " was removed");
+								double[][] pos = kf.getPos();
+								Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,255),5);
 							}
-							System.out.println(kf.getId());
-							double[][] pos = kf.getPos();
+							//System.out.println(kf.getId());
+							//double[][] pos = kf.getPos();
 							//System.out.println(pos[0][0] + " " + pos[1][0]);
-							Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);
-							
-							show.showImage(img);
-							
-							
+							//Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);
 						}
-						
 						if(!match)
 						{
 							kalVec.add(new KalmanFilter(nextID,x,y,80));								
@@ -100,38 +97,23 @@ public class TrackingTest {
 							break;
 						}
 					}
-
-
-
 				}
-				// ta fram mittpunkt som x och y plus halva width, height
-				/*
-				for(int i = 0; i < result.regions.size();i++ )
+				if(result.regions.isEmpty())
 				{
-					int x = result.regions.get(i).x + result.regions.get(i).width/2;
-					int y = result.regions.get(i).y + result.regions.get(i).height/2;
+					for(KalmanFilter kf : kalVec)
+					{
+						kf.predict();
+						kf.addUnseen();
+						double[][] pos = kf.getPos();
+						System.out.println(pos[0][0] + " " + pos[1][0]);
+						Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,Math.abs(Math.random())*255),5);
 
-					double[][] meas = {{x,y}};
-					Matrix measMatrix = new Matrix(meas);
+					}
+				}
+				show.showImage(img);
 
-					Matrix pre = kf.Predict();
-					Matrix corr = kf.Correct(measMatrix.transpose());
-					int xPre = (int) pre.getArray()[0][0];
-					int yPre = (int) pre.getArray()[1][0];
-					Core.circle(img, new Point(xPre,yPre), 5, new Scalar(125, 125, 125),5);
-					show.showImage(img);
-					System.out.println("Error: " + Math.sqrt(Math.pow((x-xPre),2) + Math.pow((y-yPre),2)));
-
-//					System.out.println("point " + x + " " + y);
-//					System.out.println("predicted " + pre.transpose());
-//					System.out.println("corrected " + corr.transpose());
-
-				 */
 			}
 		}
-
-
-
 	}
 
 }

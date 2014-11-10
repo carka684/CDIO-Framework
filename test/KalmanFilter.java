@@ -40,8 +40,8 @@ public class KalmanFilter {
 	}
 	public void predict()
 	{
-		predicted = kalman.Predict();
-		
+		predicted = kalman.Predict();	
+		kalman.setState_post(predicted);
 	}
 	public double[][] getPos()
 	{

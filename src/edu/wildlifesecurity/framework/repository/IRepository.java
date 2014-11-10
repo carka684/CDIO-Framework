@@ -48,6 +48,10 @@ public interface IRepository extends IComponent, ILogger {
 	 */
 	Mat getCaptureImage(Capture captureId);
 	
+	Object getConfigOption(String option);
+
+	void setConfigOption(String option, Object value);
+	
 	
 	/**
 	 * Disposes the repository

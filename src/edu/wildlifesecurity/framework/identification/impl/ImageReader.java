@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfFloat;
 import org.opencv.core.Scalar;
 
 public class ImageReader

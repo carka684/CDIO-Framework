@@ -9,8 +9,8 @@ public class HOGEvaluation {
 		
 		HOGIdentification hogTest = new HOGIdentification(); 
 		hogTest.init();
-		hogTest.trainClassifier("D:/Bilder/DjurEntre/Training/Pos/", "D:/Bilder/DjurEntre/Training/Neg/", "D:/Bilder/DjurEntre/classifier.txt");
-		hogTest.evaluateClassifier("D:/Bilder/DjurEntre/Evaluation/Pos/", "D:/Bilder/DjurEntre/Evaluation/Neg/");
+		hogTest.trainClassifier("Dataset/Training/", "", "classifier1.txt");
+		hogTest.evaluateClassifier("Dataset/Validation/", "");
 
 	}
 

@@ -80,7 +80,9 @@ public class TestBGM {
 					System.gc();
 				}
 			}
+			
 			// System.out.println("Image height mean: " + imageHeight.);
+			
 		}
 }
 }

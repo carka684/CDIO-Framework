@@ -34,7 +34,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	public void init()
 	{
 		bgs = new BackgroundSubtractorMOG2(0, 20, false);
-		InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
+		//InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
 	}
 	
 	public ISubscription addEventHandler(EventType type, IEventHandler<DetectionEvent> handler){

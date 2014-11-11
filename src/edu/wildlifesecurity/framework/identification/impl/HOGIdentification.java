@@ -190,6 +190,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		result.l = featureMat.rows();
 		System.out.println("Result l (number of training data): " + result.l);
 		//float[] tempClasses = classes.toArray();
+		result.y = new double[featureMat.rows()];
 		svm_node[][] svmNodes = new svm_node[featureMat.rows()][featureMat.cols()];
 		for (int row = 0; row < featureMat.rows(); row++)  {
 			System.out.println("Class: " + classes.get(row, 0)[0]);

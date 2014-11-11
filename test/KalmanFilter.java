@@ -32,6 +32,13 @@ public class KalmanFilter {
 		Matrix measurement = new Matrix(meas).transpose();
 		kalman.Correct(measurement);
 	}
+	public double getError(int x, int y)
+	{
+		double[][] pos = getPos();
+		double error = Math.sqrt(Math.pow(pos[0][0]-x, 2)+Math.pow(pos[1][0]-y, 2));
+		return error;
+		
+	}
 	public boolean isMatch(int x,int y)
 	{
 		double[][] pos = getPos();

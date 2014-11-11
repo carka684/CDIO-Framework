@@ -1,8 +1,11 @@
 import jama.Matrix;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.Vector;
 
 import jkalman.JKalman;
@@ -50,7 +53,7 @@ public class TrackingTest {
 			{
 
 				Thread.sleep(100);
-				for(int i = 0; i < result.regions.size();i++ )//Loopa över regioner
+				for(int i = 0; i < result.regions.size();i++ )//Loopa ï¿½ver regioner
 				{
 					//System.out.println("new image");
 					int x = result.regions.get(i).x + result.regions.get(i).width/2;
@@ -64,19 +67,21 @@ public class TrackingTest {
 					else
 					{
 						boolean match = false;
+						double minError = 9999;
+						KalmanFilter bestKalman = null;
+						HashMap<Double, KalmanFilter> hashMap = new HashMap<Double, KalmanFilter>();
 						for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
 						{
 							KalmanFilter kf = iterator.next();
-							kf.predict(); //Ska detta ske här eller efter isMatch? Testa noga!
+							kf.predict(); //Ska detta ske hï¿½r eller efter isMatch? Testa noga!
 							kf.addUnseen();
-							if(kf.isMatch(x, y) && !match)
+							double error = kf.getError(x,y);
+							if (error < minError)
 							{
-								//Set region ID to kf.getID();
-								kf.seen();
-								kf.correct(x, y);
-								match = true;
-								Core.circle(img, new Point(x,y), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);
-							}
+								minError = error;
+								bestKalman = kf;
+							}   
+							
 							if(kf.getNumOfUnseen() > 15)
 							{
 								iterator.remove();
@@ -89,6 +94,11 @@ public class TrackingTest {
 							//System.out.println(pos[0][0] + " " + pos[1][0]);
 							//Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);
 						}
+						KalmanFilter kf = bestKalman;
+						kf.seen();
+						kf.correct(x, y);
+						match = true;
+						Core.circle(img, new Point(x,y), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);
 						if(!match)
 						{
 							kalVec.add(new KalmanFilter(nextID,x,y,80));								

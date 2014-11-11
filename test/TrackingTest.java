@@ -6,6 +6,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
+import org.opencv.highgui.VideoCapture;
 
 import com.atul.JavaOpenCV.Imshow;
 
@@ -33,22 +34,28 @@ public class TrackingTest {
 	public static void main(String[] args) throws Exception {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-
+		VideoCapture vc = new VideoCapture("animalEntre.avi");
+		
 		IDetection detection = new DefaultDetection();
 		detection.init();		
 		init();
-		ImageReader reader = new ImageReader();
-		reader.readImages("C:/Users/Calle/Documents/MATLAB/images/");
-		Vector<String> files = reader.getFilesVec();
-		int k = 0;
+		//ImageReader reader = new ImageReader();
+		//reader.readImages("C:/Users/Calle/Documents/MATLAB/images/");
+		//Vector<String> files = reader.getFilesVec();
+		
 		Imshow show = new Imshow("");
 		KalmanTracking tracker = new KalmanTracking();
 		KalmanTracking.init();
-		for(String file : files){
-			Mat img = Highgui.imread(file);
+		Mat img = new Mat();
+		int k = 0;
+
+		System.out.println(vc.isOpened());
+		for(int frameNr = 0; frameNr < vc.get(7) - 1; frameNr++)
+		{
+			vc.read(img);
 			DetectionResult result = detection.getObjInImage(img);
 			// Ladda in bild till Mat
-			if(k++ > 2)	
+			if(k++ > 10)	
 			{
 				tracker.trackRegions(result, img, show);
 			}

@@ -1,5 +1,6 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
+import java.io.IOException;
 import java.util.Vector;
 
 import libsvm.svm;
@@ -60,6 +61,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		params = new svm_parameter();
 		int linearSVM = 0;
 		params.kernel_type = linearSVM;
+		params.C = 16;
+		params.eps = 0.01;
 		
 		//SVM = new CvSVM();
 		//params = new CvSVMParams();
@@ -134,6 +137,13 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		System.out.println("y length = " + prob.y.length);
 		System.out.println("svm_node = " + prob.x[0].length + " sista " + prob.x[279].length); */
 		model = SVM.svm_train(prob, params);
+		try {
+			SVM.svm_save_model(outputFile, model);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.out.println("Could not save model to file.");
+			e.printStackTrace();
+		}
 
 		// Förra versionen
 		//SVM.train(featMat,classes,new Mat(),new Mat(),params);
@@ -149,7 +159,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Mat featMat = extractFeaturesFromFiles(trainFiles);
 		
 		// Ny version med libsvm
-		Mat results = new Mat(featMat.rows(), 1, CvType.CV_8U);
+		Mat results = new Mat(featMat.rows(), 1, CvType.CV_8S); // Must be signed
 		for(int row = 0; row < featMat.rows(); row++) {
 			svm_node[] tempNodes = mat2svm_nodeArray(featMat, row);
 			//System.out.println("tempNode size = " + tempNodes.length);
@@ -159,10 +169,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		
 		// Förra versionen
 		//SVM.predict_all(featMat, results);
-		/*System.out.println("Resultvector: ");
-		for(int i=0; i < results.rows(); i++){
-			System.out.println(results.get(i,0)[0]);
-		}*/
+		
 		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
 	}
 	/*

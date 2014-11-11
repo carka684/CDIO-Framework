@@ -43,6 +43,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	//CvSVM SVM;
 	//CvSVMParams params;
 	Size s;
+	double[] w;
 	
 	private EventDispatcher<IdentificationEvent> dispatcher =  new EventDispatcher<IdentificationEvent>();
 	
@@ -70,7 +71,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 
 	    
 	    // Load classifier
-	    loadClassifierFromFile(configuration.get("Identification_Classifier").toString());
+	    //loadClassifierFromFile(configuration.get("Identification_Classifier").toString());
 	}
 
 	public Mat extractFeatures(Mat inputImage) {
@@ -163,7 +164,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		for(int row = 0; row < featMat.rows(); row++) {
 			svm_node[] tempNodes = mat2svm_nodeArray(featMat, row);
 			//System.out.println("tempNode size = " + tempNodes.length);
-			double sampleClass = SVM.svm_predict(model, tempNodes);
+			double sampleClass = svm_plane_predict(w, tempNodes);
+			//double sampleClass = SVM.svm_predict(model, tempNodes);
 			results.put(row, 0, sampleClass);
 		}
 		
@@ -242,5 +244,39 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 		
 		return result;
+	}
+	
+	public double svm_plane_predict(double[] w, svm_node[] features) {
+		double classResult;
+		double scalarprodResult = 0;
+		scalarprodResult += w[0];
+		for(int index = 0; index < features.length; index++) {
+			scalarprodResult += w[index+1]*features[index].value;
+		}
+		if (scalarprodResult >= 0){
+			classResult = 0;
+		}
+		else {
+			classResult = 1;
+		}
+		return classResult;
+	}
+	
+	public void svm_model2primalValue() {
+		w = new double[model.SV[0].length+1];
+		w[0] = -model.rho[0];
+		if (model.label[1] == 0) {
+			w[0] = -w[0];
+		}
+		for(int featureIndex = 0; featureIndex < model.SV[0].length; featureIndex++) {
+				w[featureIndex+1] = 0;
+			for(int svIndex = 0; svIndex < model.sv_coef[0].length; svIndex++) {
+				w[featureIndex+1] += model.SV[svIndex][featureIndex].value * model.sv_coef[0][svIndex];
+				//System.out.println(featureIndex + "  " +svIndex );
+				}
+			if (model.label[1] == 0) {
+				w[featureIndex+1] = -w[featureIndex+1];
+			}
+		}
 	}
 }

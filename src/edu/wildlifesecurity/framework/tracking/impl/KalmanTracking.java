@@ -18,6 +18,7 @@ public class KalmanTracking {
 	static int nextID;
 	static int errorDist;
 	static int numOfUnseen;
+	static double maxAreaIncrease;
 
 	public static void init()
 	{
@@ -25,6 +26,8 @@ public class KalmanTracking {
 		kalVec =  new Vector<KalmanFilter>();
 		errorDist = 80; // Read from config!!
 		numOfUnseen = 15; // -- || --
+		maxAreaIncrease = 0.3;
+		
 	}
 	public void trackRegions(DetectionResult detections,Mat img) throws Exception
 	{
@@ -43,12 +46,13 @@ public class KalmanTracking {
 		}				
 		for(Detection result : detections.getVector())
 		{
-			int x = result.getRegion().x + result.getRegion().width/2;
-			int y = result.getRegion().y + result.getRegion().height/2;
+			int height = result.getRegion().height;
+			int width = result.getRegion().width;
+			int x = result.getRegion().x + width/2;
+			int y = result.getRegion().y + height/2;
 			if(kalVec.isEmpty())
 			{
-				kalVec.add(new KalmanFilter(nextID,x,y));
-				//setRegionID = nextID++;
+				kalVec.add(new KalmanFilter(nextID,x,y,height,width));
 				nextID++;
 			}	
 			else
@@ -58,10 +62,12 @@ public class KalmanTracking {
 				for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
 				{
 					KalmanFilter kf = iterator.next();
-					double error = kf.getError(x,y);
-					if (error < minError)
+					double errorDist = kf.getError(x,y);
+					double errorArea = kf.getErrorArea(height*width);
+					System.out.println(errorArea);
+					if (errorDist < minError)
 					{
-						minError = error;
+						minError = errorDist;
 						bestKalman = kf;
 					}   
 				}
@@ -70,11 +76,12 @@ public class KalmanTracking {
 					result.setID(bestKalman.getId());
 					result.setColor(bestKalman.getColor());
 					bestKalman.seen();
-					bestKalman.correct(x, y);
+					bestKalman.correct(x,y,height,width);
+					System.out.println(bestKalman.getKalman().getState_post().transpose());
 				}
 				else
 				{
-					KalmanFilter kf = new KalmanFilter(nextID,x,y);
+					KalmanFilter kf = new KalmanFilter(nextID,x,y,height,width);
 					result.setID(kf.getId());
 					result.setColor(kf.getColor());
 					kalVec.add(kf);								

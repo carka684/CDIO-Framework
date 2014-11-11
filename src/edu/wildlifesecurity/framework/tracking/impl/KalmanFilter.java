@@ -15,26 +15,27 @@ public class KalmanFilter {
 	Scalar color;
 
 		
-	public KalmanFilter(Integer id,int x,int y) throws Exception
+	public KalmanFilter(Integer id,int x,int y, int height, int width) throws Exception
 	{
-		kalman = new JKalman(4, 2);
+		kalman = new JKalman(6, 4);
 		double[][] tr = 
-			   {{1, 0, 1, 0},   
-				{0, 1, 0, 1},             
-				{0, 0, 1, 0}, 
-				{0, 0, 0, 1}};
+			   {{1, 0, 0, 0, 1, 0},   
+				{0, 1, 0, 0, 0, 1},             
+				{0, 0, 1, 0, 0, 0}, 
+				{0, 0, 0, 1, 0, 0},
+				{0, 0, 0, 0, 1, 0},
+				{0, 0, 0, 0, 0, 1}};
 		kalman.setTransition_matrix(new Matrix(tr));
 		this.id = id;
 		numOfUnseen = 0;
-		double[][] m = {{x,y,0,0}};
-		Matrix measMa = new Matrix(m);
-		kalman.setState_post(measMa.transpose());
+		double[][] m = {{x,y,height,width,0,0}};
+		Matrix initMat = new Matrix(m);
+		kalman.setState_post(initMat.transpose());
 		color = new Scalar(Math.abs(Math.random()*255),Math.abs(Math.random()*255),Math.abs(Math.random()*255));
-
 	}
-	public void correct(int x, int y)
+	public void correct(int x, int y,int height, int width)
 	{
-		double[][] meas = {{x,y}};
+		double[][] meas = {{x,y,height,width}};
 		Matrix measurement = new Matrix(meas).transpose();
 		kalman.Correct(measurement);
 	}
@@ -43,7 +44,14 @@ public class KalmanFilter {
 		double[][] pos = getPos();
 		double error = Math.sqrt(Math.pow(pos[0][0]-x, 2)+Math.pow(pos[1][0]-y, 2));
 		return error;
-		
+	}
+	public double getErrorArea(double area)
+	{
+		double tmpArea = kalman.getState_pre().get(3, 0)*kalman.getState_pre().get(2, 0);
+		double res = tmpArea/area;
+		if(res > 1)
+			res = 1/res;
+		return res;
 	}
 
 	public void predict()
@@ -79,6 +87,7 @@ public class KalmanFilter {
 	{
 		return color;
 	}
+	
 
 	
 	

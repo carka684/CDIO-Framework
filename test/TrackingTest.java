@@ -58,7 +58,6 @@ public class TrackingTest {
 				tracker.trackRegions(detections, img);
 				for(Detection dec : detections.getVector())
 				{
-					System.out.println(dec.getColor());
 					Core.rectangle(img, dec.getRegion().tl(), dec.getRegion().br(),dec.getColor(),5);
 				}
 				show.showImage(img);

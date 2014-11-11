@@ -13,6 +13,6 @@
 	<classpathentry kind="lib" path="opencv/Imshow.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="opencv/libsvm.jar"/>
-	<classpathentry kind="lib" path="JKalman.jar" sourcepath="test"/>
+	<classpathentry kind="lib" path="JKalman.jar" sourcepath="test/jkalman"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

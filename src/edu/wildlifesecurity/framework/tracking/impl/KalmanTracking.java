@@ -10,8 +10,8 @@ import org.opencv.core.Scalar;
 
 import com.atul.JavaOpenCV.Imshow;
 
+import edu.wildlifesecurity.framework.detection.Detection;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
-import edu.wildlifesecurity.framework.detection.Detections;
 
 public class KalmanTracking {
 	static Vector<KalmanFilter> kalVec;
@@ -26,7 +26,7 @@ public class KalmanTracking {
 		errorDist = 80; // Read from config!!
 		numOfUnseen = 15; // -- || --
 	}
-	public void trackRegions(Detections detections,Mat img, Imshow show) throws Exception
+	public void trackRegions(DetectionResult detections,Mat img, Imshow show) throws Exception
 	{
 		for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
 		{
@@ -42,7 +42,7 @@ public class KalmanTracking {
 				System.out.println(kf.getId() + " was removed");
 			}
 		}				
-		for(DetectionResult result : detections.getVector())
+		for(Detection result : detections.getVector())
 		{
 			int x = result.getRegion().x + result.getRegion().width/2;
 			int y = result.getRegion().y + result.getRegion().height/2;

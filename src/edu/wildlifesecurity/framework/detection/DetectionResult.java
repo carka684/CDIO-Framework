@@ -2,38 +2,16 @@ package edu.wildlifesecurity.framework.detection;
 
 import java.util.Vector;
 
-import org.opencv.core.Mat;
-import org.opencv.core.Rect;
-
 public class DetectionResult {
-	private Mat image;
-	private Rect region;
-	private Mat boxImage;
-	private int ID;
+	private Vector<Detection> detVec;
 	
-	public DetectionResult(Mat img, Rect rect, Mat boxImage){
-		image = img;
-		region = rect;
-		this.boxImage = boxImage;
-		ID = -1;
-	}
-	public void setID(int ID)
+	public DetectionResult(Vector<Detection> detVec)
 	{
-		this.ID = ID;
-	}
-	public Mat getImg()
-	{
-		return image;
-	}
-	public Rect getRegion()
-	{
-		return region;
-	}
-	public Mat getBoxImage()
-	{
-		return boxImage;
+		this.detVec = detVec;
 	}
 	
-
-	
+	public Vector<Detection> getVector()
+	{
+		return detVec;
+	}
 }

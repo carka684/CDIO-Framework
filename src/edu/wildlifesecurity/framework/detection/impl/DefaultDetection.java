@@ -19,8 +19,8 @@ import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.detection.DetectionEvent;
+import edu.wildlifesecurity.framework.detection.Detection;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
-import edu.wildlifesecurity.framework.detection.Detections;
 import edu.wildlifesecurity.framework.detection.IDetection;
 
 public class DefaultDetection extends AbstractComponent implements IDetection
@@ -42,9 +42,9 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		return dispatcher.addEventHandler(type, handler);
 	}
 	
-	private Detections getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)
+	private DetectionResult getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)
 	{
-		Vector<DetectionResult> detVec = new Vector<>();
+		Vector<Detection> detVec = new Vector<>();
 		for (int i = 0; i < contours.size(); i++)
 		{
 			double area = Imgproc.contourArea(contours.get(i));
@@ -52,13 +52,13 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 			{
 				Rect boundBox = Imgproc.boundingRect(contours.get(i));
 				boundBox = squarify(boundBox, img.width(), img.height());
-				DetectionResult result = new DetectionResult(img.submat(boundBox).clone(),boundBox,null);
+				Detection result = new Detection(img.submat(boundBox).clone(),boundBox,null);
 				detVec.add(result);
 				//result.regions.add(boundBox);
 				//result.images.add(img.submat(boundBox).clone());
 			}
 		}
-		Detections detections = new Detections(detVec);
+		DetectionResult detections = new DetectionResult(detVec);
 		return detections;
 	}
 	
@@ -102,10 +102,10 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	
 		
 	@Override
-	public Detections getObjInImage(Mat img)
+	public DetectionResult getObjInImage(Mat img)
 	{
 		age++;
-		Detections result;
+		DetectionResult result;
 		Mat fgMask = new Mat();
 	
 		if(age < InitTime)	

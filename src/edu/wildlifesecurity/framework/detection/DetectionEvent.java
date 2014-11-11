@@ -7,14 +7,14 @@ public class DetectionEvent extends Event {
 	
 	public static final EventType NEW_DETECTION = new EventType("Detection.NewDetection");
 	
-	private Detections detection;
+	private DetectionResult detection;
 
-	public DetectionEvent(EventType type, Detections detection) {
+	public DetectionEvent(EventType type, DetectionResult detection) {
 		super(type);
 		this.detection = detection;
 	}
 
-	public Detections getDetectionResult(){
+	public DetectionResult getDetectionResult(){
 		return this.detection;
 	}
 	

@@ -11,6 +11,7 @@ import org.opencv.core.Mat;
 
 import edu.wildlifesecurity.framework.Message.Commands;
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
+import edu.wildlifesecurity.framework.detection.Detection;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
 import edu.wildlifesecurity.framework.detection.IDetection;
 import edu.wildlifesecurity.framework.identification.Classes;

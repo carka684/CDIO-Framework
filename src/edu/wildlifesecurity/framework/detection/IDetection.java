@@ -13,6 +13,6 @@ public interface IDetection extends IComponent {
 	
 	ISubscription addEventHandler(EventType type, IEventHandler<DetectionEvent> handler);
 	 
-	DetectionResult getObjInImage(Mat image);
+	Detections getObjInImage(Mat image);
 
 }

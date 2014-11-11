@@ -20,6 +20,7 @@ import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.detection.DetectionEvent;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
+import edu.wildlifesecurity.framework.detection.Detections;
 import edu.wildlifesecurity.framework.detection.IDetection;
 
 public class DefaultDetection extends AbstractComponent implements IDetection
@@ -41,9 +42,9 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		return dispatcher.addEventHandler(type, handler);
 	}
 	
-	private DetectionResult getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)
+	private Detections getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)
 	{
-		DetectionResult result = new DetectionResult();
+		Vector<DetectionResult> detVec = new Vector<>();
 		for (int i = 0; i < contours.size(); i++)
 		{
 			double area = Imgproc.contourArea(contours.get(i));
@@ -51,11 +52,14 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 			{
 				Rect boundBox = Imgproc.boundingRect(contours.get(i));
 				boundBox = squarify(boundBox, img.width(), img.height());
-				result.regions.add(boundBox);
-				result.images.add(img.submat(boundBox).clone());
+				DetectionResult result = new DetectionResult(img.submat(boundBox).clone(),boundBox,null);
+				detVec.add(result);
+				//result.regions.add(boundBox);
+				//result.images.add(img.submat(boundBox).clone());
 			}
 		}
-		return result;
+		Detections detections = new Detections(detVec);
+		return detections;
 	}
 	
 	private Rect squarify(Rect rect, int imWidth, int imHeight){
@@ -98,10 +102,10 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	
 		
 	@Override
-	public DetectionResult getObjInImage(Mat img)
+	public Detections getObjInImage(Mat img)
 	{
 		age++;
-		DetectionResult result;
+		Detections result;
 		Mat fgMask = new Mat();
 	
 		if(age < InitTime)	
@@ -122,7 +126,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		
 		int MinimalSizeOfObjets = 500;
 		result = getImagesInsideContours(contours, img, MinimalSizeOfObjets);
-		result.rawDetection = fgMask;
+		//result.rawDetection = fgMask;
 		
 		// Dispatch event
 		dispatcher.dispatch(new DetectionEvent(DetectionEvent.NEW_DETECTION, result));

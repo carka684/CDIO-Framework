@@ -11,6 +11,7 @@ import org.opencv.highgui.VideoCapture;
 import com.atul.JavaOpenCV.Imshow;
 
 import edu.wildlifesecurity.framework.detection.DetectionResult;
+import edu.wildlifesecurity.framework.detection.Detections;
 import edu.wildlifesecurity.framework.detection.IDetection;
 import edu.wildlifesecurity.framework.detection.impl.DefaultDetection;
 import edu.wildlifesecurity.framework.identification.impl.ImageReader;
@@ -34,7 +35,7 @@ public class TrackingTest {
 	public static void main(String[] args) throws Exception {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-		VideoCapture vc = new VideoCapture("animalEntre.avi");
+		VideoCapture vc = new VideoCapture("C:/Camera1_2.avi");
 		
 		IDetection detection = new DefaultDetection();
 		detection.init();		
@@ -53,11 +54,11 @@ public class TrackingTest {
 		for(int frameNr = 0; frameNr < vc.get(7) - 1; frameNr++)
 		{
 			vc.read(img);
-			DetectionResult result = detection.getObjInImage(img);
+			Detections detections = detection.getObjInImage(img);
 			// Ladda in bild till Mat
 			if(k++ > 10)	
 			{
-				tracker.trackRegions(result, img, show);
+				tracker.trackRegions(detections, img, show);
 			}
 		}
 	}

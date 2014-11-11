@@ -74,7 +74,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		MatOfFloat features = new MatOfFloat();
 		Imgproc.resize(inputImage, inputImage, s);
 		hog.compute(inputImage, features);	
-		// System.out.println(features.size());
+		//System.out.println(features.size());
 		return features;
 	}
 	
@@ -127,9 +127,12 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Vector<String> trainFiles = trainReader.getFilesVec();
 		Mat classes = trainReader.getClasses();
 		Mat featMat = extractFeaturesFromFiles(trainFiles);
-		
+		// System.out.println("FeatureMatrix size: " + featMat.rows() + ", " + featMat.cols());
 		// Ny version med libsvm
-		svm_problem prob = mat2svm_problem(featMat, classes);		
+		svm_problem prob = mat2svm_problem(featMat, classes);	
+		/*System.out.println("Prob, l = " + prob.l);
+		System.out.println("y length = " + prob.y.length);
+		System.out.println("svm_node = " + prob.x[0].length + " sista " + prob.x[279].length); */
 		model = SVM.svm_train(prob, params);
 
 		// Förra versionen
@@ -149,13 +152,17 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Mat results = new Mat(featMat.rows(), 1, CvType.CV_8U);
 		for(int row = 0; row < featMat.rows(); row++) {
 			svm_node[] tempNodes = mat2svm_nodeArray(featMat, row);
+			//System.out.println("tempNode size = " + tempNodes.length);
 			double sampleClass = SVM.svm_predict(model, tempNodes);
-			results.put(row, 1, sampleClass);
+			results.put(row, 0, sampleClass);
 		}
 		
 		// Förra versionen
 		//SVM.predict_all(featMat, results);
-
+		/*System.out.println("Resultvector: ");
+		for(int i=0; i < results.rows(); i++){
+			System.out.println(results.get(i,0)[0]);
+		}*/
 		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
 	}
 	/*
@@ -188,12 +195,10 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public svm_problem mat2svm_problem(Mat featureMat, Mat classes) {
 		svm_problem result = new svm_problem();
 		result.l = featureMat.rows();
-		System.out.println("Result l (number of training data): " + result.l);
 		//float[] tempClasses = classes.toArray();
 		result.y = new double[featureMat.rows()];
 		svm_node[][] svmNodes = new svm_node[featureMat.rows()][featureMat.cols()];
 		for (int row = 0; row < featureMat.rows(); row++)  {
-			System.out.println("Class: " + classes.get(row, 0)[0]);
 			result.y[row] = classes.get(row, 0)[0];
 			for(int col = 0; col < featureMat.cols(); col++) {
 				svm_node tempNode = new svm_node();

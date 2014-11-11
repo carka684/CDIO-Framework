@@ -1,4 +1,6 @@
 package edu.wildlifesecurity.framework.tracking.impl;
+import org.opencv.core.Scalar;
+
 import jama.Matrix;
 import jkalman.JKalman;
 
@@ -10,21 +12,25 @@ public class KalmanFilter {
 	private Integer id;
 	private Integer numOfUnseen;
 	Matrix predicted; 
-	private double errorDist;
-	
+	Scalar color;
+
+		
 	public KalmanFilter(Integer id,int x,int y) throws Exception
 	{
 		kalman = new JKalman(4, 2);
-		double[][] tr = { {1, 0, 1, 0},   
+		double[][] tr = 
+			   {{1, 0, 1, 0},   
 				{0, 1, 0, 1},             
 				{0, 0, 1, 0}, 
-				{0, 0, 0, 1} };
+				{0, 0, 0, 1}};
 		kalman.setTransition_matrix(new Matrix(tr));
 		this.id = id;
 		numOfUnseen = 0;
 		double[][] m = {{x,y,0,0}};
 		Matrix measMa = new Matrix(m);
 		kalman.setState_post(measMa.transpose());
+		color = new Scalar(Math.abs(Math.random()*255),Math.abs(Math.random()*255),Math.abs(Math.random()*255));
+
 	}
 	public void correct(int x, int y)
 	{
@@ -68,6 +74,10 @@ public class KalmanFilter {
 	public void seen()
 	{
 		numOfUnseen = 0;
+	}
+	public Scalar getColor()
+	{
+		return color;
 	}
 
 	

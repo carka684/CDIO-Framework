@@ -1,10 +1,7 @@
-import java.util.Iterator;
 import java.util.Vector;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
 import org.opencv.highgui.Highgui;
 import org.opencv.highgui.VideoCapture;
 
@@ -24,13 +21,13 @@ public class TrackingTest {
 	 * @param args
 	 * @throws Exception 
 	 */
-	static Vector<KalmanFilter> kalVec;
+	static Vector<KalmanFilter_test> kalVec;
 	static int nextID;
 
 	public static void init()
 	{
 		nextID = 0;
-		kalVec =  new Vector<KalmanFilter>();
+		kalVec =  new Vector<KalmanFilter_test>();
 	}
 	public static void main(String[] args) throws Exception {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
@@ -40,9 +37,9 @@ public class TrackingTest {
 		IDetection detection = new DefaultDetection();
 		detection.init();		
 		init();
-		//ImageReader reader = new ImageReader();
-		//reader.readImages("C:/Users/Calle/Documents/MATLAB/images/");
-		//Vector<String> files = reader.getFilesVec();
+		ImageReader reader = new ImageReader();
+		reader.readImages("C:/Users/Calle/Documents/MATLAB/images/");
+		Vector<String> files = reader.getFilesVec();
 		
 		Imshow show = new Imshow("");
 		KalmanTracking tracker = new KalmanTracking();
@@ -51,15 +48,22 @@ public class TrackingTest {
 		int k = 0;
 
 		System.out.println(vc.isOpened());
-		for(int frameNr = 0; frameNr < vc.get(7) - 1; frameNr++)
+		for(String file : files)
 		{
-			vc.read(img);
+			img = Highgui.imread(file);
 			DetectionResult detections = detection.getObjInImage(img);
 			// Ladda in bild till Mat
-			if(k++ > 10)	
+			if(k++ > 2)	
 			{
-				tracker.trackRegions(detections, img, show);
+				tracker.trackRegions(detections, img);
+				for(Detection dec : detections.getVector())
+				{
+					System.out.println(dec.getColor());
+					Core.rectangle(img, dec.getRegion().tl(), dec.getRegion().br(),dec.getColor(),5);
+				}
+				show.showImage(img);
 			}
+			Thread.sleep(300);
 		}
 	}
 }

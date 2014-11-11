@@ -26,7 +26,7 @@ public class KalmanTracking {
 		errorDist = 80; // Read from config!!
 		numOfUnseen = 15; // -- || --
 	}
-	public void trackRegions(DetectionResult detections,Mat img, Imshow show) throws Exception
+	public void trackRegions(DetectionResult detections,Mat img) throws Exception
 	{
 		for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
 		{
@@ -35,7 +35,6 @@ public class KalmanTracking {
 			kf.addUnseen();
 			double[][] pos = kf.getPos();
 			Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);	
-
 			if(kf.getNumOfUnseen() > numOfUnseen)
 			{
 				iterator.remove();
@@ -68,19 +67,23 @@ public class KalmanTracking {
 				}
 				if(bestKalman != null)
 				{
+					result.setID(bestKalman.getId());
+					result.setColor(bestKalman.getColor());
 					bestKalman.seen();
 					bestKalman.correct(x, y);
 				}
 				else
 				{
-					kalVec.add(new KalmanFilter(nextID,x,y));								
-					//setRegionID = nextID;
+					KalmanFilter kf = new KalmanFilter(nextID,x,y);
+					result.setID(kf.getId());
+					result.setColor(kf.getColor());
+					kalVec.add(kf);								
+					
 					nextID++;
 					break;
 				}
 			}
 		}
-		show.showImage(img);
 	}
 
 }

@@ -52,7 +52,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 				// Set logger (CommunicatorClient instance)
 				mediaSource.loadLogger(communicator);
 				detection.loadLogger(communicator);
-				identification.loadLogger(communicator);*/
+				identification.loadLogger(communicator);*/ 
 					
 				// TODO: Load all components' configuration
 				loadComponentsConfigutation();
@@ -91,12 +91,11 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		DetectionResult objects = detection.getObjInImage(image);
 		
 		// Use identification component to identify things in the image
-		/*List<IClassificationResult> results = new LinkedList<IClassificationResult>();
+		List<IClassificationResult> results = new LinkedList<IClassificationResult>();
 		for(Mat obj : objects.images){
 			IClassificationResult result = identification.classify(obj);
-			if(result.getResultingClass() != Classes.UNIDENTIFIED)
-				results.add(result);
-		}*/
+			System.out.println("Identified: " + result.getResultingClass());
+		}
 		
 		// TODO: Use tracking component to track identified objects
 		
@@ -134,7 +133,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		/// TEMPORARY! Hardcoded configuration
 		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
-		mediaSourceConfig.put("MediaSource_FrameRate", 5000); // Sets the frame rate when the component should take pictures
+		mediaSourceConfig.put("MediaSource_FrameRate", 1000); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
 		Map<String, Object> detectionConfig = new HashMap<String, Object>();
@@ -142,7 +141,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		detection.loadConfiguration(detectionConfig);
 		
 		Map<String, Object> identificationConfig = new HashMap<String, Object>();
-		identificationConfig.put("Identification_Classifier", "/data/data/edu.wildlifesecurity.trapdevice/files/classifier1.txt");
+		identificationConfig.put("Identification_Classifier", "/storage/sdcard0/classifier1.txt");
 		identification.loadConfiguration(identificationConfig);
 	}
 	

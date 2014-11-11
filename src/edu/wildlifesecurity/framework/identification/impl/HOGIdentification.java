@@ -70,7 +70,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 
 	    
 	    // Load classifier
-	    //loadClassifierFromFile(configuration.get("Identification_Classifier").toString());
+	    loadClassifierFromFile(configuration.get("Identification_Classifier").toString());
 	}
 
 	public Mat extractFeatures(Mat inputImage) {
@@ -86,10 +86,10 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Mat features = extractFeatures(image);
 		// Ny version med libsvm
 		svm_node[] imageNodes = mat2svm_nodeArray(features, 0);
-		float res = (float) SVM.svm_predict(model, imageNodes);
+		double res = svm.svm_predict(model, imageNodes);
 		// Förra versionen
 		//float res = SVM.predict(features);
-		Classes resClass = (res < 0)?Classes.UNIDENTIFIED:Classes.RHINO;
+		Classes resClass = (res >= 1)?Classes.RHINO:Classes.UNIDENTIFIED;
 		
 		ClassificationResult result = new ClassificationResult(resClass, image);
 		dispatcher.dispatch(new IdentificationEvent(IdentificationEvent.NEW_IDENTIFICATION, result));
@@ -195,7 +195,11 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	
 	@Override
 	public void loadClassifierFromFile(String file) {
-		//SVM.load(file);
+		try {
+			model = svm.svm_load_model(file);
+		} catch (IOException e) {
+			System.out.println("Error in HOGIdentification: " + e.getMessage());
+		}
 	}
 	
 	// Hjälpfunktioner för att libsvm varianten ska fungera

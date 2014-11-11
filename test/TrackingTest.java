@@ -51,77 +51,60 @@ public class TrackingTest {
 			// Ladda in bild till Mat
 			if(k++ > 2)	
 			{
+				for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
+				{
+					KalmanFilter kf = iterator.next();
+					kf.predict(); //Ska detta ske h�r eller efter isMatch? Testa noga!
+					kf.addUnseen();
+					double[][] pos = kf.getPos();
+					Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);	
 
+					if(kf.getNumOfUnseen() > 15)
+					{
+						iterator.remove();
+						System.out.println(kf.getId() + " was removed");
+					}
+				}				
 				Thread.sleep(100);
 				for(int i = 0; i < result.regions.size();i++ )//Loopa �ver regioner
 				{
-					//System.out.println("new image");
 					int x = result.regions.get(i).x + result.regions.get(i).width/2;
 					int y = result.regions.get(i).y + result.regions.get(i).height/2;
 					if(kalVec.isEmpty())
 					{
-						kalVec.add(new KalmanFilter(nextID,x,y,80));
+						kalVec.add(new KalmanFilter(nextID,x,y));
 						//setRegionID = nextID++;
 						nextID++;
 					}	
 					else
 					{
-						boolean match = false;
-						double minError = 9999;
+						double minError = 80;
 						KalmanFilter bestKalman = null;
-						HashMap<Double, KalmanFilter> hashMap = new HashMap<Double, KalmanFilter>();
 						for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
 						{
 							KalmanFilter kf = iterator.next();
-							kf.predict(); //Ska detta ske h�r eller efter isMatch? Testa noga!
-							kf.addUnseen();
 							double error = kf.getError(x,y);
 							if (error < minError)
 							{
 								minError = error;
 								bestKalman = kf;
 							}   
-							
-							if(kf.getNumOfUnseen() > 15)
-							{
-								iterator.remove();
-								System.out.println(kf.getId() + " was removed");
-								double[][] pos = kf.getPos();
-								Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,255),5);
-							}
-							//System.out.println(kf.getId());
-							//double[][] pos = kf.getPos();
-							//System.out.println(pos[0][0] + " " + pos[1][0]);
-							//Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);
 						}
-						KalmanFilter kf = bestKalman;
-						kf.seen();
-						kf.correct(x, y);
-						match = true;
-						Core.circle(img, new Point(x,y), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);
-						if(!match)
+						if(bestKalman != null)
 						{
-							kalVec.add(new KalmanFilter(nextID,x,y,80));								
+							bestKalman.seen();
+							bestKalman.correct(x, y);
+						}
+						else
+						{
+							kalVec.add(new KalmanFilter(nextID,x,y));								
 							//setRegionID = nextID;
 							nextID++;
 							break;
 						}
 					}
 				}
-				if(result.regions.isEmpty())
-				{
-					for(KalmanFilter kf : kalVec)
-					{
-						kf.predict();
-						kf.addUnseen();
-						double[][] pos = kf.getPos();
-						System.out.println(pos[0][0] + " " + pos[1][0]);
-						Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,Math.abs(Math.random())*255),5);
-
-					}
-				}
 				show.showImage(img);
-
 			}
 		}
 	}

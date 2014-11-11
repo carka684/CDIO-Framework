@@ -11,7 +11,7 @@ public class KalmanFilter {
 	Matrix predicted; 
 	private double errorDist;
 	
-	public KalmanFilter(Integer id,int x,int y, double errorDist) throws Exception
+	public KalmanFilter(Integer id,int x,int y) throws Exception
 	{
 		kalman = new JKalman(4, 2);
 		double[][] tr = { {1, 0, 1, 0},   
@@ -21,7 +21,6 @@ public class KalmanFilter {
 		kalman.setTransition_matrix(new Matrix(tr));
 		this.id = id;
 		numOfUnseen = 0;
-		this.errorDist = errorDist;
 		double[][] m = {{x,y,0,0}};
 		Matrix measMa = new Matrix(m);
 		kalman.setState_post(measMa.transpose());
@@ -39,12 +38,7 @@ public class KalmanFilter {
 		return error;
 		
 	}
-	public boolean isMatch(int x,int y)
-	{
-		double[][] pos = getPos();
-		double error = Math.sqrt(Math.pow(pos[0][0]-x, 2)+Math.pow(pos[1][0]-y, 2));
-		return error < errorDist;
-	}
+
 	public void predict()
 	{
 		predicted = kalman.Predict();	

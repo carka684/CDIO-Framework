@@ -17,6 +17,7 @@ public class KalmanTracking {
 	static Vector<KalmanFilter> kalVec;
 	static int nextID;
 	static int errorDist;
+	static double errorArea;
 	static int numOfUnseen;
 	static double maxAreaIncrease;
 
@@ -25,6 +26,7 @@ public class KalmanTracking {
 		nextID = 0;
 		kalVec =  new Vector<KalmanFilter>();
 		errorDist = 80; // Read from config!!
+		errorArea = 1;
 		numOfUnseen = 15; // -- || --
 		maxAreaIncrease = 0.3;
 		
@@ -58,18 +60,22 @@ public class KalmanTracking {
 			else
 			{
 				double minError = errorDist;
+				double minErrorArea = errorArea;
 				KalmanFilter bestKalman = null;
 				for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
 				{
 					KalmanFilter kf = iterator.next();
 					double errorDist = kf.getError(x,y);
 					double errorArea = kf.getErrorArea(height*width);
-					System.out.println(errorArea);
-					if (errorDist < minError)
+					//System.out.println("errorArea: " + errorArea);
+					if (errorDist < minError && errorArea < minErrorArea) // test errorArea here.
 					{
 						minError = errorDist;
+						minErrorArea = errorArea;
 						bestKalman = kf;
+						
 					}   
+					
 				}
 				if(bestKalman != null)
 				{
@@ -77,7 +83,7 @@ public class KalmanTracking {
 					result.setColor(bestKalman.getColor());
 					bestKalman.seen();
 					bestKalman.correct(x,y,height,width);
-					System.out.println(bestKalman.getKalman().getState_post().transpose());
+					//System.out.println(bestKalman.getKalman().getState_post().transpose());
 				}
 				else
 				{

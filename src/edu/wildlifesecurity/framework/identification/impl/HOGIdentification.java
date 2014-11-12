@@ -1,5 +1,8 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -278,5 +281,32 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 				w[featureIndex+1] = -w[featureIndex+1];
 			}
 		}
+	}
+	
+	public void savePrimalValue2file(String filePath)
+	{
+		try {
+			File file = new File(filePath);
+ 
+			// if file doesnt exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+ 
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			for(int featureIndex = 0; featureIndex < w.length; featureIndex++)
+			{
+				bw.write(w[featureIndex] + " ");
+			}
+			bw.close();
+ 
+			System.out.println("Primal Value Saved");
+ 
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 }

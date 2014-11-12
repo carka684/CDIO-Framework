@@ -13,6 +13,8 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.KalmanFilter;
 
+import com.atul.JavaOpenCV.Imshow;
+
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventDispatcher;
 import edu.wildlifesecurity.framework.EventType;
@@ -52,10 +54,9 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 			{
 				Rect boundBox = Imgproc.boundingRect(contours.get(i));
 				boundBox = squarify(boundBox, img.width(), img.height());
-				Detection result = new Detection(img.submat(boundBox).clone(),boundBox,null);
+				Mat regionImage = img.submat(boundBox);
+				Detection result = new Detection(img.submat(boundBox).clone(),boundBox,regionImage); 
 				detVec.add(result);
-				//result.regions.add(boundBox);
-				//result.images.add(img.submat(boundBox).clone());
 			}
 		}
 		DetectionResult detections = new DetectionResult(detVec);

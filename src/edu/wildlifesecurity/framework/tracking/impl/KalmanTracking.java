@@ -69,8 +69,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 			int classification = result.getClassification();
 			if(kalVec.isEmpty())
 			{
-				kalVec.add(new KalmanFilter(nextID,x,y,height,width));
-				nextID++;
+				kalVec.add(new KalmanFilter(nextID++,x,y,height,width));
 			}	
 			else
 			{
@@ -105,12 +104,11 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 				}
 				else
 				{
-					KalmanFilter kf = new KalmanFilter(nextID,x,y,height,width);
+					KalmanFilter kf = new KalmanFilter(nextID++,x,y,height,width);
 					result.setID(kf.getId());
 					result.setColor(kf.getColor());
 					kf.addClass(classification);
 					kalVec.add(kf);								
-					nextID++;
 					break;
 				}
 			}

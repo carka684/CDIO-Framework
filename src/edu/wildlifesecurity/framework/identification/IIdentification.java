@@ -18,5 +18,6 @@ public interface IIdentification extends IComponent {
 	IClassificationResult classify(Mat image);
 	
 	void loadClassifierFromFile(String file);
-
+	
+	void loadPrimalValueFromFile(String filepath);
 }

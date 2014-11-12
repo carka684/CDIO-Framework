@@ -1,6 +1,7 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
 import java.io.IOException;
+import java.util.Scanner;
 import java.util.Vector;
 
 import libsvm.svm;
@@ -86,8 +87,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public IClassificationResult classify(Mat image) {
 		Mat features = extractFeatures(image);
 		// Ny version med libsvm
-		svm_node[] imageNodes = mat2svm_nodeArray(features, 0);
-		double res = svm.svm_predict(model, imageNodes);
+		svm_node[] imageFeatureNodes = mat2svm_nodeArray(features, 0);
+		double res = svm_plane_predict(w, imageFeatureNodes); // classify using the plane
+		// double res = svm.svm_predict(model, imageFeatureNodes); // libsvm version
 		// Förra versionen
 		//float res = SVM.predict(features);
 		Classes resClass = (res >= 1)?Classes.RHINO:Classes.UNIDENTIFIED;
@@ -277,6 +279,22 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 			if (model.label[1] == 0) {
 				w[featureIndex+1] = -w[featureIndex+1];
 			}
+		}
+	}
+	
+	@Override
+	public void loadPrimalValueFromFile(String filepath) {
+		try {
+			Scanner input = new Scanner(filepath);
+			int index = 0;
+			while(input.hasNext()) {
+				w[index] = input.nextFloat();
+				index++;
+			}
+			input.close();
+		}
+		catch (Exception e) {
+			System.out.println("Error loading file: " + filepath);
 		}
 	}
 }

@@ -45,5 +45,11 @@ public class LBPIdentification extends AbstractComponent implements IIdentificat
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public void loadPrimalValueFromFile(String filepath) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

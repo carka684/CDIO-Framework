@@ -53,6 +53,18 @@ public class KalmanFilter {
 			res = 1/res;
 		return res;
 	}
+	public double[] getErrorDim(double height,double width)
+	{
+		double tmpHeight = height/kalman.getState_pre().get(2, 0);
+		double tmpWidth = width/kalman.getState_pre().get(3, 0);
+		
+		if(tmpHeight > 1)
+			tmpHeight = 1/tmpHeight;
+		if(tmpWidth > 1)
+			tmpWidth  = 1/tmpWidth;
+		
+		return new double[]{tmpHeight,tmpWidth};
+	}
 
 	public void predict()
 	{

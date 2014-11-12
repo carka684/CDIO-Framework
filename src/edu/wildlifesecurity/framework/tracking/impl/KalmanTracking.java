@@ -17,7 +17,8 @@ public class KalmanTracking {
 	static Vector<KalmanFilter> kalVec;
 	static int nextID;
 	static int errorDist;
-	static double errorArea;
+	static double errorHeight;
+	static double errorWidth;
 	static int numOfUnseen;
 	static double maxAreaIncrease;
 
@@ -26,8 +27,9 @@ public class KalmanTracking {
 		nextID = 0;
 		kalVec =  new Vector<KalmanFilter>();
 		errorDist = 80; // Read from config!!
-		errorArea = 1;
-		numOfUnseen = 15; // -- || --
+		errorHeight = 0.8;
+		errorWidth = 0.8;
+		numOfUnseen = 25; // -- || --
 		maxAreaIncrease = 0.3;
 		
 	}
@@ -39,7 +41,7 @@ public class KalmanTracking {
 			kf.predict(); 
 			kf.addUnseen();
 			double[][] pos = kf.getPos();
-			Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, new Scalar(255-kf.getId()*50, kf.getId()*60+80,0),5);	
+			Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, kf.getColor(),5);	
 			if(kf.getNumOfUnseen() > numOfUnseen)
 			{
 				iterator.remove();
@@ -60,20 +62,21 @@ public class KalmanTracking {
 			else
 			{
 				double minError = errorDist;
-				double minErrorArea = errorArea;
+				double minErrorHeight = errorHeight;
+				double minErrorWidth = errorWidth;
 				KalmanFilter bestKalman = null;
 				for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
 				{
 					KalmanFilter kf = iterator.next();
 					double errorDist = kf.getError(x,y);
-					double errorArea = kf.getErrorArea(height*width);
+					double[] errorDims = kf.getErrorDim(height, width);
 					//System.out.println("errorArea: " + errorArea);
-					if (errorDist < minError && errorArea < minErrorArea) // test errorArea here.
+					if (errorDist < minError && minErrorHeight < errorDims[0] && minErrorWidth < errorDims[1]) // test errorArea here.
 					{
 						minError = errorDist;
-						minErrorArea = errorArea;
+						minErrorHeight = errorDims[0];
+						minErrorWidth = errorDims[1];
 						bestKalman = kf;
-						
 					}   
 					
 				}
@@ -83,7 +86,6 @@ public class KalmanTracking {
 					result.setColor(bestKalman.getColor());
 					bestKalman.seen();
 					bestKalman.correct(x,y,height,width);
-					//System.out.println(bestKalman.getKalman().getState_post().transpose());
 				}
 				else
 				{

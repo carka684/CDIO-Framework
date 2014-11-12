@@ -43,7 +43,7 @@ public class TrackingTest {
 		
 		Imshow show = new Imshow("");
 		KalmanTracking tracker = new KalmanTracking();
-		KalmanTracking.init();
+		tracker.init();
 		Mat img = new Mat();
 		int k = 0;
 

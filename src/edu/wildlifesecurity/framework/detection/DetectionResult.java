@@ -9,7 +9,6 @@ public class DetectionResult {
 	{
 		this.detVec = detVec;
 	}
-	
 	public Vector<Detection> getVector()
 	{
 		return detVec;

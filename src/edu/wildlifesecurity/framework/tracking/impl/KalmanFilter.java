@@ -1,8 +1,12 @@
 package edu.wildlifesecurity.framework.tracking.impl;
-import org.opencv.core.Scalar;
-
 import jama.Matrix;
+
+import java.util.Collections;
+import java.util.Vector;
+
 import jkalman.JKalman;
+
+import org.opencv.core.Scalar;
 
 
 public class KalmanFilter {
@@ -11,8 +15,10 @@ public class KalmanFilter {
 	private JKalman kalman;
 	private Integer id;
 	private Integer numOfUnseen;
+	private Integer numOfSeen;
 	Matrix predicted; 
 	Scalar color;
+	Vector<Integer> classVec;
 
 		
 	public KalmanFilter(Integer id,int x,int y, int height, int width) throws Exception
@@ -28,11 +34,37 @@ public class KalmanFilter {
 		kalman.setTransition_matrix(new Matrix(tr));
 		this.id = id;
 		numOfUnseen = 0;
+		numOfSeen = 0;
 		double[][] m = {{x,y,height,width,0,0}};
 		Matrix initMat = new Matrix(m);
 		kalman.setState_post(initMat.transpose());
 		color = new Scalar(Math.abs(Math.random()*255),Math.abs(Math.random()*255),Math.abs(Math.random()*255));
+		classVec = new Vector<>();
 	}
+	
+	public boolean isDone(int minSeen, double classRatio)
+	{
+		if(classVec.isEmpty())
+			return false;
+		Collections.sort(classVec);
+		int maxOcc = 0;
+		int maxClass = -1;
+		
+		for(int i = classVec.firstElement(); i <= classVec.lastElement(); i++)
+		{
+			int tmpMax = Collections.frequency(classVec, i);
+			if(tmpMax > maxOcc)
+			{
+				maxClass = i;
+				maxOcc = tmpMax;
+			}
+		}
+		if(numOfSeen == minSeen && maxOcc/classVec.size() > classRatio)
+			return true;
+		
+		return false;
+	}
+	
 	public void correct(int x, int y,int height, int width)
 	{
 		double[][] meas = {{x,y,height,width}};
@@ -65,7 +97,7 @@ public class KalmanFilter {
 		
 		return new double[]{tmpHeight,tmpWidth};
 	}
-
+	
 	public void predict()
 	{
 		predicted = kalman.Predict();	
@@ -94,12 +126,20 @@ public class KalmanFilter {
 	public void seen()
 	{
 		numOfUnseen = 0;
+		numOfSeen++;
 	}
 	public Scalar getColor()
 	{
 		return color;
 	}
-	
+	public void addClass(int classification)
+	{
+		classVec.add(classification);
+	}
+	public Vector<Integer> getClassVec()
+	{
+		return classVec;
+	}
 
 	
 	

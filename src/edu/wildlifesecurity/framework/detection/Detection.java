@@ -7,16 +7,27 @@ import org.opencv.core.Scalar;
 public class Detection {
 	private Mat image;
 	private Rect region;
-	private Mat boxImage;
+	private Mat regionImage;
 	private int ID;
 	private Scalar color;
+	private int classification;
 	
-	public Detection(Mat img, Rect rect, Mat boxImage){
+	
+	public Detection(Mat img, Rect rect, Mat regionImage){
 		image = img;
 		region = rect;
-		this.boxImage = boxImage;
+		this.regionImage = regionImage;
 		ID = -1;
 		color = new Scalar(125,125,125);
+		classification = -1;
+	}
+	public void setClassification(int classification)
+	{
+		this.classification = classification;
+	}
+	public int getClassification()
+	{
+		return this.classification;
 	}
 	public void setColor(Scalar color)
 	{
@@ -42,9 +53,9 @@ public class Detection {
 	{
 		return region;
 	}
-	public Mat getBoxImage()
+	public Mat getRegionImage()
 	{
-		return boxImage;
+		return regionImage;
 	}
 	
 

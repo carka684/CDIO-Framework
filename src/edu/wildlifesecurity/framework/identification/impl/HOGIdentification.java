@@ -75,7 +75,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 
 	    
 	    // Load classifier
-	    //loadClassifierFromFile(configuration.get("Identification_Classifier").toString());
+	    loadPrimalValueFromFile((configuration.get("Identification_Classifier").toString()));
 	}
 
 	public Mat extractFeatures(Mat inputImage) {

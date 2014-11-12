@@ -47,7 +47,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	//CvSVM SVM;
 	//CvSVMParams params;
 	Size s;
-	double[] w;
+	Vector<Double> w = new Vector<Double>();
 	
 	private EventDispatcher<IdentificationEvent> dispatcher =  new EventDispatcher<IdentificationEvent>();
 	
@@ -91,7 +91,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Mat features = extractFeatures(image);
 		// Ny version med libsvm
 		svm_node[] imageFeatureNodes = mat2svm_nodeArray(features, 0);
-		double res = svm_plane_predict(w, imageFeatureNodes); // classify using the plane
+		double res = svm_plane_predict(imageFeatureNodes); // classify using the plane
 		// double res = svm.svm_predict(model, imageFeatureNodes); // libsvm version
 		// Förra versionen
 		//float res = SVM.predict(features);
@@ -169,7 +169,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		for(int row = 0; row < featMat.rows(); row++) {
 			svm_node[] tempNodes = mat2svm_nodeArray(featMat, row);
 			//System.out.println("tempNode size = " + tempNodes.length);
-			double sampleClass = svm_plane_predict(w, tempNodes);
+			double sampleClass = svm_plane_predict(tempNodes);
 			//double sampleClass = SVM.svm_predict(model, tempNodes);
 			results.put(row, 0, sampleClass);
 		}
@@ -251,12 +251,12 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		return result;
 	}
 	
-	public double svm_plane_predict(double[] w, svm_node[] features) {
+	public double svm_plane_predict(svm_node[] features) {
 		double classResult;
 		double scalarprodResult = 0;
-		scalarprodResult += w[0];
+		scalarprodResult += w.get(0);
 		for(int index = 0; index < features.length; index++) {
-			scalarprodResult += w[index+1]*features[index].value;
+			scalarprodResult += w.get(index+1)*features[index].value;
 		}
 		if (scalarprodResult >= 0){
 			classResult = 0;
@@ -268,19 +268,19 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	}
 	
 	public void svm_model2primalValue() {
-		w = new double[model.SV[0].length+1];
-		w[0] = -model.rho[0];
+		w.clear();
+		w.add(-model.rho[0]);
 		if (model.label[1] == 0) {
-			w[0] = -w[0];
+			w.set(0, -w.get(0));
 		}
 		for(int featureIndex = 0; featureIndex < model.SV[0].length; featureIndex++) {
-				w[featureIndex+1] = 0;
+				w.add(0.0);
 			for(int svIndex = 0; svIndex < model.sv_coef[0].length; svIndex++) {
-				w[featureIndex+1] += model.SV[svIndex][featureIndex].value * model.sv_coef[0][svIndex];
+				w.set(featureIndex+1, w.get(featureIndex+1) + model.SV[svIndex][featureIndex].value * model.sv_coef[0][svIndex]);
 				//System.out.println(featureIndex + "  " +svIndex );
 				}
 			if (model.label[1] == 0) {
-				w[featureIndex+1] = -w[featureIndex+1];
+				w.set(featureIndex+1, -w.get(featureIndex+1));
 			}
 		}
 	}
@@ -288,11 +288,12 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	@Override
 	public void loadPrimalValueFromFile(String filepath) {
 		try {
-			Scanner input = new Scanner(filepath);
-			int index = 0;
+			w.clear();
+			Scanner input = new Scanner(new File(filepath));
+			
 			while(input.hasNext()) {
-				w[index] = input.nextFloat();
-				index++;
+				String s = input.next();
+				w.add(Double.parseDouble(s));
 			}
 			input.close();
 		}
@@ -314,9 +315,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 			
-			for(int featureIndex = 0; featureIndex < w.length; featureIndex++)
+			for(int featureIndex = 0; featureIndex < w.size(); featureIndex++)
 			{
-				bw.write(w[featureIndex] + " ");
+				bw.write(w.get(featureIndex) + " ");
 			}
 			bw.close();
  

@@ -1,5 +1,6 @@
 package edu.wildlifesecurity.framework.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.opencv.core.Mat;
@@ -48,10 +49,51 @@ public interface IRepository extends IComponent, ILogger {
 	 */
 	Mat getCaptureImage(Capture captureId);
 	
+	/**
+	 * Gets a config entry
+	 * 
+	 * @param option
+	 * @author lukas
+	 * @return Object
+	 */
+	Object getConfigOption(String option);
+
+	/**
+	 * Sets a config entry
+	 * 
+	 * @param option
+	 * @param value
+	 * @author lukas
+	 */
+	void setConfigOption(String option, Object value);
+	
 	
 	/**
 	 * Disposes the repository
 	 */
 	void dispose();
+	
+	/**
+	 * Writes entry to log with priority prio and message msg
+	 * @param prio
+	 * @param msg
+	 * 
+	 */
+	void log(String prio, String msg);
+	
+	/**
+	 * Get log entries from log that is between start time and end time
+	 * @param startTime
+	 * @param endTime
+	 * @author lukas
+	 */
+	public String getLog(Date startTime, Date endTime);
+	
+	/**
+	 * Get log entries from log that is after start time.
+	 * @param startTime
+	 * @author lukas
+	 */
+	public String getLog(Date startTime);
 	
 }

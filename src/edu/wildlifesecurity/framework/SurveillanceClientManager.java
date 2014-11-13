@@ -11,6 +11,7 @@ import org.opencv.core.Mat;
 
 import edu.wildlifesecurity.framework.Message.Commands;
 import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
+import edu.wildlifesecurity.framework.detection.Detection;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
 import edu.wildlifesecurity.framework.detection.IDetection;
 import edu.wildlifesecurity.framework.identification.Classes;
@@ -91,11 +92,11 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		DetectionResult objects = detection.getObjInImage(image);
 		
 		// Use identification component to identify things in the image
-		List<IClassificationResult> results = new LinkedList<IClassificationResult>();
-		for(Mat obj : objects.images){
-			IClassificationResult result = identification.classify(obj);
-			System.out.println("Identified: " + result.getResultingClass());
-		}
+//		List<IClassificationResult> results = new LinkedList<IClassificationResult>();
+//		for(Mat obj : objects.images){
+//			IClassificationResult result = identification.classify(obj);
+//			System.out.println("Identified: " + result.getResultingClass());
+//		}
 		
 		// TODO: Use tracking component to track identified objects
 		

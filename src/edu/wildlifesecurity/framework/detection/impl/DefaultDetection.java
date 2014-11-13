@@ -13,12 +13,15 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.video.BackgroundSubtractorMOG2;
 import org.opencv.video.KalmanFilter;
 
+import com.atul.JavaOpenCV.Imshow;
+
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventDispatcher;
 import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.detection.DetectionEvent;
+import edu.wildlifesecurity.framework.detection.Detection;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
 import edu.wildlifesecurity.framework.detection.IDetection;
 
@@ -34,7 +37,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	public void init()
 	{
 		bgs = new BackgroundSubtractorMOG2(0, 20, false);
-		InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
+		//InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
 	}
 	
 	public ISubscription addEventHandler(EventType type, IEventHandler<DetectionEvent> handler){
@@ -43,7 +46,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	
 	private DetectionResult getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)
 	{
-		DetectionResult result = new DetectionResult();
+		Vector<Detection> detVec = new Vector<>();
 		for (int i = 0; i < contours.size(); i++)
 		{
 			double area = Imgproc.contourArea(contours.get(i));
@@ -51,11 +54,13 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 			{
 				Rect boundBox = Imgproc.boundingRect(contours.get(i));
 				boundBox = squarify(boundBox, img.width(), img.height());
-				result.regions.add(boundBox);
-				result.images.add(img.submat(boundBox).clone());
+				Mat regionImage = img.submat(boundBox);
+				Detection result = new Detection(img.submat(boundBox).clone(),boundBox,regionImage); 
+				detVec.add(result);
 			}
 		}
-		return result;
+		DetectionResult detections = new DetectionResult(detVec);
+		return detections;
 	}
 	
 	private Rect squarify(Rect rect, int imWidth, int imHeight){
@@ -122,7 +127,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		
 		int MinimalSizeOfObjets = 500;
 		result = getImagesInsideContours(contours, img, MinimalSizeOfObjets);
-		result.rawDetection = fgMask;
+		//result.rawDetection = fgMask;
 		
 		// Dispatch event
 		dispatcher.dispatch(new DetectionEvent(DetectionEvent.NEW_DETECTION, result));

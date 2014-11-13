@@ -74,8 +74,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		//params.set_kernel_type(CvSVM.LINEAR);
 
 	    
-	    // Load classifier
-	    loadPrimalValueFromFile((configuration.get("Identification_Classifier").toString()));
+	    // Load classifier if a configuration option exists
+		if(configuration != null && configuration.containsKey("Identification_Classifier"))
+			loadPrimalValueFromFile((configuration.get("Identification_Classifier").toString()));
 	}
 
 	public Mat extractFeatures(Mat inputImage) {
@@ -296,6 +297,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 				w.add(Double.parseDouble(s));
 			}
 			input.close();
+			System.out.println("Loaded classifier!");
 		}
 		catch (Exception e) {
 			System.out.println("Error loading file: " + filepath);

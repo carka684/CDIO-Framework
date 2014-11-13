@@ -6,6 +6,7 @@ import edu.wildlifesecurity.framework.EventType;
 public class TrackingEvent extends Event {
 	
 	public static EventType NEW_CAPTURE = new EventType("TrackingEvent.NewCapture");
+	public static EventType NEW_TRACK = new EventType("TrackingEvent.NewTrack");
 	
 	private Capture capture;
 

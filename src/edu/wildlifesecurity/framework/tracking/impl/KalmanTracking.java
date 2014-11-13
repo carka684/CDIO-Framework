@@ -38,8 +38,8 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 		nextID = 0;
 		kalVec =  new Vector<KalmanFilter>();
 		errorDist = 80; // Read from config!!
-		errorHeight = 0.8;
-		errorWidth = 0.8;
+		errorHeight = 0.7;
+		errorWidth = 0.7;
 		numOfUnseen = 25; 
 		correctClassRatio = 0.9;
 		numOfSeen = 10;
@@ -52,7 +52,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 			kf.predict(); 
 			kf.addUnseen();
 			double[][] pos = kf.getPos();
-			Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, kf.getColor(),5);	
+			Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, kf.getColorKalman(),5);	
 			if(kf.getNumOfUnseen() > numOfUnseen)
 			{
 				iterator.remove();
@@ -93,20 +93,21 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 				if(bestKalman != null)
 				{
 					result.setID(bestKalman.getId());
-					result.setColor(bestKalman.getColor()); 
+					result.setColor(bestKalman.getColorRegion()); 
 					bestKalman.seen();
 					bestKalman.correct(x,y,height,width);
 					bestKalman.addClass(classification);
+					sendEvent(bestKalman,result.getRegionImage(), TrackingEvent.NEW_TRACK);
 					if(bestKalman.isDone(numOfSeen,correctClassRatio))
 					{
-						sendEvent(bestKalman,result.getRegionImage());
+						sendEvent(bestKalman,result.getRegionImage(), TrackingEvent.NEW_CAPTURE);
 					}
 				}
 				else
 				{
 					KalmanFilter kf = new KalmanFilter(nextID++,x,y,height,width);
 					result.setID(kf.getId());
-					result.setColor(kf.getColor());
+					result.setColor(kf.getColorRegion());
 					kf.addClass(classification);
 					kalVec.add(kf);								
 					break;
@@ -118,7 +119,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 	public ISubscription addEventHandler(EventType type, IEventHandler<TrackingEvent> handler) {
 		return dispatcher.addEventHandler(type, handler);
 	}
-	public void sendEvent(KalmanFilter kf,Mat img)
+	public void sendEvent(KalmanFilter kf,Mat img, EventType type)
 	{
 		Capture capture = new Capture();
 		capture.captureId = kf.getId();
@@ -126,7 +127,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 		capture.timeStamp = new Timestamp(new Date().getTime());
 		capture.image = img;
 		capture.trapDeviceId = -1;
-		dispatcher.dispatch(new TrackingEvent(TrackingEvent.NEW_CAPTURE, capture));
+		dispatcher.dispatch(new TrackingEvent(type, capture));
 		System.out.println(capture.timeStamp + " sent event");
 	}
 

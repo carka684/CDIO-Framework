@@ -37,9 +37,9 @@ public class TrackingTest {
 		IDetection detection = new DefaultDetection();
 		detection.init();		
 		init();
-		ImageReader reader = new ImageReader();
-		reader.readImages("C:/Users/Calle/Documents/MATLAB/images/");
-		Vector<String> files = reader.getFilesVec();
+		//ImageReader reader = new ImageReader();
+		//reader.readImages("C:/Users/Calle/Documents/MATLAB/images/");
+		//Vector<String> files = reader.getFilesVec();
 		
 		Imshow show = new Imshow("");
 		KalmanTracking tracker = new KalmanTracking();
@@ -48,12 +48,12 @@ public class TrackingTest {
 		int k = 0;
 
 		System.out.println(vc.isOpened());
-		for(String file : files)
+		//for(String file : files)
 		//{
-		//for(int frameNr = 0; frameNr < vc.get(7) - 1; frameNr++)
+		for(int frameNr = 0; frameNr < vc.get(7) - 1; frameNr++)
 		{
-			//vc.read(img);
-			img = Highgui.imread(file);
+			vc.read(img);
+			//img = Highgui.imread(file);
 			DetectionResult detections = detection.getObjInImage(img);
 			// Ladda in bild till Mat
 			if(k++ > 2)	
@@ -65,7 +65,7 @@ public class TrackingTest {
 				}
 				show.showImage(img);
 			}
-			Thread.sleep(100);
+			Thread.sleep(0);
 		}
 	}
 }

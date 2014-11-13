@@ -19,6 +19,8 @@ import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.framework.mediasource.MediaEvent;
+import edu.wildlifesecurity.framework.tracking.ITracking;
+import edu.wildlifesecurity.framework.tracking.impl.KalmanTracking;
 
 public class SurveillanceClientManager extends SurveillanceManager {
 	
@@ -26,15 +28,17 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	private IDetection detection;
 	private IIdentification identification;
 	private ICommunicatorClient communicator;
+	private KalmanTracking tracker;
 	
 	public SurveillanceClientManager(IMediaSource mediaSource, IDetection detection, IIdentification identification,
-									 ICommunicatorClient communicator){
+									 ICommunicatorClient communicator, KalmanTracking tracker){
 		super();
 		
 		this.mediaSource = mediaSource;
 		this.detection = detection;
 		this.identification = identification;
 		this.communicator = communicator;
+		this.tracker = tracker;
 	}
 	
 	/*
@@ -62,6 +66,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 				mediaSource.init();
 				detection.init();
 				identification.init();
+				tracker.init();
 
 				// Start listening for images from the MediaSource component
 				mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
@@ -98,6 +103,12 @@ public class SurveillanceClientManager extends SurveillanceManager {
 //			System.out.println("Identified: " + result.getResultingClass());
 //		}
 		
+		try {
+			tracker.trackRegions(objects, image);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// TODO: Use tracking component to track identified objects
 		
 		// TODO: Send results of tracking to server using communicator component

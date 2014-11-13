@@ -17,7 +17,9 @@ public class KalmanFilter {
 	private Integer numOfUnseen;
 	private Integer numOfSeen;
 	Matrix predicted; 
-	Scalar color;
+	Scalar colorRegion;
+	Scalar colorKalman;
+	Vector<Scalar> colorVec;
 	Vector<Integer> classVec;
 
 		
@@ -38,7 +40,12 @@ public class KalmanFilter {
 		double[][] m = {{x,y,height,width,0,0}};
 		Matrix initMat = new Matrix(m);
 		kalman.setState_post(initMat.transpose());
-		color = new Scalar(Math.abs(Math.random()*255),Math.abs(Math.random()*255),Math.abs(Math.random()*255));
+		colorRegion = new Scalar(125,125,125);//new Scalar(Math.abs(Math.random()*255),Math.abs(Math.random()*255),Math.abs(Math.random()*255));
+		colorKalman = new Scalar(Math.abs(Math.random()*255),Math.abs(Math.random()*255),Math.abs(Math.random()*255));
+		colorVec = new Vector<>();
+		colorVec.add(new Scalar(23,17,255));
+		colorVec.add(new Scalar(249,83,87));
+		colorVec.add(new Scalar(68,227,85));
 		classVec = new Vector<>();
 	}
 	
@@ -128,13 +135,19 @@ public class KalmanFilter {
 		numOfUnseen = 0;
 		numOfSeen++;
 	}
-	public Scalar getColor()
+	public Scalar getColorRegion()
 	{
-		return color;
+		return colorRegion;
+	}
+	public Scalar getColorKalman()
+	{
+		return colorKalman;
 	}
 	public void addClass(int classification)
 	{
 		classVec.add(classification);
+		if(classification >= 0)
+		colorRegion = colorVec.get(classification);
 	}
 	public Vector<Integer> getClassVec()
 	{

@@ -8,9 +8,9 @@ import org.opencv.core.Mat;
 
 public class Capture {
 	
-	private String pathFormat= "Captures/%s/%d.png";
+	private String pathFormat= "Captures/Trap %d/%d.png";
 	
-	private DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+	private DateFormat df = new SimpleDateFormat("yyyy-MM-dd"); // <-- if we want time stamped folders
 	
 	public int captureId;
 
@@ -36,7 +36,7 @@ public class Capture {
 		this.trapDeviceId = trapDeviceId;
 		this.position = position;
 		this.image = image;
-		this.imagePath = String.format(pathFormat,df.format(this.timeStamp),this.captureId);
+		this.imagePath = String.format(pathFormat,this.trapDeviceId,this.captureId);
 	}
 	
 	public Capture(int captureId, Date timeStamp, int trapDeviceId,
@@ -46,7 +46,7 @@ public class Capture {
 		this.timeStamp = timeStamp;
 		this.trapDeviceId = trapDeviceId;
 		this.position = position;
-		this.imagePath = String.format(pathFormat,df.format(this.timeStamp),this.captureId);
+		this.imagePath = String.format(pathFormat,this.trapDeviceId,this.captureId);
 	}
 	
 	public Capture(int captureId, Date timeStamp, int trapDeviceId,

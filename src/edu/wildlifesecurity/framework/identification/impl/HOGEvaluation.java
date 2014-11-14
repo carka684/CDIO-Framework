@@ -5,6 +5,7 @@ import java.io.File;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
 import org.opencv.highgui.Highgui;
+import org.opencv.imgproc.Imgproc;
 
 public class HOGEvaluation {
 
@@ -29,8 +30,10 @@ public class HOGEvaluation {
 		int fileNr = 0;
 		for(File file : allfiles.listFiles())
 		{
-			Mat im = Highgui.imread(file.getPath());
-			hogTest.classify(im);
+			Mat image = Highgui.imread(file.getPath());
+			Mat grayImage = new Mat();
+			Imgproc.cvtColor(image, grayImage, Imgproc.COLOR_RGB2GRAY);
+			hogTest.classify(grayImage);
 		}*/
 	}
 

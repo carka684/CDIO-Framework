@@ -47,7 +47,7 @@ public interface IRepository extends IComponent, ILogger {
 	 * @param captureId
 	 * @return
 	 */
-	Mat getCaptureImage(Capture captureId);
+	Mat getCaptureImage(int captureId);
 	
 	/**
 	 * Gets a config entry

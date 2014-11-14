@@ -1,13 +1,18 @@
 package edu.wildlifesecurity.framework;
 
+import java.io.ByteArrayInputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Base64;
 
 import edu.wildlifesecurity.framework.Message.Commands;
 import edu.wildlifesecurity.framework.actuator.IActuator;
 import edu.wildlifesecurity.framework.communicatorserver.ICommunicatorServer;
 import edu.wildlifesecurity.framework.repository.IRepository;
+import edu.wildlifesecurity.framework.tracking.Capture;
 import edu.wildlifesecurity.framework.tracking.ITracking;
 
 public class SurveillanceServerManager extends SurveillanceManager {
@@ -42,7 +47,7 @@ public class SurveillanceServerManager extends SurveillanceManager {
 		actuator.init();
 		communicator.init();
 		
-		// TODO: Connect components (start listen for various messages etc...)
+		/// Adds listeners for various message types
 		
 		// Redirect log requests
 		communicator.addEventHandler(MessageEvent.getEventType(Commands.LOG), new IEventHandler<MessageEvent>(){
@@ -62,6 +67,38 @@ public class SurveillanceServerManager extends SurveillanceManager {
 					break;
 				}
 				
+			}
+			
+		});
+		
+		// Handle NEW_CAPTURE messages
+		communicator.addEventHandler(MessageEvent.getEventType(Commands.NEW_CAPTURE), new IEventHandler<MessageEvent>(){
+
+			@Override
+			public void handle(MessageEvent event) {
+
+				// When a new capture is received, save it to repository and send it to actuator that decides how to act on it
+
+				Capture capture = null;
+				
+				try{
+					// Parse capture
+					String captureEncoded = event.getMessage().getMessage().split(",")[1];
+					byte[] bytes = Base64.getDecoder().decode(captureEncoded);
+					ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+					ObjectInput ois = new ObjectInputStream(bis);
+					capture = (Capture) ois.readObject();
+					
+				}catch(Exception e){
+					repository.error("Error in SurveillanceServerManager. Cannot deserialize capture: " + e.getMessage());
+					return;
+				}
+				
+				// Send to actuator
+				actuator.actOnCapture(capture);
+				
+				// Store in repository
+				repository.storeCapture(capture);
 			}
 			
 		});

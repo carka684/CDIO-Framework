@@ -75,7 +75,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 
 	    
 	    // Load classifier
-	    loadPrimalValueFromFile((configuration.get("Identification_Classifier").toString()));
+		//loadPrimalValueFromFile((configuration.get("Identification_Classifier").toString()));
 	}
 
 	public Mat extractFeatures(Mat inputImage) {
@@ -88,16 +88,20 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	
 	@Override
 	public IClassificationResult classify(Mat image) {
-		Mat features = extractFeatures(image);
+		Mat grayImage = new Mat();
+		Imgproc.cvtColor(image, grayImage, Imgproc.COLOR_RGB2GRAY);
+		Mat features = extractFeatures(grayImage);
 		// Ny version med libsvm
-		svm_node[] imageFeatureNodes = mat2svm_nodeArray(features, 0);
+		svm_node[] imageFeatureNodes = mat2svm_nodeArray(features.t(), 0); // features must be a row-vector
 		double res = svm_plane_predict(imageFeatureNodes); // classify using the plane
 		// double res = svm.svm_predict(model, imageFeatureNodes); // libsvm version
 		// Förra versionen
 		//float res = SVM.predict(features);
+		//System.out.print(", " + (int) res);
 		Classes resClass = (res >= 1)?Classes.RHINO:Classes.UNIDENTIFIED;
 		
-		ClassificationResult result = new ClassificationResult(resClass, image);
+		ClassificationResult result = new ClassificationResult(resClass, grayImage);
+		// System.out.println("ResultingClass: " + result.getResultingClass());
 		dispatcher.dispatch(new IdentificationEvent(IdentificationEvent.NEW_IDENTIFICATION, result));
 		return result;
 	}
@@ -167,23 +171,32 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		// Ny version med libsvm
 		Mat results = new Mat(featMat.rows(), 1, CvType.CV_8S); // Must be signed
 		for(int row = 0; row < featMat.rows(); row++) {
-			svm_node[] tempNodes = mat2svm_nodeArray(featMat, row);
-			//System.out.println("tempNode size = " + tempNodes.length);
-			double sampleClass = svm_plane_predict(tempNodes);
-			//double sampleClass = SVM.svm_predict(model, tempNodes);
-			results.put(row, 0, sampleClass);
+			if(row == 60) {
+				svm_node[] tempNodes = mat2svm_nodeArray(featMat, row);
+				double sampleClass = svm_plane_predict(tempNodes);
+				results.put(row, 0, sampleClass);
+			}
+			else {
+				svm_node[] tempNodes = mat2svm_nodeArray(featMat, row);
+				//System.out.println("tempNode size = " + tempNodes.length);
+				double sampleClass = svm_plane_predict(tempNodes);
+				//double sampleClass = SVM.svm_predict(model, tempNodes);
+				results.put(row, 0, sampleClass);
+			}
 		}
-		
 		// Förra versionen
 		//SVM.predict_all(featMat, results);
 		
 		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
 	}
+	
 	/*
 	 * TODO: How should the result be presented?
 	 */
 	public static  double[] getResult(Mat classes, Mat results, int numOfClasses,int[] numOfEachClass)
 	{
+		System.out.println("Results: " + results.t().dump());
+		System.out.println("Classes: " + classes.t().dump());
 		int pos = 0;
 		for(int i = 0; i < numOfClasses; i++)
 		{

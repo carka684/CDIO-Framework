@@ -44,10 +44,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	svm SVM;
 	svm_model model;
 	svm_parameter params;
-	//CvSVM SVM;
-	//CvSVMParams params;
 	Size s;
-	Vector<Double> w = new Vector<Double>();
+	Vector<Double> w = new Vector<Double>(); // Primal variable
 	
 	private EventDispatcher<IdentificationEvent> dispatcher =  new EventDispatcher<IdentificationEvent>();
 	
@@ -68,38 +66,26 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		params.kernel_type = linearSVM;
 		params.C = 16;
 		params.eps = 0.01;
-		
-		//SVM = new CvSVM();
-		//params = new CvSVMParams();
-		//params.set_kernel_type(CvSVM.LINEAR);
-
 	    
 		// Load classifier if a configuration option exists
 		if(configuration != null && configuration.containsKey("Identification_Classifier"))
-			loadPrimalValueFromFile((configuration.get("Identification_Classifier").toString()));
+			loadPrimalVariableFromFile((configuration.get("Identification_Classifier").toString()));
 	}
 
 	public Mat extractFeatures(Mat inputImage) {
 		MatOfFloat features = new MatOfFloat();
 		Imgproc.resize(inputImage, inputImage, s);
-		hog.compute(inputImage, features);	
-		//System.out.println(features.size());
+		hog.compute(inputImage, features);
 		return features;
 	}
 	
 	@Override
 	public IClassificationResult classify(Mat image) {
 		Mat features = extractFeatures(image);
-		// Ny version med libsvm
-		svm_node[] imageFeatureNodes = mat2svm_nodeArray(features.t(), 0); // features must be a row-vector
-		double res = svm_plane_predict(imageFeatureNodes); // classify using the plane
-		// double res = svm.svm_predict(model, imageFeatureNodes); // libsvm version
-		// Förra versionen
-		//float res = SVM.predict(features);
-		//System.out.print(", " + (int) res);
+		svm_node[] imageFeatureNodes = featureMat2svm_nodeArray(features.t(), 0); // features must be a row-vector
+		double res = svmPlanePredict(imageFeatureNodes); // classify using the plane
 		Classes resClass = (res >= 1)?Classes.RHINO:Classes.UNIDENTIFIED;
 		ClassificationResult result = new ClassificationResult(resClass, image);
-		//System.out.println("ResultingClass: " + result.getResultingClass());
 		dispatcher.dispatch(new IdentificationEvent(IdentificationEvent.NEW_IDENTIFICATION, result));
 		return result;
 	}
@@ -137,26 +123,17 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		trainReader.readImages(trainFolder);
 		Vector<String> trainFiles = trainReader.getFilesVec();
 		Mat classes = trainReader.getClasses();
-		Mat featMat = extractFeaturesFromFiles(trainFiles);
-		// System.out.println("FeatureMatrix size: " + featMat.rows() + ", " + featMat.cols());
-		// Ny version med libsvm
-		svm_problem prob = mat2svm_problem(featMat, classes);	
-		/*System.out.println("Prob, l = " + prob.l);
-		System.out.println("y length = " + prob.y.length);
-		System.out.println("svm_node = " + prob.x[0].length + " sista " + prob.x[279].length); */
-		model = SVM.svm_train(prob, params);
-		svm_model2primalValue();
+		Mat featureMat = extractFeaturesFromFiles(trainFiles);
+		svm_problem featureProblem = featureMat2svm_problem(featureMat, classes);	
+		model = SVM.svm_train(featureProblem, params);
+		svm_model2primalVariable();
 		try {
-			savePrimalValue2file(outputFile);
+			savePrimalVariable2file(outputFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Could not save model to file.");
 			e.printStackTrace();
 		}
-
-		// Förra versionen
-		//SVM.train(featMat,classes,new Mat(),new Mat(),params);
-		//SVM.save(outputFile);
 	}
 	
 	@Override
@@ -165,20 +142,13 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		trainReader.readImages(valFolder);
 		Vector<String> trainFiles = trainReader.getFilesVec();
 		Mat classes = trainReader.getClasses();
-		Mat featMat = extractFeaturesFromFiles(trainFiles);
-		
-		// Ny version med libsvm
-		Mat results = new Mat(featMat.rows(), 1, CvType.CV_8S); // Must be signed
-		for(int row = 0; row < featMat.rows(); row++) {
-				svm_node[] tempNodes = mat2svm_nodeArray(featMat, row);
-				//System.out.println("tempNode size = " + tempNodes.length);
-				double sampleClass = svm_plane_predict(tempNodes);
-				//double sampleClass = SVM.svm_predict(model, tempNodes);
+		Mat featureMat = extractFeaturesFromFiles(trainFiles);
+		Mat results = new Mat(featureMat.rows(), 1, CvType.CV_8S); // Must be signed
+		for(int row = 0; row < featureMat.rows(); row++) {
+				svm_node[] featureNodes = featureMat2svm_nodeArray(featureMat, row);
+				double sampleClass = svmPlanePredict(featureNodes);
 				results.put(row, 0, sampleClass);
 		}
-		// Förra versionen
-		//SVM.predict_all(featMat, results);
-		
 		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
 	}
 	
@@ -212,57 +182,57 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 	}
 	
-	// Helpfunctions for libsvm version
-	
-	public svm_problem mat2svm_problem(Mat featureMat, Mat classes) {
+	// Convert from featureMatrix to svm_problem, which is required as input to svm_train
+	public svm_problem featureMat2svm_problem(Mat featureMat, Mat classes) {
 		svm_problem result = new svm_problem();
-		result.l = featureMat.rows();
-		//float[] tempClasses = classes.toArray();
-		result.y = new double[featureMat.rows()];
-		svm_node[][] svmNodes = new svm_node[featureMat.rows()][featureMat.cols()];
+		result.l = featureMat.rows(); // number of samples
+		result.y = new double[featureMat.rows()]; // correct class
+		svm_node[][] svmNodes = new svm_node[featureMat.rows()][featureMat.cols()]; // nodes containing index and features
 		for (int row = 0; row < featureMat.rows(); row++)  {
 			result.y[row] = classes.get(row, 0)[0];
 			for(int col = 0; col < featureMat.cols(); col++) {
-				svm_node tempNode = new svm_node();
+				svm_node featureNode = new svm_node();
 				if (col != featureMat.cols() - 1) {
-					tempNode.index = col;
+					featureNode.index = col;
 				}
 				else {
-					tempNode.index = -1;
+					featureNode.index = -1;
 				}
-				tempNode.value = featureMat.get(row, col)[0];
-				svmNodes[row][col] = tempNode;
+				featureNode.value = featureMat.get(row, col)[0];
+				svmNodes[row][col] = featureNode;
 			}
 		}
 		result.x = svmNodes;
 		return result;
 	}
 	
-	public svm_node[] mat2svm_nodeArray(Mat featureMat, int sampleNr) {
+	// Convert from feature-vector to svm_node[], which is required as input to svmPlanePredict
+	public svm_node[] featureMat2svm_nodeArray(Mat featureMat, int sampleNr) {
 		svm_node[] result = new svm_node[featureMat.cols()];
 		for(int col = 0; col < featureMat.cols(); col++) {
-			svm_node tempNode = new svm_node();
+			svm_node featureNode = new svm_node();
 			if (col != featureMat.cols() - 1) {
-				tempNode.index = col;
+				featureNode.index = col;
 			}
 			else {
-				tempNode.index = -1;
+				featureNode.index = -1;
 			}
-			tempNode.value = featureMat.get(sampleNr, col)[0];
-			result[col] = tempNode; 
+			featureNode.value = featureMat.get(sampleNr, col)[0];
+			result[col] = featureNode; 
 		}
 		
 		return result;
 	}
 	
-	public double svm_plane_predict(svm_node[] features) {
+	public double svmPlanePredict(svm_node[] features) {
 		double classResult;
 		double scalarprodResult = 0;
-		scalarprodResult += w.get(0);
+		scalarprodResult += w.get(0); // biased weight
 		for(int index = 0; index < features.length; index++) {
 			scalarprodResult += w.get(index+1)*features[index].value;
 		}
-		if (scalarprodResult >= 0){
+		
+		if (scalarprodResult >= 0) {
 			classResult = 0;
 		}
 		else {
@@ -271,18 +241,17 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		return classResult;
 	}
 	
-	public void svm_model2primalValue() {
+	public void svm_model2primalVariable() {
 		w.clear();
 		w.add(-model.rho[0]);
 		if (model.label[1] == 0) {
 			w.set(0, -w.get(0));
 		}
 		for(int featureIndex = 0; featureIndex < model.SV[0].length; featureIndex++) {
-				w.add(0.0);
+			w.add(0.0);
 			for(int svIndex = 0; svIndex < model.sv_coef[0].length; svIndex++) {
 				w.set(featureIndex+1, w.get(featureIndex+1) + model.SV[svIndex][featureIndex].value * model.sv_coef[0][svIndex]);
-				//System.out.println(featureIndex + "  " +svIndex );
-				}
+			}
 			if (model.label[1] == 0) {
 				w.set(featureIndex+1, -w.get(featureIndex+1));
 			}
@@ -290,14 +259,14 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	}
 	
 	@Override
-	public void loadPrimalValueFromFile(String filepath) {
+	public void loadPrimalVariableFromFile(String filepath) {
 		try {
 			w.clear();
 			Scanner input = new Scanner(new File(filepath));
-			
+			String str = new String();
 			while(input.hasNext()) {
-				String s = input.next();
-				w.add(Double.parseDouble(s));
+				str = input.next();
+				w.add(Double.parseDouble(str));
 			}
 			input.close();
 			System.out.println("Loaded classifier!");
@@ -307,16 +276,14 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 	}
 	
-	public void savePrimalValue2file(String filePath) throws IOException
+	public void savePrimalVariable2file(String filePath) throws IOException
 	{
 		try {
 			File file = new File(filePath);
- 
-			// if file doesnt exists, then create it
+			// if file does not exists, then create it
 			if (!file.exists()) {
 				file.createNewFile();
 			}
- 
 			FileWriter fw = new FileWriter(file.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 			
@@ -325,9 +292,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 				bw.write(w.get(featureIndex) + " ");
 			}
 			bw.close();
- 
-			System.out.println("Primal Value Saved");
- 
+			System.out.println("Primal variable Saved");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

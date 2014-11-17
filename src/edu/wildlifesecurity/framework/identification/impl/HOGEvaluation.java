@@ -1,11 +1,6 @@
 package edu.wildlifesecurity.framework.identification.impl;
 
-import java.io.File;
-
 import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.highgui.Highgui;
-import org.opencv.imgproc.Imgproc;
 
 public class HOGEvaluation {
 
@@ -14,8 +9,8 @@ public class HOGEvaluation {
 		
 		HOGIdentification hogTest = new HOGIdentification(); 
 		hogTest.init();
-		hogTest.trainClassifier("/Users/jonasforsner/Documents/Dataset/Training/", "", "primalValue.txt");
-		hogTest.loadPrimalValueFromFile("primalValue.txt");
+		// hogTest.trainClassifier("/Users/jonasforsner/Documents/Dataset/Training/", "", "primalVariable.txt");
+		hogTest.loadPrimalVariableFromFile("primalVariable.txt");
 		
 		long startTime = System.currentTimeMillis();
 		hogTest.evaluateClassifier("/Users/jonasforsner/Documents/Dataset/Validation/", "");

@@ -99,7 +99,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		//System.out.print(", " + (int) res);
 		Classes resClass = (res >= 1)?Classes.RHINO:Classes.UNIDENTIFIED;
 		ClassificationResult result = new ClassificationResult(resClass, image);
-		System.out.println("ResultingClass: " + result.getResultingClass());
+		//System.out.println("ResultingClass: " + result.getResultingClass());
 		dispatcher.dispatch(new IdentificationEvent(IdentificationEvent.NEW_IDENTIFICATION, result));
 		return result;
 	}
@@ -117,7 +117,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 			try {
 				img = Highgui.imread(file,Highgui.CV_LOAD_IMAGE_GRAYSCALE);
 			} catch (Exception e) {
-				System.out.println("F�rs�kte l�sa in:" + file);
+				System.out.println("Error loading: " + file);
 				e.printStackTrace();
 			}
 			feat = extractFeatures(img);
@@ -145,8 +145,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		System.out.println("y length = " + prob.y.length);
 		System.out.println("svm_node = " + prob.x[0].length + " sista " + prob.x[279].length); */
 		model = SVM.svm_train(prob, params);
+		svm_model2primalValue();
 		try {
-			SVM.svm_save_model(outputFile, model);
+			savePrimalValue2file(outputFile);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("Could not save model to file.");
@@ -211,7 +212,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 	}
 	
-	// Hjälpfunktioner för att libsvm varianten ska fungera
+	// Helpfunctions for libsvm version
+	
 	public svm_problem mat2svm_problem(Mat featureMat, Mat classes) {
 		svm_problem result = new svm_problem();
 		result.l = featureMat.rows();
@@ -305,7 +307,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 	}
 	
-	public void savePrimalValue2file(String filePath)
+	public void savePrimalValue2file(String filePath) throws IOException
 	{
 		try {
 			File file = new File(filePath);

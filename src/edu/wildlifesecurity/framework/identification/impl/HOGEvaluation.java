@@ -14,11 +14,7 @@ public class HOGEvaluation {
 		
 		HOGIdentification hogTest = new HOGIdentification(); 
 		hogTest.init();
-		//hogTest.trainClassifier("/Users/jonasforsner/Documents/Dataset/Training/", "", "classifier1.txt");
-		
-		//hogTest.loadClassifierFromFile("classifier1.txt");
-		//hogTest.svm_model2primalValue();
-		//hogTest.savePrimalValue2file("primalValue.txt");
+		hogTest.trainClassifier("/Users/jonasforsner/Documents/Dataset/Training/", "", "primalValue.txt");
 		hogTest.loadPrimalValueFromFile("primalValue.txt");
 		
 		long startTime = System.currentTimeMillis();

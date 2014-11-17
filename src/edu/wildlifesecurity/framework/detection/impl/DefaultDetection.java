@@ -103,7 +103,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		age++;
 		DetectionResult result;
 		Mat fgMask = new Mat();
-	
+		System.out.println("Age: " + age);
 		if(age < InitTime)	
 		{
 			bgs.apply(img, fgMask, 0.01);

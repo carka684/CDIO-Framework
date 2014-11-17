@@ -137,7 +137,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
 		Map<String, Object> detectionConfig = new HashMap<String, Object>();
-		detectionConfig.put("Detection_InitTime", 20);
+		detectionConfig.put("Detection_InitTime", 200);
 		detection.loadConfiguration(detectionConfig);
 		
 		Map<String, Object> identificationConfig = new HashMap<String, Object>();

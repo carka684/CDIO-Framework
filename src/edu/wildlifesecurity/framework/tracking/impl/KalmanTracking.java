@@ -42,7 +42,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 		errorWidth = 0.7;
 		numOfUnseen = 25; 
 		correctClassRatio = 0.9;
-		numOfSeen = 10;
+		numOfSeen = 5;
 	}
 	public void trackRegions(DetectionResult detections,Mat img) throws Exception
 	{
@@ -52,7 +52,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 			kf.predict(); 
 			kf.addUnseen();
 			double[][] pos = kf.getPos();
-			Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, kf.getColorKalman(),5);	
+			//Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, kf.getColorKalman(),5);	
 			if(kf.getNumOfUnseen() > numOfUnseen)
 			{
 				iterator.remove();
@@ -97,10 +97,11 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 					bestKalman.seen();
 					bestKalman.correct(x,y,height,width);
 					bestKalman.addClass(classification);
-					sendEvent(bestKalman,result.getRegionImage(), TrackingEvent.NEW_TRACK);
+					sendEvent(bestKalman, result, TrackingEvent.NEW_TRACK);
+					Core.rectangle(img, result.getRegion().tl(), result.getRegion().br(),result.getColor(),5);
 					if(bestKalman.isDone(numOfSeen,correctClassRatio))
 					{
-						sendEvent(bestKalman,result.getRegionImage(), TrackingEvent.NEW_CAPTURE);
+						sendEvent(bestKalman,result, TrackingEvent.NEW_CAPTURE);
 					}
 				}
 				else
@@ -119,16 +120,10 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 	public ISubscription addEventHandler(EventType type, IEventHandler<TrackingEvent> handler) {
 		return dispatcher.addEventHandler(type, handler);
 	}
-	public void sendEvent(KalmanFilter kf,Mat img, EventType type)
+	public void sendEvent(KalmanFilter kf,Detection detection, EventType type)
 	{
-		Capture capture = new Capture();
-		capture.captureId = kf.getId();
-		capture.position = "" + kf.getPos()[0][0] + " " + kf.getPos()[1][0];
-		capture.timeStamp = new Timestamp(new Date().getTime());
-		capture.image = img;
-		capture.trapDeviceId = -1;
+		Capture capture = new Capture(kf.getId(), new Timestamp(new Date().getTime()), -1, detection.getRegion(), detection.getRegionImage(),detection.getClassification());
 		dispatcher.dispatch(new TrackingEvent(type, capture));
-		System.out.println(capture.timeStamp + " sent event");
 	}
 
 }

@@ -32,14 +32,14 @@ public class TrackingTest {
 	public static void main(String[] args) throws Exception {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 
-		VideoCapture vc = new VideoCapture("/Users/annasoederroos/TSBB11/Camera1_2.mp4");
-		
+//		VideoCapture vc = new VideoCapture("/Users/annasoederroos/TSBB11/Camera1_2.mp4");
+		VideoCapture vc = new VideoCapture("C:/Camera1_2.mp4");
 		IDetection detection = new DefaultDetection();
 		detection.init();		
 		init();
-		//ImageReader reader = new ImageReader();
-		//reader.readImages("C:/Users/Calle/Documents/MATLAB/images/");
-		//Vector<String> files = reader.getFilesVec();
+		ImageReader reader = new ImageReader();
+		reader.readImages("C:/Users/Calle/Documents/MATLAB/images/");
+		Vector<String> files = reader.getFilesVec();
 		
 		Imshow show = new Imshow("");
 		KalmanTracking tracker = new KalmanTracking();
@@ -48,24 +48,26 @@ public class TrackingTest {
 		int k = 0;
 
 		System.out.println(vc.isOpened());
-		//for(String file : files)
+		for(String file : files)
 		//{
 		for(int frameNr = 0; frameNr < vc.get(7) - 1; frameNr++)
 		{
 			vc.read(img);
-			//img = Highgui.imread(file);
-			DetectionResult detections = detection.getObjInImage(img);
-			// Ladda in bild till Mat
-			if(k++ > 2)	
+			if(frameNr % 25 == 0)
 			{
-				tracker.trackRegions(detections, img);
-				for(Detection dec : detections.getVector())
+				//img = Highgui.imread(file);
+				DetectionResult detections = detection.getObjInImage(img);
+				Mat raw = detections.getRawDetection();
+				// Ladda in bild till Mat
+				if(k++ > 2)	
 				{
-					Core.rectangle(img, dec.getRegion().tl(), dec.getRegion().br(),dec.getColor(),5);
+					tracker.trackRegions(detections, raw);
+
+					show.showImage(raw);
 				}
-				show.showImage(img);
+				Thread.sleep(0);
 			}
-			Thread.sleep(0);
+			
 		}
 	}
 }

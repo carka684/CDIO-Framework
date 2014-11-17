@@ -5,7 +5,6 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 
 public class Detection {
-	private Mat image;
 	private Rect region;
 	private Mat regionImage;
 	private int ID;
@@ -13,8 +12,7 @@ public class Detection {
 	private int classification;
 	
 	
-	public Detection(Mat img, Rect rect, Mat regionImage){
-		image = img;
+	public Detection(Rect rect, Mat regionImage){
 		region = rect;
 		this.regionImage = regionImage;
 		ID = -1;
@@ -44,10 +42,6 @@ public class Detection {
 	public void setID(int ID)
 	{
 		this.ID = ID;
-	}
-	public Mat getImg()
-	{
-		return image;
 	}
 	public Rect getRegion()
 	{

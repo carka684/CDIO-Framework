@@ -44,7 +44,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		return dispatcher.addEventHandler(type, handler);
 	}
 	
-	private DetectionResult getImagesInsideContours(Vector <MatOfPoint> contours, Mat img, int minAreaOnImage)
+	private DetectionResult getImagesInsideContours(Vector <MatOfPoint> contours,Mat img, Mat rawDetection, int minAreaOnImage)
 	{
 		Vector<Detection> detVec = new Vector<>();
 		for (int i = 0; i < contours.size(); i++)
@@ -53,13 +53,13 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 			if (area > minAreaOnImage)
 			{
 				Rect boundBox = Imgproc.boundingRect(contours.get(i));
-				boundBox = squarify(boundBox, img.width(), img.height());
+				boundBox = squarify(boundBox, rawDetection.width(), rawDetection.height());
 				Mat regionImage = img.submat(boundBox);
-				Detection result = new Detection(img.submat(boundBox).clone(),boundBox,regionImage); 
+				Detection result = new Detection(boundBox,regionImage); 
 				detVec.add(result);
 			}
 		}
-		DetectionResult detections = new DetectionResult(detVec);
+		DetectionResult detections = new DetectionResult(detVec,rawDetection);
 		return detections;
 	}
 	
@@ -126,7 +126,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		Imgproc.findContours(fgMaskMod, contours, contourHierarchy, 3, 1);
 		
 		int MinimalSizeOfObjets = 500;
-		result = getImagesInsideContours(contours, img, MinimalSizeOfObjets);
+		result = getImagesInsideContours(contours,img,fgMask, MinimalSizeOfObjets);
 		//result.rawDetection = fgMask;
 		
 		// Dispatch event

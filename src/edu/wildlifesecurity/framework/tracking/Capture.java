@@ -13,15 +13,17 @@ public class Capture {
 	public Rect region;
 	public Mat regionImage;
 	public int classification;
+	public String GPSPos;
 	
 	public Capture(int captureId, Date timeStamp, int trapDeviceId,
-			Rect region, Mat regionImage, int classification) {
+			Rect region, Mat regionImage, int classification, String GPSPos) {
 		this.captureId = captureId;
 		this.timeStamp = timeStamp;
 		this.trapDeviceId = trapDeviceId;
 		this.region = region;
 		this.regionImage = regionImage;
 		this.classification = classification;
+		this.GPSPos = GPSPos;
 	}
 	public Date getTimeStamp() {
 		return timeStamp;
@@ -61,6 +63,12 @@ public class Capture {
 	}
 	public void setClassification(int classification) {
 		this.classification = classification;
+	}
+	public String getGPSPos() {
+		return GPSPos;
+	}
+	public void setGPSPos(String gPSPos) {
+		GPSPos = gPSPos;
 	}
 
 

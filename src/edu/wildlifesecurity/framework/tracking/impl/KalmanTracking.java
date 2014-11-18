@@ -122,7 +122,9 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 	}
 	public void sendEvent(KalmanFilter kf,Detection detection, EventType type)
 	{
-		Capture capture = new Capture(kf.getId(), new Timestamp(new Date().getTime()), -1, detection.getRegion(), detection.getRegionImage(),detection.getClassification());
+		String GPSPos = "";
+		Capture capture = new Capture(kf.getId(), new Timestamp(new Date().getTime()), -1, detection.getRegion(), 
+				detection.getRegionImage(),detection.getClassification(),GPSPos);
 		dispatcher.dispatch(new TrackingEvent(type, capture));
 	}
 

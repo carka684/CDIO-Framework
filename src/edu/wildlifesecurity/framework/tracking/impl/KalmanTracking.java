@@ -49,27 +49,35 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 		{
 			KalmanFilter kf = iterator.next();
 			kf.predict(); 
+			
 			kf.addUnseen();
-
+			/*
+			 * If the filter hasn't got connected to a detection in numOfUnseen frames
+			 * it's removed.
+			 */
 			if(kf.getNumOfUnseen() > numOfUnseen)
 			{
 				iterator.remove();
 			}
 			
 		}				
-		for(Detection result : detections.getVector())
+		for(Detection detection : detections.getVector())
 		{
-			int height = result.getRegion().height;
-			int width = result.getRegion().width;
-			int x = result.getRegion().x + width/2;
-			int y = result.getRegion().y + height/2;
-			Classes classification = result.getClassification();
+			int height = detection.getRegion().height;
+			int width = detection.getRegion().width;
+			int x = detection.getRegion().x + width/2;
+			int y = detection.getRegion().y + height/2;
+			Classes classification = detection.getClassification();
 			if(kalVec.isEmpty())
 			{
 				kalVec.add(new KalmanFilter(nextID++,x,y,height,width));
 			}	
 			else
 			{
+				/*
+				 * If a Kalman-filter which is "good enough" for the current detection
+				 * that filter will be bestKalman and gets conntected to the detection. 
+				 */
 				double minError = errorDist;
 				double minErrorHeight = errorHeight;
 				double minErrorWidth = errorWidth;
@@ -87,22 +95,31 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 						bestKalman = kf;
 					}   
 				}
+				/*
+				 * If a existing filter was a match that filter (bestKalman) get connected
+				 * to the detection and a NEW_TRACK-event is sent.
+				 * If bestKalman fulfills the requirements to be a capture a NEW_CAPTURE will be sent. 
+				 */
 				if(bestKalman != null)
 				{
-					result.setID(bestKalman.getId());
+					detection.setID(bestKalman.getId());
 					bestKalman.seen();
 					bestKalman.correct(x,y,height,width);
 					bestKalman.addClass(classification);
-					sendEvent(bestKalman, result, TrackingEvent.NEW_TRACK);
+					sendEvent(bestKalman, detection, TrackingEvent.NEW_TRACK);
 					if(bestKalman.isDone(numOfSeen,correctClassRatio))
 					{
-						sendEvent(bestKalman,result, TrackingEvent.NEW_CAPTURE);
+						sendEvent(bestKalman,detection, TrackingEvent.NEW_CAPTURE);
 					}
 				}
+				/*
+				 * If there wasn't any KF which matched the detection a new filter 
+				 * will be created and connected to the detection
+				 */
 				else
 				{
 					KalmanFilter kf = new KalmanFilter(nextID++,x,y,height,width);
-					result.setID(kf.getId());
+					detection.setID(kf.getId());
 					kf.addClass(classification);
 					kalVec.add(kf);								
 					break;

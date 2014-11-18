@@ -122,12 +122,12 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		// 4. Send results of tracking to server using communicator component
 		Capture capture = new Capture(new Date(),null,Classes.RHINO,"hemma hos Lukas");
 		
-		try {
-			communicator.sendMessage(serializeCapture(capture));
-		} catch (IOException e) {
-			// Write log message
-			communicator.error("Error in SurveillanceClientManager. Could not serialize capture: " + e.getMessage());
-		}
+//		try {
+//			communicator.sendMessage(serializeCapture(capture));
+//		} catch (IOException e) {
+//			// Write log message
+//			communicator.error("Error in SurveillanceClientManager. Could not serialize capture: " + e.getMessage());
+//		}
 		
 		
 	}

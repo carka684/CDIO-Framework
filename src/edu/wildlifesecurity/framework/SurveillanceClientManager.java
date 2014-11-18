@@ -1,5 +1,11 @@
 package edu.wildlifesecurity.framework;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Base64;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,6 +25,7 @@ import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.framework.mediasource.MediaEvent;
+import edu.wildlifesecurity.framework.tracking.Capture;
 import edu.wildlifesecurity.framework.tracking.ITracking;
 import edu.wildlifesecurity.framework.tracking.impl.KalmanTracking;
 
@@ -93,25 +100,35 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	private void processImage(Mat image){
 		
-		// Use detection component to detect stuff in the image
+		// 1. Use detection component to detect stuff in the image
 		DetectionResult objects = detection.getObjInImage(image);
 		
-		// Use identification component to identify things in the image
+		// 2. Use identification component to identify things in the image
 //		List<IClassificationResult> results = new LinkedList<IClassificationResult>();
 //		for(Mat obj : objects.images){
 //			IClassificationResult result = identification.classify(obj);
 //			System.out.println("Identified: " + result.getResultingClass());
 //		}
 		
+		// 3. Use tracking component to track identified objects
 		try {
-			tracker.trackRegions(objects, image);
+			tracker.trackRegions(objects); // Should return captures somehow??
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// TODO: Use tracking component to track identified objects
 		
-		// TODO: Send results of tracking to server using communicator component
+		
+		// 4. Send results of tracking to server using communicator component
+		Capture capture = new Capture(new Date(),null,Classes.RHINO,"hemma hos Lukas");
+		
+		try {
+			communicator.sendMessage(serializeCapture(capture));
+		} catch (IOException e) {
+			// Write log message
+			communicator.error("Error in SurveillanceClientManager. Could not serialize capture: " + e.getMessage());
+		}
+		
 		
 	}
 	
@@ -155,6 +172,24 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		Map<String, Object> identificationConfig = new HashMap<String, Object>();
 		identificationConfig.put("Identification_Classifier", "/storage/sdcard0/primalValue.txt");
 		identification.loadConfiguration(identificationConfig);
+	}
+	
+	/**
+	 * Serializes a Capture object to a Message that can be sent to server using the CommunicatorClient
+	 * 
+	 * @param capture
+	 * @return
+	 * @throws IOException
+	 */
+	private Message serializeCapture(Capture capture) throws IOException {
+		String message = "NEW_CAPTURE,";
+		
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		ObjectOutputStream oos = new ObjectOutputStream(os);
+		oos.writeObject(capture);
+		
+		message += new String(Base64.getEncoder().encode(os.toByteArray()));
+		return new Message(0, message);
 	}
 	
 }

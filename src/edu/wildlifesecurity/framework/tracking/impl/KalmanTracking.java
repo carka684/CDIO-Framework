@@ -1,13 +1,11 @@
 package edu.wildlifesecurity.framework.tracking.impl;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Vector;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
-import org.opencv.core.Point;
 
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventDispatcher;
@@ -16,6 +14,7 @@ import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.detection.Detection;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
+import edu.wildlifesecurity.framework.identification.Classes;
 import edu.wildlifesecurity.framework.tracking.Capture;
 import edu.wildlifesecurity.framework.tracking.ITracking;
 import edu.wildlifesecurity.framework.tracking.TrackingEvent;
@@ -44,19 +43,17 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 		correctClassRatio = 0.9;
 		numOfSeen = 5;
 	}
-	public void trackRegions(DetectionResult detections,Mat img) throws Exception
+	public void trackRegions(DetectionResult detections)
 	{
 		for(Iterator<KalmanFilter> iterator = kalVec.iterator(); iterator.hasNext(); )
 		{
 			KalmanFilter kf = iterator.next();
 			kf.predict(); 
 			kf.addUnseen();
-			double[][] pos = kf.getPos();
-			//Core.circle(img, new Point(pos[0][0],pos[1][0]), 5, kf.getColorKalman(),5);	
+
 			if(kf.getNumOfUnseen() > numOfUnseen)
 			{
 				iterator.remove();
-				System.out.println(kf.getId() + " was removed");
 			}
 			
 		}				
@@ -66,7 +63,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 			int width = result.getRegion().width;
 			int x = result.getRegion().x + width/2;
 			int y = result.getRegion().y + height/2;
-			int classification = result.getClassification();
+			Classes classification = result.getClassification();
 			if(kalVec.isEmpty())
 			{
 				kalVec.add(new KalmanFilter(nextID++,x,y,height,width));
@@ -93,12 +90,10 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 				if(bestKalman != null)
 				{
 					result.setID(bestKalman.getId());
-					result.setColor(bestKalman.getColorRegion()); 
 					bestKalman.seen();
 					bestKalman.correct(x,y,height,width);
 					bestKalman.addClass(classification);
 					sendEvent(bestKalman, result, TrackingEvent.NEW_TRACK);
-					Core.rectangle(img, result.getRegion().tl(), result.getRegion().br(),result.getColor(),5);
 					if(bestKalman.isDone(numOfSeen,correctClassRatio))
 					{
 						sendEvent(bestKalman,result, TrackingEvent.NEW_CAPTURE);
@@ -108,7 +103,6 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 				{
 					KalmanFilter kf = new KalmanFilter(nextID++,x,y,height,width);
 					result.setID(kf.getId());
-					result.setColor(kf.getColorRegion());
 					kf.addClass(classification);
 					kalVec.add(kf);								
 					break;
@@ -123,9 +117,8 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 	public void sendEvent(KalmanFilter kf,Detection detection, EventType type)
 	{
 		String GPSPos = "";
-		Capture capture = new Capture(kf.getId(), new Timestamp(new Date().getTime()), -1, detection.getRegion(), 
-				detection.getRegionImage(),detection.getClassification(),GPSPos);
-		dispatcher.dispatch(new TrackingEvent(type, capture));
+		Capture capture = new Capture(new Date(),detection.getRegionImage(),null,GPSPos);
+		dispatcher.dispatch(new TrackingEvent(type, capture,detection.getRegion()));
 	}
 
 }

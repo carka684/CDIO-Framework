@@ -8,6 +8,8 @@ import jkalman.JKalman;
 
 import org.opencv.core.Scalar;
 
+import edu.wildlifesecurity.framework.identification.Classes;
+
 
 public class KalmanFilter {
 	
@@ -17,15 +19,16 @@ public class KalmanFilter {
 	private Integer numOfUnseen;
 	private Integer numOfSeen;
 	Matrix predicted; 
-	Scalar colorRegion;
 	Scalar colorKalman;
-	Vector<Scalar> colorVec;
-	Vector<Integer> classVec;
-
+	Vector<Classes> classVec;
 		
-	public KalmanFilter(Integer id,int x,int y, int height, int width) throws Exception
+	public KalmanFilter(Integer id,int x,int y, int height, int width)
 	{
-		kalman = new JKalman(6, 4);
+		try {
+			kalman = new JKalman(6, 4);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		double[][] tr = 
 			   {{1, 0, 0, 0, 1, 0},   
 				{0, 1, 0, 0, 0, 1},             
@@ -40,12 +43,7 @@ public class KalmanFilter {
 		double[][] m = {{x,y,height,width,0,0}};
 		Matrix initMat = new Matrix(m);
 		kalman.setState_post(initMat.transpose());
-		colorRegion = new Scalar(125,125,125);//new Scalar(Math.abs(Math.random()*255),Math.abs(Math.random()*255),Math.abs(Math.random()*255));
 		colorKalman = new Scalar(Math.abs(Math.random()*255),Math.abs(Math.random()*255),Math.abs(Math.random()*255));
-		colorVec = new Vector<>();
-		colorVec.add(new Scalar(23,17,255));
-		colorVec.add(new Scalar(249,83,87));
-		colorVec.add(new Scalar(68,227,85));
 		classVec = new Vector<>();
 	}
 	
@@ -55,14 +53,13 @@ public class KalmanFilter {
 			return false;
 		Collections.sort(classVec);
 		int maxOcc = 0;
-		int maxClass = -1;
-		
-		for(int i = classVec.firstElement(); i <= classVec.lastElement(); i++)
+		Classes maxClass;
+		for(Classes cl : classVec)
 		{
-			int tmpMax = Collections.frequency(classVec, i);
+			int tmpMax = Collections.frequency(classVec, cl);
 			if(tmpMax > maxOcc)
 			{
-				maxClass = i;
+				maxClass = cl;
 				maxOcc = tmpMax;
 			}
 		}
@@ -135,21 +132,15 @@ public class KalmanFilter {
 		numOfUnseen = 0;
 		numOfSeen++;
 	}
-	public Scalar getColorRegion()
-	{
-		return colorRegion;
-	}
 	public Scalar getColorKalman()
 	{
 		return colorKalman;
 	}
-	public void addClass(int classification)
+	public void addClass(Classes classification)
 	{
 		classVec.add(classification);
-		if(classification >= 0)
-		colorRegion = colorVec.get(classification);
 	}
-	public Vector<Integer> getClassVec()
+	public Vector<Classes> getClassVec()
 	{
 		return classVec;
 	}

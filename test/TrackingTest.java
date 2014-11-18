@@ -61,7 +61,7 @@ public class TrackingTest {
 				// Ladda in bild till Mat
 				if(k++ > 2)	
 				{
-					tracker.trackRegions(detections, raw);
+					tracker.trackRegions(detections);
 
 					show.showImage(raw);
 				}

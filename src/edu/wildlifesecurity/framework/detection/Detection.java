@@ -4,12 +4,14 @@ import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 
+import edu.wildlifesecurity.framework.identification.Classes;
+
 public class Detection {
 	private Rect region;
 	private Mat regionImage;
 	private int ID;
 	private Scalar color;
-	private int classification;
+	private Classes classification;
 	
 	
 	public Detection(Rect rect, Mat regionImage){
@@ -17,13 +19,13 @@ public class Detection {
 		this.regionImage = regionImage;
 		ID = -1;
 		color = new Scalar(125,125,125);
-		classification = -1;
+		classification = Classes.UNIDENTIFIED;
 	}
-	public void setClassification(int classification)
+	public void setClassification(Classes classification)
 	{
 		this.classification = classification;
 	}
-	public int getClassification()
+	public Classes getClassification()
 	{
 		return this.classification;
 	}

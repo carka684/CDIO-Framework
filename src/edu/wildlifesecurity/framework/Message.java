@@ -5,7 +5,8 @@ public class Message {
 	public enum Commands {
 		HANDSHAKE_REQ("HANDSHAKE_REQ"),
 		HANDSHAKE_ACK("HANDSHAKE_ACK"),
-		LOG("LOG");
+		LOG("LOG"),
+		NEW_CAPTURE("NEW_CAPTURE");
 		
 		private final String name;       
 	    private Commands(String s) {

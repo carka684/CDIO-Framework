@@ -1,5 +1,7 @@
 package edu.wildlifesecurity.framework.tracking;
 
+import org.opencv.core.Rect;
+
 import edu.wildlifesecurity.framework.Event;
 import edu.wildlifesecurity.framework.EventType;
 
@@ -10,7 +12,7 @@ public class TrackingEvent extends Event {
 	
 	private Capture capture;
 
-	public TrackingEvent(EventType type, Capture capture) {
+	public TrackingEvent(EventType type, Capture capture, Rect region) {
 		super(type);
 		this.capture = capture;
 	}

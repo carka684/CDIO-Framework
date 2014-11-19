@@ -47,7 +47,7 @@ public class LBPIdentification extends AbstractComponent implements IIdentificat
 	}
 	
 	@Override
-	public void loadPrimalVariableFromFile(String file) {
+	public void loadPrimalVariableFromFile(String file , int classes) {
 		// TODO Auto-generated method stub
 	}
 }

@@ -19,5 +19,5 @@ public interface IIdentification extends IComponent {
 	
 	void loadClassifierFromFile(String file);
 	
-	void loadPrimalVariableFromFile(String file);
+	void loadPrimalVariableFromFile(String file, int classNum);
 }

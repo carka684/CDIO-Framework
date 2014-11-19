@@ -46,6 +46,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	svm_parameter params;
 	Size s;
 	Vector<Double> w = new Vector<Double>(); // Primal variable
+	// Vector<Vector<Double>> primalVariableVector = new Vector<Vector<Double>>(); // Vector of primal variables
+	
 	
 	private EventDispatcher<IdentificationEvent> dispatcher =  new EventDispatcher<IdentificationEvent>();
 	
@@ -241,6 +243,14 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		return classResult;
 	}
 	
+	/* public double svmMultiClassPredict(svm_node[] features) {
+		double resultClass = 0;
+		for(int index = 0; index < primalVariableVector.size()-1; index++) {
+			
+		}
+		return resultClass;
+	} */
+	
 	public void svm_model2primalVariable() {
 		w.clear();
 		w.add(-model.rho[0]);
@@ -260,20 +270,23 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	
 	@Override
 	public void loadPrimalVariableFromFile(String filepath) {
-		try {
-			w.clear();
-			Scanner input = new Scanner(new File(filepath));
-			String str = new String();
-			while(input.hasNext()) {
-				str = input.next();
-				w.add(Double.parseDouble(str));
+		//for(int index = 0; index < 2; index++) {
+			try {
+				w.clear();
+				Scanner input = new Scanner(new File(filepath));
+				String str = new String();
+				while(input.hasNext()) {
+					str = input.next();
+					w.add(Double.parseDouble(str));
+				}
+				input.close();
+				System.out.println("Loaded classifier!");
 			}
-			input.close();
-			System.out.println("Loaded classifier!");
-		}
-		catch (Exception e) {
-			System.out.println("Error loading file: " + filepath);
-		}
+			catch (Exception e) {
+				System.out.println("Error loading file: " + filepath);
+			}
+			//primalVariableVector.add(w);
+		//}
 	}
 	
 	public void savePrimalVariable2file(String filePath) throws IOException

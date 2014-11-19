@@ -18,9 +18,12 @@ public class KalmanFilter {
 	private Integer id;
 	private Integer numOfUnseen;
 	private Integer numOfSeen;
+	private boolean sentCapture;
 	Matrix predicted; 
 	Scalar colorKalman;
 	Vector<Classes> classVec;
+
+
 		
 	public KalmanFilter(Integer id,int x,int y, int height, int width)
 	{
@@ -45,6 +48,8 @@ public class KalmanFilter {
 		kalman.setState_post(initMat.transpose());
 		colorKalman = new Scalar(Math.abs(Math.random()*255),Math.abs(Math.random()*255),Math.abs(Math.random()*255));
 		classVec = new Vector<>();
+		sentCapture = false;
+
 	}
 	
 	public boolean isDone(int minSeen, double classRatio)
@@ -63,7 +68,8 @@ public class KalmanFilter {
 				maxOcc = tmpMax;
 			}
 		}
-		if( (numOfSeen >= minSeen) && (maxOcc/classVec.size() > classRatio))
+		System.out.println(numOfSeen + " " + (double) maxOcc/classVec.size());
+		if( (numOfSeen >= minSeen) && ((double) maxOcc/classVec.size() > classRatio))
 			return true;
 		
 		return false;
@@ -144,7 +150,18 @@ public class KalmanFilter {
 	{
 		return classVec;
 	}
-
+	public int getSeen()
+	{
+		return numOfSeen;
+	}
+	public boolean isSent()
+	{
+		return sentCapture;
+	}
+	public void setSent()
+	{
+		sentCapture = true;
+	}
 	
 	
 }

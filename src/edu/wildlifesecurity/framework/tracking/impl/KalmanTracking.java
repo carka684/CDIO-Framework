@@ -40,7 +40,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 		errorHeight = 0.7;
 		errorWidth = 0.7;
 		numOfUnseen = 25; 
-		correctClassRatio = 0.9;
+		correctClassRatio = 0.5;
 		numOfSeen = 5;
 	}
 	public void trackRegions(DetectionResult detections)
@@ -134,7 +134,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 	public void sendEvent(KalmanFilter kf,Detection detection, EventType type)
 	{
 		String GPSPos = "";
-		Capture capture = new Capture(new Date(),detection.getRegionImage(),null,GPSPos);
+		Capture capture = new Capture(new Date(),detection.getRegionImage(), detection.getClassification(),GPSPos);
 		dispatcher.dispatch(new TrackingEvent(type, capture,detection.getRegion()));
 	}
 

@@ -29,7 +29,6 @@ import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ISubscription;
 import edu.wildlifesecurity.framework.identification.Classes;
-import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.identification.IdentificationEvent;
 
@@ -57,7 +56,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	@Override
 	public void init(){
 		// TODO: Should be loaded from configuration
+		s = new Size(240, 240); 
 		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9);
+		
 		SVM = new svm();
 		model = new svm_model();
 		params = new svm_parameter();
@@ -79,14 +80,14 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	}
 
 	@Override
-	public IClassificationResult classify(Mat image) {
+	public Classes classify(Mat image) {
 		Mat features = extractFeatures(image);
 		svm_node[] imageFeatureNodes = featureMat2svm_nodeArray(features.t(), 0); // features must be a row-vector
 		double res = svmPlanePredict(imageFeatureNodes); // classify using the plane
 		Classes resClass = (res >= 1)?Classes.RHINO:Classes.UNIDENTIFIED;
 		ClassificationResult result = new ClassificationResult(resClass, image);
 		dispatcher.dispatch(new IdentificationEvent(IdentificationEvent.NEW_IDENTIFICATION, result));
-		return result;
+		return resClass;
 	}
 
 	public Mat extractFeaturesFromFiles(Vector<String> trainFiles){

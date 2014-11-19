@@ -63,7 +63,7 @@ public class KalmanFilter {
 				maxOcc = tmpMax;
 			}
 		}
-		if(numOfSeen == minSeen && maxOcc/classVec.size() > classRatio)
+		if( (numOfSeen >= minSeen) && (maxOcc/classVec.size() > classRatio))
 			return true;
 		
 		return false;

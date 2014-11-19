@@ -104,11 +104,10 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		DetectionResult objects = detection.getObjInImage(image);
 		
 		// 2. Use identification component to identify things in the image
-//		List<IClassificationResult> results = new LinkedList<IClassificationResult>();
-//		for(Mat obj : objects.images){
-//			IClassificationResult result = identification.classify(obj);
-//			System.out.println("Identified: " + result.getResultingClass());
-//		}
+		for(Detection obj : objects.getVector()){
+			obj.setClassification(identification.classify(obj.getRegionImage()));
+			System.out.println("Identified: " + obj.getClassification());
+		}
 		
 		// 3. Use tracking component to track identified objects
 		try {
@@ -166,7 +165,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
 		Map<String, Object> detectionConfig = new HashMap<String, Object>();
-		detectionConfig.put("Detection_InitTime", 200);
+		detectionConfig.put("Detection_InitTime", 10);
 		detection.loadConfiguration(detectionConfig);
 		
 		Map<String, Object> identificationConfig = new HashMap<String, Object>();

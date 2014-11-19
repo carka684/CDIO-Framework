@@ -114,7 +114,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		}
 		else
 		{
-			bgs.apply(img, fgMask, 0.001);
+			bgs.apply(img, fgMask, 0.004);
 		}
 		
 		Mat fgMaskMod = openAndClose(fgMask);

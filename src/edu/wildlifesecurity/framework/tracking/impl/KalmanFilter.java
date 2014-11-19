@@ -40,6 +40,7 @@ public class KalmanFilter {
 				{0, 0, 0, 0, 1, 0},
 				{0, 0, 0, 0, 0, 1}};
 		kalman.setTransition_matrix(new Matrix(tr));
+		kalman.setMeasurement_noise_cov(Matrix.identity(4, 4, 1e-4));
 		this.id = id;
 		numOfUnseen = 0;
 		numOfSeen = 0;

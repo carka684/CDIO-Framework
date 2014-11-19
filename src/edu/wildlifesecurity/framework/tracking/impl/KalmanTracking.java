@@ -37,7 +37,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 		nextID = 0;
 		kalVec =  new Vector<KalmanFilter>();
 		errorDist = 80; // Read from config!!
-		errorHeight = 0.7;
+		errorHeight = 0.5;
 		errorWidth = 0.5;
 		numOfUnseen = 7; 
 		correctClassRatio = 0.7;
@@ -87,7 +87,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 					KalmanFilter kf = iterator.next();
 					double errorDist = kf.getError(x,y);
 					double[] errorDims = kf.getErrorDim(height, width);
-					if (errorDist < minError && minErrorHeight < errorDims[0] && minErrorWidth < errorDims[1]) // test errorArea here.
+					if (errorDist < minError && minErrorHeight < errorDims[0] && minErrorWidth < errorDims[1]) 
 					{
 						minError = errorDist;
 						minErrorHeight = errorDims[0];

@@ -169,7 +169,9 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		detection.loadConfiguration(detectionConfig);
 		
 		Map<String, Object> identificationConfig = new HashMap<String, Object>();
-		identificationConfig.put("Identification_Classifier", "/storage/sdcard0/primalVariable.txt");
+		identificationConfig.put("Identification_Classifier0", "/storage/sdcard0/primalVariableRhinoOther.txt");
+		identificationConfig.put("Identification_Classifier1", "/storage/sdcard0/primalVariableHumanOther.txt");
+		identificationConfig.put("Identification_Classifier2", "/storage/sdcard0/primalVariableRhinoHuman.txt");
 		identification.loadConfiguration(identificationConfig);
 	}
 	

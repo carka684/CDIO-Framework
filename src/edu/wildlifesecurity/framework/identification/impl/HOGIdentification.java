@@ -77,10 +77,10 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	    
 		// Load classifier if a configuration option exists
 		
-		for(int i = 0; i < numberOfClasses; i++)
+		for(int i = 0; i <= numberOfClasses; i++)
 		{
-		if(configuration != null && configuration.containsKey("Identification_Classifier"))
-			loadPrimalVariableFromFile((configuration.get("Identification_Classifier").toString()), i);
+		if(configuration != null && configuration.containsKey("Identification_Classifier" + i))
+			loadPrimalVariableFromFile((configuration.get("Identification_Classifier" + i).toString()), i);
 		}
 	}
 

@@ -2,6 +2,9 @@ package edu.wildlifesecurity.framework.identification.impl;
 
 import org.opencv.core.Mat;
 
+import ij.process.ColorProcessor;
+import ij.process.ImageProcessor;
+import de.lmu.ifi.dbs.jfeaturelib.features.LocalBinaryPatterns;
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IEventHandler;
@@ -30,11 +33,11 @@ public class LBPIdentification extends AbstractComponent implements IIdentificat
 		
 	}
 
-	@Override
+	/*@Override
 	public void loadClassifierFromFile(String file) {
 		// TODO Auto-generated method stub
 		
-	}
+	}*/
 
 	@Override
 	public ISubscription addEventHandler(EventType type,
@@ -44,7 +47,7 @@ public class LBPIdentification extends AbstractComponent implements IIdentificat
 	}
 	
 	@Override
-	public void loadPrimalVariableFromFile(String file) {
+	public void loadPrimalVariableFromFile(String file , int classes) {
 		// TODO Auto-generated method stub
 	}
 }

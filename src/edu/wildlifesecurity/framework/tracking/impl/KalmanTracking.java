@@ -41,7 +41,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 		errorWidth = 0.5;
 		numOfUnseen = 7; 
 		correctClassRatio = 0.7;
-		numOfSeen = 5;
+		numOfSeen = 10;
 	}
 	public void trackRegions(DetectionResult detections)
 	{

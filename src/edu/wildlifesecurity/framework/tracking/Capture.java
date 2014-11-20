@@ -3,14 +3,13 @@ package edu.wildlifesecurity.framework.tracking;
 import java.util.Date;
 
 import org.opencv.core.Mat;
-import org.opencv.core.Rect;
 
 import edu.wildlifesecurity.framework.identification.Classes;
 
 public class Capture {
 
-	public int id;
-	public int trapDeviceId;
+	public Integer id;
+	public Integer trapDeviceId;
 	public Classes classification;
 	public Date timeStamp;
 	public Mat regionImage;
@@ -19,6 +18,15 @@ public class Capture {
 	public Capture(){ }
 	
 	public Capture(Date timeStamp, Mat regionImage, Classes classification, String GPSPos) {
+		this.timeStamp = timeStamp;
+		this.regionImage = regionImage;
+		this.classification = classification;
+		this.GPSPos = GPSPos;
+	}
+	
+	public Capture(Integer id,Integer trapDeviceId,Date timeStamp, Mat regionImage, Classes classification, String GPSPos) {
+		this.id=id;
+		this.trapDeviceId=trapDeviceId;
 		this.timeStamp = timeStamp;
 		this.regionImage = regionImage;
 		this.classification = classification;

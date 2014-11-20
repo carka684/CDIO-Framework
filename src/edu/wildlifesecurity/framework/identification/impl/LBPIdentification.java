@@ -33,11 +33,11 @@ public class LBPIdentification extends AbstractComponent implements IIdentificat
 		
 	}
 
-	@Override
+	/*@Override
 	public void loadClassifierFromFile(String file) {
 		// TODO Auto-generated method stub
 		
-	}
+	}*/
 
 	@Override
 	public ISubscription addEventHandler(EventType type,

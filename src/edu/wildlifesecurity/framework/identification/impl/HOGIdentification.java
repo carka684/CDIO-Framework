@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Vector;
 
@@ -44,8 +45,14 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	svm_model model;
 	svm_parameter params;
 	Size s;
+	HashMap<Integer,Vector<Double>> mapOfvectors = new HashMap<Integer,Vector<Double>>();
+	Vector<Double> wHumanOther = new Vector<Double>(); // Primal variable
+	Vector<Double> wRhinoOther = new Vector<Double>(); // Primal variable
+	Vector<Double> wRhinoHuman = new Vector<Double>(); // Primal variable
 	Vector<Double> w = new Vector<Double>(); // Primal variable
-
+	//int numOfClasses;
+	int numberOfClasses;
+	Vector<Double> v = new Vector<Double>();
 	private EventDispatcher<IdentificationEvent> dispatcher =  new EventDispatcher<IdentificationEvent>();
 
 	@Override
@@ -56,7 +63,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	@Override
 	public void init(){
 		// TODO: Should be loaded from configuration
-		s = new Size(240, 240); 
+		s = new Size(240, 240);
 		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9);
 		
 		SVM = new svm();
@@ -66,13 +73,18 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		params.kernel_type = linearSVM;
 		params.C = 16;
 		params.eps = 0.01;
-
+		numberOfClasses = 2;
+	    
 		// Load classifier if a configuration option exists
+		
+		for(int i = 0; i < numberOfClasses; i++)
+		{
 		if(configuration != null && configuration.containsKey("Identification_Classifier"))
-			loadPrimalVariableFromFile((configuration.get("Identification_Classifier").toString()));
+			loadPrimalVariableFromFile((configuration.get("Identification_Classifier").toString()), i);
+		}
 	}
 
-	public Mat extractFeatures(Mat inputImage) {
+	public Mat extractFeatures(Mat inputImage) { 
 		MatOfFloat features = new MatOfFloat();
 		Imgproc.resize(inputImage, inputImage, s);
 		hog.compute(inputImage, features);
@@ -82,15 +94,24 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	@Override
 	public Classes classify(Mat image) {
 		Mat features = extractFeatures(image);
+		
 		svm_node[] imageFeatureNodes = featureMat2svm_nodeArray(features.t(), 0); // features must be a row-vector
 		double res = svmPlanePredict(imageFeatureNodes); // classify using the plane
-		Classes resClass = (res >= 1)?Classes.RHINO:Classes.UNIDENTIFIED;
+		
+		Classes resClass;
+		if(res == 1)
+			 resClass = Classes.HUMAN;
+		else if(res == 0)
+			resClass = Classes.RHINO;
+		else
+			resClass = Classes.UNIDENTIFIED;
+		v.add(res);
 		ClassificationResult result = new ClassificationResult(resClass, image);
 		dispatcher.dispatch(new IdentificationEvent(IdentificationEvent.NEW_IDENTIFICATION, result));
 		return resClass;
 	}
-
-	public Mat extractFeaturesFromFiles(Vector<String> trainFiles){
+////////////////// FOR TRAINING /////////////////////
+	public Mat extractFeaturesFromFiles(Vector<String> trainFiles){ 
 		int cols  = (int) extractFeatures(Highgui.imread(trainFiles.elementAt(0),Highgui.CV_LOAD_IMAGE_GRAYSCALE)).size().height;
 		int rows = trainFiles.size();
 		Mat featMat =  Mat.zeros(rows,cols,CvType.CV_32F);
@@ -117,6 +138,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		return featMat;
 	}
 
+//////////////////FOR TRAINING /////////////////////
 	@Override
 	public void trainClassifier(String trainFolder,String UNUSED, String outputFile) {
 		ImageReader trainReader = new ImageReader();
@@ -124,9 +146,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Vector<String> trainFiles = trainReader.getFilesVec();
 		Mat classes = trainReader.getClasses();
 		Mat featureMat = extractFeaturesFromFiles(trainFiles);
-		svm_problem featureProblem = featureMat2svm_problem(featureMat, classes);
+		svm_problem featureProblem = featureMat2svm_problem(featureMat, classes);	
 		model = SVM.svm_train(featureProblem, params);
-		svm_model2primalVariable();
+			svm_model2primalVariable();
 		try {
 			savePrimalVariable2file(outputFile);
 		} catch (IOException e) {
@@ -135,7 +157,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 			e.printStackTrace();
 		}
 	}
-
+	
+//////////////////FOR TRAINING EVALUTATION/////////////////////
 	@Override
 	public void evaluateClassifier(String valFolder, String UNUSED) {
 		ImageReader trainReader = new ImageReader();
@@ -151,10 +174,11 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
 	}
-
+	
 	/*
 	 * TODO: How should the result be presented?
 	 */
+//////////////////FOR TRAINING EVALUATION/////////////////////
 	public static  double[] getResult(Mat classes, Mat results, int numOfClasses,int[] numOfEachClass)
 	{
 		int pos = 0;
@@ -172,7 +196,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 		return null;
 	}
-
+	/*
 	@Override
 	public void loadClassifierFromFile(String file) {
 		try {
@@ -181,7 +205,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 			System.out.println("Error in HOGIdentification: " + e.getMessage());
 		}
 	}
-
+	*/
+	
 	// Convert from featureMatrix to svm_problem, which is required as input to svm_train
 	public svm_problem featureMat2svm_problem(Mat featureMat, Mat classes) {
 		svm_problem result = new svm_problem();
@@ -205,7 +230,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		result.x = svmNodes;
 		return result;
 	}
-
+	
 	// Convert from feature-vector to svm_node[], which is required as input to svmPlanePredict
 	public svm_node[] featureMat2svm_nodeArray(Mat featureMat, int sampleNr) {
 		svm_node[] result = new svm_node[featureMat.cols()];
@@ -218,29 +243,48 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 				featureNode.index = -1;
 			}
 			featureNode.value = featureMat.get(sampleNr, col)[0];
-			result[col] = featureNode;
+			result[col] = featureNode; 
 		}
 
 		return result;
 	}
-
+//////////////////FOR CLASSIFYING WITH PLANE/////////////////////
 	public double svmPlanePredict(svm_node[] features) {
-		double classResult;
+		//get w from hashMap mapOfVectors and the classresult is the key in map
+		
+		double classResult = numberOfClasses;
 		double scalarprodResult = 0;
-		scalarprodResult += w.get(0); // biased weight
-		for(int index = 0; index < features.length; index++) {
-			scalarprodResult += w.get(index+1)*features[index].value;
-		}
-
-		if (scalarprodResult >= 0) {
-			classResult = 0;
-		}
-		else {
-			classResult = 1;
-		}
+		for(int i = 0; i < numberOfClasses; i++)
+		{
+			w = mapOfvectors.get(i);
+			scalarprodResult += w.get(0); // biased weight
+			for(int index = 0; index < features.length; index++) {
+				scalarprodResult += w.get(index+1)*features[index].value;
+			}
+			
+			if (scalarprodResult >= 0) {
+				classResult = i;
+				if(classResult == 0 || classResult == 1) //Rhino or Human, check with RhinoHuman plane
+				{
+					scalarprodResult = 0;
+					w = mapOfvectors.get(2); //get RhinoHuman plane
+					scalarprodResult += w.get(0); // biased weight
+					for(int index = 0; index < features.length; index++) {
+						scalarprodResult += w.get(index+1)*features[index].value;
+					}
+					if (classResult == 0 && scalarprodResult <= 0 )
+						classResult = 1.0; //Changed from Rhino to Human by the RhinoHuman plane
+					else if(classResult == 1 && scalarprodResult >= 0)
+						classResult = 0.0; //Changed from Human to Rhino by the RhinoHuman plane					
+				}
+				return classResult;
+			}
+			scalarprodResult = 0;
+		}	
 		return classResult;
 	}
 
+//////////////////FOR TRAINING /////////////////////
 	public void svm_model2primalVariable() {
 		w.clear();
 		w.add(-model.rho[0]);
@@ -256,26 +300,43 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 				w.set(featureIndex+1, -w.get(featureIndex+1));
 			}
 		}
+		
 	}
-
+	
+//////////////////FOR CLASSIFYING WITH PLANE/////////////////////
 	@Override
-	public void loadPrimalVariableFromFile(String filepath) {
-		try {
-			w.clear();
-			Scanner input = new Scanner(new File(filepath));
-			String str = new String();
-			while(input.hasNext()) {
-				str = input.next();
-				w.add(Double.parseDouble(str));
-			}
-			input.close();
-			System.out.println("Loaded classifier!");
-		}
-		catch (Exception e) {
-			System.out.println("Error loading file: " + filepath);
-		}
+	public void loadPrimalVariableFromFile(String filepath, int classNum) {
+		
+			try {
+				//w.clear();
+				Scanner input = new Scanner(new File(filepath));
+				String str = new String();
+				while(input.hasNext()) {
+					str = input.next();
+					if(classNum == 0)
+						wRhinoOther.add(Double.parseDouble(str));
+					
+					else if(classNum == 1)
+						wHumanOther.add(Double.parseDouble(str));
+					else
+						wRhinoHuman.add(Double.parseDouble(str));
+					}
+				input.close();
+				System.out.println("Loaded classifier!");
+				}
+			catch (Exception e) {
+				System.out.println("Error loading file: " + filepath);
+				}
+			if(classNum == 0)
+				mapOfvectors.put(classNum, wRhinoOther);
+			
+			else if(classNum == 1)
+				mapOfvectors.put(classNum, wHumanOther);
+			else
+				mapOfvectors.put(classNum, wRhinoHuman);
+				
 	}
-
+//////////////////FOR TRAINING TO SAVE PLANE /////////////////////
 	public void savePrimalVariable2file(String filePath) throws IOException
 	{
 		try {

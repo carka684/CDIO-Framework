@@ -9,10 +9,14 @@ import edu.wildlifesecurity.framework.identification.Classes;
 
 public class Capture {
 
+	public int id;
+	public int trapDeviceId;
 	public Classes classification;
 	public Date timeStamp;
 	public Mat regionImage;
 	public String GPSPos;
+	
+	public Capture(){ }
 	
 	public Capture(Date timeStamp, Mat regionImage, Classes classification, String GPSPos) {
 		this.timeStamp = timeStamp;

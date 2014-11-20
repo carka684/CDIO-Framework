@@ -5,10 +5,16 @@ import edu.wildlifesecurity.framework.EventType;
 
 public class ConnectEvent extends Event {
 
-	public TrapDevice trapDevice;
+	public static EventType NEW_TRAPDEVICE = new EventType("ConnectEvent.NewTrapDevice");
+
+	private TrapDevice trapDevice;
 	public ConnectEvent(EventType type, TrapDevice trapDevice) {
 		super(type);
 		this.trapDevice=trapDevice;
 	}
 
+	public TrapDevice getTrapDevice()
+	{
+		return trapDevice;
+	}
 }

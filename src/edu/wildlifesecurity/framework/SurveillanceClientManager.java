@@ -70,10 +70,11 @@ public class SurveillanceClientManager extends SurveillanceManager {
 				loadComponentsConfigutation();
 				
 				// Init all other components
-				mediaSource.init();
+				
 				detection.init();
 				identification.init();
 				tracker.init();
+				mediaSource.init();
 
 				// Start listening for images from the MediaSource component
 				mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){

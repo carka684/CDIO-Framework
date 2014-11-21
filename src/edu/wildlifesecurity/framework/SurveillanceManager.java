@@ -7,9 +7,8 @@ public abstract class SurveillanceManager {
 	protected SurveillanceManager(){
 		
 		// Initialize OpenCV
-
-		if (System.getProperty("sun.arch.data.model").equals("64") 
-				&& System.getProperty("os.name").equals("Linux")) // if 64 bit Linux
+		if ((System.getProperty("os.arch").equals("amd64") 
+				&& System.getProperty("os.name").equals("Linux"))) // if 64 bit Linux
 		{
 			System.loadLibrary("opencv_java249_x64"); // use 64 bit linux openCV library (Android uses 32bit)
 			

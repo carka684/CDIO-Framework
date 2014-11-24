@@ -40,11 +40,11 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	 * Extracts HOG features
 	 *
 	 */
+	Size imageSize;
 	HOGDescriptor hog;
 	svm SVM;
 	svm_model model;
 	svm_parameter params;
-	Size s;
 	HashMap<Integer,Vector<Double>> mapOfvectors = new HashMap<Integer,Vector<Double>>();
 	Vector<Double> wHumanOther = new Vector<Double>(); // Primal variable
 	Vector<Double> wRhinoOther = new Vector<Double>(); // Primal variable
@@ -63,21 +63,27 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	@Override
 	public void init(){
 		// TODO: Should be loaded from configuration
-		s = new Size(240, 240);
-		hog = new HOGDescriptor(s,new Size(16,16),new Size(8,8),new Size(8,8),9);
+		// HOG stuff
+		int imageSide = Integer.parseInt(configuration.get("Identification_imageSide").toString()); // From config
+		imageSize = new Size(imageSide, imageSide);
+		int blockSide = Integer.parseInt(configuration.get("Identification_hog_blockSide").toString());
+		int blockStrideSide = Integer.parseInt(configuration.get("Identification_hog_blockStrideSide").toString());
+		int cellSide = Integer.parseInt(configuration.get("Identification_hog_cellSide").toString());
+		int nbins = Integer.parseInt(configuration.get("Identification_hog_numberOfBins").toString());
+		hog = new HOGDescriptor(imageSize,new Size(blockSide,blockSide),new Size(blockStrideSide,blockStrideSide),new Size(cellSide,cellSide),nbins);
 		
+		// SVM stuff
 		SVM = new svm();
 		model = new svm_model();
 		params = new svm_parameter();
-		int linearSVM = 0;
-		params.kernel_type = linearSVM;
-		params.C = 16;
-		params.eps = 0.01;
-		numberOfClasses = 2;
+		params.kernel_type = Integer.parseInt(configuration.get("Identification_libsvm_kernelType").toString());
+		params.C = Integer.parseInt(configuration.get("Identification_libsvm_C").toString());
+		params.eps = Double.parseDouble(configuration.get("Identification_libsvm_eps").toString());
+
+		numberOfClasses = Integer.parseInt(configuration.get("Identification_numberOfClasses").toString());
 	    
 		// Load classifier if a configuration option exists
-		
-		for(int i = 0; i <= numberOfClasses; i++)
+		for(int i = 0; i <= numberOfClasses-1; i++)
 		{
 		if(configuration != null && configuration.containsKey("Identification_Classifier" + i))
 			loadPrimalVariableFromFile((configuration.get("Identification_Classifier" + i).toString()), i);
@@ -86,7 +92,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 
 	public Mat extractFeatures(Mat inputImage) { 
 		MatOfFloat features = new MatOfFloat();
-		Imgproc.resize(inputImage, inputImage, s);
+		Imgproc.resize(inputImage, inputImage, imageSize);
 		hog.compute(inputImage, features);
 		return features;
 	}
@@ -99,10 +105,10 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		double res = svmPlanePredict(imageFeatureNodes); // classify using the plane
 		
 		Classes resClass;
-		if(res == 1)
-			 resClass = Classes.HUMAN;
-		else if(res == 0)
-			resClass = Classes.RHINO;
+		if(res == 0)
+			 resClass = Classes.RHINO;
+		else if(res == 1)
+			resClass = Classes.HUMAN;
 		else
 			resClass = Classes.UNIDENTIFIED;
 		v.add(res);
@@ -252,9 +258,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public double svmPlanePredict(svm_node[] features) {
 		//get w from hashMap mapOfVectors and the classresult is the key in map
 		
-		double classResult = numberOfClasses;
+		double classResult = numberOfClasses-1;
 		double scalarprodResult = 0;
-		for(int i = 0; i < numberOfClasses; i++)
+		for(int i = 0; i < numberOfClasses-1; i++)
 		{
 			w = mapOfvectors.get(i);
 			scalarprodResult += w.get(0); // biased weight

@@ -169,19 +169,29 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		detection.loadConfiguration(detectionConfig);
 		
 		Map<String, Object> identificationConfig = new HashMap<String, Object>();
-		identificationConfig.put("Identification_Classifier0", "/storage/sdcard0/primalVariableRhinoOther.txt");
-		identificationConfig.put("Identification_Classifier1", "/storage/sdcard0/primalVariableHumanOther.txt");
-		identificationConfig.put("Identification_Classifier2", "/storage/sdcard0/primalVariableRhinoHuman.txt");
+		identificationConfig.put("Identification_imageSide", "240"); // Height and width of the resized image
+		identificationConfig.put("Identification_hog_blockSide", 16); // Side length of a block
+		identificationConfig.put("Identification_hog_blockStrideSide", 8); // Side length of block stride. Must be a multiple of cellSide
+		identificationConfig.put("Identification_hog_cellSide", 8); // Side length of a cell
+		identificationConfig.put("Identification_hog_numberOfBins", 9); // Number of bins
+		identificationConfig.put("Identification_libsvm_kernelType", 0); // Kernel type of libsvm, 0 = linear
+		identificationConfig.put("Identification_libsvm_C", 16); // Cost parameter C of libsvm
+		identificationConfig.put("Identification_libsvm_eps", 0.01); // Tolerance of termination criterion for libsvm
+		identificationConfig.put("Identification_numberOfClasses", 3); // Number of classes that can be identified
+		identificationConfig.put("Identification_Classifier0", "/storage/sdcard0/primalVariableRhinoOther.txt"); // Path to classifier plane for rhino vs other
+		identificationConfig.put("Identification_Classifier1", "/storage/sdcard0/primalVariableHumanOther.txt"); // Path to classifier plane for human vs other
+		identificationConfig.put("Identification_Classifier2", "/storage/sdcard0/primalVariableRhinoHuman.txt"); // Path to classifier plane for rhino vs human
 		identification.loadConfiguration(identificationConfig);
 		
 		Map<String, Object> trackingConfig = new HashMap<String, Object>();
-		trackingConfig.put("Tracking_max_predict_pos_error", "80"); //Maximum distance between prediction and true center
-		trackingConfig.put("Tracking_max_predict_height_error", "0.5"); //Minimum ratio between predicted height and true height allowed
-		trackingConfig.put("Tracking_max_predict_width_error", "0.5"); //Minimum ratio between predicted width and true width allowed
-		trackingConfig.put("Tracking_num_of_missing_frames", "7");//Number of frames a kalmanfilter can be unmatched with a detection before removal
-		trackingConfig.put("Tracking_ratio_of_same_classification", "0.7");//Minimum ratio of the most common class for each kalman filter for a capture to be sent
-		trackingConfig.put("Tracking_num_of_seen_frames", "10");//Minimum frames the same detection has been seen for a capture to be sent.
-		}
+		trackingConfig.put("Tracking_max_predict_pos_error", 80); //Maximum distance between prediction and true center
+		trackingConfig.put("Tracking_max_predict_height_error", 0.5); //Minimum ratio between predicted height and true height allowed
+		trackingConfig.put("Tracking_max_predict_width_error", 0.5); //Minimum ratio between predicted width and true width allowed
+		trackingConfig.put("Tracking_num_of_missing_frames", 7);//Number of frames a kalmanfilter can be unmatched with a detection before removal
+		trackingConfig.put("Tracking_ratio_of_same_classification", 0.7);//Minimum ratio of the most common class for each kalman filter for a capture to be sent
+		trackingConfig.put("Tracking_num_of_seen_frames", 10);//Minimum frames the same detection has been seen for a capture to be sent.
+		tracker.loadConfiguration(trackingConfig);
+	}
 	
 	/**
 	 * Serializes a Capture object to a Message that can be sent to server using the CommunicatorClient

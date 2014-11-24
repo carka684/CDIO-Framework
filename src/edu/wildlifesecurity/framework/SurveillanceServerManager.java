@@ -50,7 +50,7 @@ public class SurveillanceServerManager extends SurveillanceManager {
 		/// Adds listeners for various message types
 		
 		// Redirect log requests
-		communicator.addEventHandler(MessageEvent.getEventType(Commands.LOG), new IEventHandler<MessageEvent>(){
+		communicator.addMessageEventHandler(MessageEvent.getEventType(Commands.LOG), new IEventHandler<MessageEvent>(){
 
 			@Override
 			public void handle(MessageEvent event) {
@@ -72,7 +72,7 @@ public class SurveillanceServerManager extends SurveillanceManager {
 		});
 		
 		// Handle NEW_CAPTURE messages
-		communicator.addEventHandler(MessageEvent.getEventType(Commands.NEW_CAPTURE), new IEventHandler<MessageEvent>(){
+		communicator.addMessageEventHandler(MessageEvent.getEventType(Commands.NEW_CAPTURE), new IEventHandler<MessageEvent>(){
 
 			@Override
 			public void handle(MessageEvent event) {

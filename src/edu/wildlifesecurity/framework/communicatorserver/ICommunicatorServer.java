@@ -14,7 +14,7 @@ public interface ICommunicatorServer extends IComponent {
 	/*
 	 * Enables consumers to listen for messages. For example, a Repository implementation should listen to log messages.
 	 */
-	ISubscription addEventHandler(EventType type, IEventHandler<MessageEvent> handler);
+	ISubscription addMessageEventHandler(EventType type, IEventHandler<MessageEvent> handler);
 	
 	/*
 	 * Sends a message to a recipient that is contained in the Message instance.
@@ -25,5 +25,7 @@ public interface ICommunicatorServer extends IComponent {
 	 * Gets a list of currently connected trap devices
 	 */
 	List<TrapDevice> getConnectedTrapDevices();
+	
+	ISubscription addConnectEventHandler(EventType type, IEventHandler<ConnectEvent> handler);
 
 }

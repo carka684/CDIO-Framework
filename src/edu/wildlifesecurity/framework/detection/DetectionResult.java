@@ -7,13 +7,12 @@ import org.opencv.core.Mat;
 public class DetectionResult {
 	private Vector<Detection> detVec;
 	private Mat rawDetection;
-	private Mat orginalImage;
-	
-	public DetectionResult(Vector<Detection> detVec, Mat rawDetection,Mat orignialImage)
+	private Mat originalImage;
+	public DetectionResult(Vector<Detection> detVec, Mat rawDetection, Mat originalImage)
 	{
 		this.detVec = detVec;
 		this.rawDetection = rawDetection;
-		this.orginalImage = orignialImage;
+		this.originalImage = originalImage;
 	}
 	public Vector<Detection> getVector()
 	{
@@ -25,7 +24,6 @@ public class DetectionResult {
 	}
 	public Mat getOriginalImage()
 	{
-		return orginalImage;
+		return originalImage;
 	}
-	
 }

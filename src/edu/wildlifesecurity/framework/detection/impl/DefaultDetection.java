@@ -59,7 +59,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 				detVec.add(result);
 			}
 		}
-		DetectionResult detections = new DetectionResult(detVec,rawDetection,img);
+		DetectionResult detections = new DetectionResult(detVec,rawDetection, img);
 		return detections;
 	}
 	

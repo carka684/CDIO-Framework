@@ -1,19 +1,12 @@
 package edu.wildlifesecurity.framework.tracking.impl;
 
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.io.ByteArrayInputStream;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Date;
 
-import org.opencv.core.CvType;
-import org.opencv.core.Mat;
-
-import com.sixlegs.png.PngImage;
-
+import edu.wildlifesecurity.framework.IImageDecoder;
 import edu.wildlifesecurity.framework.IImageEncoder;
 import edu.wildlifesecurity.framework.identification.Classes;
 import edu.wildlifesecurity.framework.tracking.Capture;
@@ -22,6 +15,7 @@ import edu.wildlifesecurity.framework.tracking.Capture;
 public class SerializableCapture implements Externalizable {
 
 	public static IImageEncoder encoder;
+	public static IImageDecoder decoder;
 	
 	private Capture capture;
 	
@@ -78,12 +72,12 @@ public class SerializableCapture implements Externalizable {
 		byte[] array = new byte[size];
 		in.readFully(array, 0, size);
 		
+		/*
 		PngImage decoder = new PngImage();
 		BufferedImage img = decoder.read(new ByteArrayInputStream(array), true);
 		Mat mat = new Mat(img.getHeight(), img.getWidth(), CvType.CV_8UC3);
-		mat.put(0, 0, ((DataBufferByte)img.getRaster().getDataBuffer()).getData());
-		
-		capture.regionImage = mat;
+		mat.put(0, 0, ((DataBufferByte)img.getRaster().getDataBuffer()).getData());*/
+		capture.regionImage = decoder.decode(array);
 	}
 	
 }

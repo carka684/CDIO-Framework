@@ -2,9 +2,6 @@ package edu.wildlifesecurity.framework.identification.impl;
 
 import org.opencv.core.Mat;
 
-import ij.process.ColorProcessor;
-import ij.process.ImageProcessor;
-import de.lmu.ifi.dbs.jfeaturelib.features.LocalBinaryPatterns;
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IEventHandler;

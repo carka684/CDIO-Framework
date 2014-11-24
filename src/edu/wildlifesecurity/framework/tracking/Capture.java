@@ -8,12 +8,12 @@ import edu.wildlifesecurity.framework.identification.Classes;
 
 public class Capture {
 
-	public Integer id;
-	public Integer trapDeviceId;
+	public Integer id = 0;
+	public Integer trapDeviceId = 0;
 	public Classes classification;
 	public Date timeStamp;
 	public Mat regionImage;
-	public String GPSPos;
+	public String GPSPos = "";
 	
 	public Capture(){ }
 	

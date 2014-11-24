@@ -14,6 +14,7 @@ import edu.wildlifesecurity.framework.communicatorserver.ICommunicatorServer;
 import edu.wildlifesecurity.framework.repository.IRepository;
 import edu.wildlifesecurity.framework.tracking.Capture;
 import edu.wildlifesecurity.framework.tracking.ITracking;
+import edu.wildlifesecurity.framework.tracking.impl.SerializableCapture;
 
 public class SurveillanceServerManager extends SurveillanceManager {
 	
@@ -87,7 +88,7 @@ public class SurveillanceServerManager extends SurveillanceManager {
 					byte[] bytes = Base64.getDecoder().decode(captureEncoded);
 					ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 					ObjectInput ois = new ObjectInputStream(bis);
-					capture = (Capture) ois.readObject();
+					capture = ((SerializableCapture) ois.readObject()).getCapture();
 					
 				}catch(Exception e){
 					repository.error("Error in SurveillanceServerManager. Cannot deserialize capture: " + e.getMessage());

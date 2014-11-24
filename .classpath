@@ -8,9 +8,8 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="Framework/opencv/native"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="opencv/JFeatureLib-1.6.0.jar"/>
-	<classpathentry kind="lib" path="opencv/ij.jar"/>
 	<classpathentry kind="lib" path="opencv/Imshow.jar"/>
+	<classpathentry kind="lib" path="opencv/javapng-2.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="opencv/libsvm.jar"/>
 	<classpathentry kind="lib" path="opencv/JKalman.jar"/>

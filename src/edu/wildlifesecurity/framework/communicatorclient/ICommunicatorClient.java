@@ -31,4 +31,8 @@ public interface ICommunicatorClient extends IComponent, ILogger {
 	 */
 	Map<String,Object> getConfiguration();
 	
+	/**
+	 * Disposes the communicator
+	 */
+	void dispose();
 }

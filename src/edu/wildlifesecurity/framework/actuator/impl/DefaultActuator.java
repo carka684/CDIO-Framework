@@ -52,7 +52,10 @@ public class DefaultActuator extends AbstractComponent implements IActuator {
 	@Override
 	public void actOnCapture(Capture capture) {
 		if(capture.classification == Classes.RHINO){
-			sendAlarmMessage();
+			//sendAlarmMessage();
+			System.out.println("Actuator Alarm! Rhino was captured! " + capture.timeStamp);
+		}else if(capture.classification == Classes.HUMAN){
+			System.out.println("Actuator Alarm! Human was captured! " + capture.timeStamp);
 		}
 	}
 	

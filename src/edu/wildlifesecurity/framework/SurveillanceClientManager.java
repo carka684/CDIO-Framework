@@ -4,7 +4,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -12,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.opencv.core.Mat;
 
@@ -27,7 +28,9 @@ import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.framework.mediasource.MediaEvent;
 import edu.wildlifesecurity.framework.tracking.Capture;
 import edu.wildlifesecurity.framework.tracking.ITracking;
+import edu.wildlifesecurity.framework.tracking.TrackingEvent;
 import edu.wildlifesecurity.framework.tracking.impl.KalmanTracking;
+import edu.wildlifesecurity.framework.tracking.impl.SerializableCapture;
 
 public class SurveillanceClientManager extends SurveillanceManager {
 	
@@ -55,7 +58,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	public void start(){
 		
 		// First, connect to backend server to fetch components' configuration
-		/*communicator.init();
+		communicator.init();
 		communicator.addEventHandler(MessageEvent.getEventType(Commands.HANDSHAKE_ACK), new IEventHandler<MessageEvent>(){
 
 			@Override
@@ -64,7 +67,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 				// Set logger (CommunicatorClient instance)
 				mediaSource.loadLogger(communicator);
 				detection.loadLogger(communicator);
-				identification.loadLogger(communicator);*/ 
+				identification.loadLogger(communicator);
 					
 				// TODO: Load all components' configuration
 				loadComponentsConfigutation();
@@ -80,19 +83,46 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 					@Override
 					public void handle(MediaEvent event) {
+						// We have got a new image from MediaSource, start process through components...
 						processImage(event.getImage());				
 					}
 					
 				});
 				
-			//}
+				// Start listening for new captures from tracking component
+				tracker.addEventHandler(TrackingEvent.NEW_CAPTURE, new IEventHandler<TrackingEvent>(){
+
+					@Override
+					public void handle(TrackingEvent event) {
+						
+						// 4. Send results of tracking to server using communicator component
+												
+						try {
+							Message m = serializeCapture(event.getCapture());
+							System.out.println(m.getMessage());
+							communicator.sendMessage(m);
+						} catch (Exception e) {
+							// Write log message
+							System.out.println("Error in SurveillanceClientManager. Could not serialize capture: " + e.getMessage());
+							communicator.error("Error in SurveillanceClientManager. Could not serialize capture: " + e.getMessage());
+						}
+					}
+					
+				});
+				
+			}
 			
-		//});
+		});
 	}
 	
 	@Override
 	public void stop(){
+		// Closes the connection to server, if there is one, and terminates background connecting thread
+		communicator.dispose();
+		
+		// Stops timer that takes pictures
 		mediaSource.destroy();
+		
 	}
 	
 	/**
@@ -111,23 +141,10 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		// 3. Use tracking component to track identified objects
 		try {
-			tracker.trackRegions(objects); // Should return captures somehow??
+			tracker.trackRegions(objects); // Dispatches NEW_CAPTURE events when it detects new captures
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
-		
-		// 4. Send results of tracking to server using communicator component
-		Capture capture = new Capture(new Date(),null,Classes.RHINO,"hemma hos Lukas");
-		
-//		try {
-//			communicator.sendMessage(serializeCapture(capture));
-//		} catch (IOException e) {
-//			// Write log message
-//			communicator.error("Error in SurveillanceClientManager. Could not serialize capture: " + e.getMessage());
-//		}
-		
+		}	
 		
 	}
 	
@@ -136,7 +153,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	private void loadComponentsConfigutation(){
 		
-		/*HashMap<String,Object> mediasourceConfig = new HashMap<String,Object>();
+		HashMap<String,Object> mediasourceConfig = new HashMap<String,Object>();
 		HashMap<String,Object> detectionConfig = new HashMap<String,Object>();
 		HashMap<String,Object> identificationConfig = new HashMap<String,Object>();
 		
@@ -156,11 +173,11 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		mediaSource.loadConfiguration(mediasourceConfig);
 		detection.loadConfiguration(detectionConfig);
-		identification.loadConfiguration(identificationConfig);*/
+		identification.loadConfiguration(identificationConfig);
 		
 		
 		/// TEMPORARY! Hardcoded configuration
-		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
+		/*Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
 		mediaSourceConfig.put("MediaSource_FrameRate", 1000); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
@@ -169,19 +186,15 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		detection.loadConfiguration(detectionConfig);
 		
 		Map<String, Object> identificationConfig = new HashMap<String, Object>();
+
 		identificationConfig.put("Identification_Classifier0", "/storage/sdcard0/primalVariableRhinoOther.txt");
 		identificationConfig.put("Identification_Classifier1", "/storage/sdcard0/primalVariableHumanOther.txt");
 		identificationConfig.put("Identification_Classifier2", "/storage/sdcard0/primalVariableRhinoHuman.txt");
 		identification.loadConfiguration(identificationConfig);
-		
-		Map<String, Object> trackingConfig = new HashMap<String, Object>();
-		trackingConfig.put("Tracking_max_predict_pos_error", "80"); //Maximum distance between prediction and true center
-		trackingConfig.put("Tracking_max_predict_height_error", "0.5"); //Minimum ratio between predicted height and true height allowed
-		trackingConfig.put("Tracking_max_predict_width_error", "0.5"); //Minimum ratio between predicted width and true width allowed
-		trackingConfig.put("Tracking_num_of_missing_frames", "7");//Number of frames a kalmanfilter can be unmatched with a detection before removal
-		trackingConfig.put("Tracking_ratio_of_same_classification", "0.7");//Minimum ratio of the most common class for each kalman filter for a capture to be sent
-		trackingConfig.put("Tracking_num_of_seen_frames", "10");//Minimum frames the same detection has been seen for a capture to be sent.
-		}
+
+		identificationConfig.put("Identification_Classifier", "/storage/sdcard0/primalVariable.txt");
+		identification.loadConfiguration(identificationConfig);*/
+	}
 	
 	/**
 	 * Serializes a Capture object to a Message that can be sent to server using the CommunicatorClient
@@ -195,9 +208,10 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(os);
-		oos.writeObject(capture);
+		oos.writeObject(new SerializableCapture(capture));
 		
-		message += new String(Base64.getEncoder().encode(os.toByteArray()));
+		message += Base64.encodeToString(os.toByteArray(), Base64.NO_WRAP);
+
 		return new Message(0, message);
 	}
 	

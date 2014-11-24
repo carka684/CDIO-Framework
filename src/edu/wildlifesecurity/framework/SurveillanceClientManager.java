@@ -173,7 +173,15 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		identificationConfig.put("Identification_Classifier1", "/storage/sdcard0/primalVariableHumanOther.txt");
 		identificationConfig.put("Identification_Classifier2", "/storage/sdcard0/primalVariableRhinoHuman.txt");
 		identification.loadConfiguration(identificationConfig);
-	}
+		
+		Map<String, Object> trackingConfig = new HashMap<String, Object>();
+		trackingConfig.put("Tracking_max_predict_pos_error", "80"); //Maximum distance between prediction and true center
+		trackingConfig.put("Tracking_max_predict_height_error", "0.5"); //Minimum ratio between predicted height and true height allowed
+		trackingConfig.put("Tracking_max_predict_width_error", "0.5"); //Minimum ratio between predicted width and true width allowed
+		trackingConfig.put("Tracking_num_of_missing_frames", "7");//Number of frames a kalmanfilter can be unmatched with a detection before removal
+		trackingConfig.put("Tracking_ratio_of_same_classification", "0.7");//Minimum ratio of the most common class for each kalman filter for a capture to be sent
+		trackingConfig.put("Tracking_num_of_seen_frames", "10");//Minimum frames the same detection has been seen for a capture to be sent.
+		}
 	
 	/**
 	 * Serializes a Capture object to a Message that can be sent to server using the CommunicatorClient

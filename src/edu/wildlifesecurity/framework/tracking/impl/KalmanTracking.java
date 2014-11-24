@@ -33,15 +33,14 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 	
 	public void init()
 	{
-//		variable = configuration.get("");
 		nextID = 0;
 		kalVec =  new Vector<KalmanFilter>();
-		errorDist = 80; // Read from config!!
-		errorHeight = 0.5;
-		errorWidth = 0.5;
-		numOfUnseen = 7; 
-		correctClassRatio = 0.7;
-		numOfSeen = 10;
+		errorDist = (int) configuration.get("Tracking_max_predict_pos_error"); // Read from config!!
+		errorHeight = (double) configuration.get("Tracking_max_predict_height_error");
+		errorWidth = (double) configuration.get("Tracking_max_predict_width_error");
+		numOfUnseen = (int) configuration.get("Tracking_num_of_missing_frames");
+		correctClassRatio = (double) configuration.get("Tracking_ratio_of_same_classification");
+		numOfSeen = (int) configuration.get("Tracking_num_of_seen_frames");
 	}
 	public void trackRegions(DetectionResult detections)
 	{

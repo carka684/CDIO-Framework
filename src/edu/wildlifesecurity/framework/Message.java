@@ -6,7 +6,8 @@ public class Message {
 		HANDSHAKE_REQ("HANDSHAKE_REQ"),
 		HANDSHAKE_ACK("HANDSHAKE_ACK"),
 		LOG("LOG"),
-		NEW_CAPTURE("NEW_CAPTURE");
+		NEW_CAPTURE("NEW_CAPTURE"),
+		SET_CONFIG("SET_CONFIG");
 		
 		private final String name;       
 	    private Commands(String s) {

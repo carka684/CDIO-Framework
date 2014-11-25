@@ -40,6 +40,8 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	private ICommunicatorClient communicator;
 	private KalmanTracking tracker;
 	
+	private List<ISubscription> subscriptions;
+	
 	public SurveillanceClientManager(IMediaSource mediaSource, IDetection detection, IIdentification identification,
 									 ICommunicatorClient communicator, KalmanTracking tracker){
 		super();
@@ -49,6 +51,8 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		this.identification = identification;
 		this.communicator = communicator;
 		this.tracker = tracker;
+		
+		subscriptions = new LinkedList<ISubscription>();
 	}
 	
 	/*
@@ -58,18 +62,18 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	public void start(){
 		
 		// First, connect to backend server to fetch components' configuration
-		/*communicator.init();
-		communicator.addEventHandler(MessageEvent.getEventType(Commands.HANDSHAKE_ACK), new IEventHandler<MessageEvent>(){
+		communicator.init();
+		subscriptions.add(communicator.addEventHandler(MessageEvent.getEventType(Commands.HANDSHAKE_ACK), new IEventHandler<MessageEvent>(){
 
 			@Override
 			public void handle(MessageEvent event) {
 				
 				// Set logger (CommunicatorClient instance)
-				/*mediaSource.loadLogger(communicator);
+				mediaSource.loadLogger(communicator);
 				detection.loadLogger(communicator);
-				identification.loadLogger(communicator);*/
+				identification.loadLogger(communicator);
 					
-				// TODO: Load all components' configuration
+				// Load all components' configuration
 				loadComponentsConfigutation();
 				
 				// Init all other components
@@ -79,7 +83,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 				mediaSource.init();
 
 				// Start listening for images from the MediaSource component
-				mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
+				subscriptions.add(mediaSource.addEventHandler(MediaEvent.NEW_SNAPSHOT, new IEventHandler<MediaEvent>(){
 		
 					@Override
 					public void handle(MediaEvent event) {
@@ -87,10 +91,10 @@ public class SurveillanceClientManager extends SurveillanceManager {
 						processImage(event.getImage());				
 					}
 					
-				});
+				}));
 				
 				// Start listening for new captures from tracking component
-				/*tracker.addEventHandler(TrackingEvent.NEW_CAPTURE, new IEventHandler<TrackingEvent>(){
+				subscriptions.add(tracker.addEventHandler(TrackingEvent.NEW_CAPTURE, new IEventHandler<TrackingEvent>(){
 
 					@Override
 					public void handle(TrackingEvent event) {
@@ -99,7 +103,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 												
 						try {
 							Message m = serializeCapture(event.getCapture());
-							//System.out.println(m.getMessage());
+							System.out.println(m.getMessage());
 							communicator.sendMessage(m);
 						} catch (Exception e) {
 							// Write log message
@@ -108,15 +112,43 @@ public class SurveillanceClientManager extends SurveillanceManager {
 						}
 					}
 					
-				});
+				}));
+				
+				// Start listen for configuration updates
+				subscriptions.add(communicator.addEventHandler(MessageEvent.getEventType(Commands.SET_CONFIG), new IEventHandler<MessageEvent>(){
+
+					@Override
+					public void handle(MessageEvent event) {
+						
+						String[] messageParts = event.getMessage().getMessage().split(",");
+						
+						switch(messageParts[1].split("_")[0]){
+						case "MediaSource":
+							mediaSource.setConfigOption(messageParts[1], messageParts[2]);
+							break;
+						case "Detection":
+							detection.setConfigOption(messageParts[1], messageParts[2]);
+							break;
+						case "Identification":
+							identification.setConfigOption(messageParts[1], messageParts[2]);
+							break;
+						}
+						
+					}
+					
+				}));
 				
 			}
 			
-		});*/
+		}));
 	}
 	
 	@Override
 	public void stop(){
+		// Unsubscribe all subscriptions
+		for(ISubscription sub : subscriptions)
+			sub.removeHandler();
+		
 		// Closes the connection to server, if there is one, and terminates background connecting thread
 		communicator.dispose();
 		
@@ -153,10 +185,9 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	 */
 	private void loadComponentsConfigutation(){
 		
-		/*HashMap<String,Object> mediasourceConfig = new HashMap<String,Object>();
+		HashMap<String,Object> mediasourceConfig = new HashMap<String,Object>();
 		HashMap<String,Object> detectionConfig = new HashMap<String,Object>();
 		HashMap<String,Object> identificationConfig = new HashMap<String,Object>();
-		HashMap<String,Object> trackingConfig = new HashMap<String,Object>();
 		
 		for(Entry<String,Object> entry : communicator.getConfiguration().entrySet()){
 			switch(entry.getKey().split("_")[0]){
@@ -177,11 +208,11 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		mediaSource.loadConfiguration(mediasourceConfig);
 		detection.loadConfiguration(detectionConfig);
-		identification.loadConfiguration(identificationConfig);*/
+		identification.loadConfiguration(identificationConfig);
 		
 		
 		/// TEMPORARY! Hardcoded configuration
-		Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
+		/*Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
 		mediaSourceConfig.put("MediaSource_FrameRate", 1000); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
@@ -211,7 +242,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		trackingConfig.put("Tracking_num_of_missing_frames", 7);//Number of frames a kalmanfilter can be unmatched with a detection before removal
 		trackingConfig.put("Tracking_ratio_of_same_classification", 0.7);//Minimum ratio of the most common class for each kalman filter for a capture to be sent
 		trackingConfig.put("Tracking_num_of_seen_frames", 10);//Minimum frames the same detection has been seen for a capture to be sent.
-		tracker.loadConfiguration(trackingConfig);
+		tracker.loadConfiguration(trackingConfig); */
 	}
 	
 	/**

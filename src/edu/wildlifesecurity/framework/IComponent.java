@@ -13,6 +13,8 @@ public interface IComponent {
 
 	void loadConfiguration(Map<String, Object> config);
 	
+	void setConfigOption(String key, String value);
+	
 	void loadLogger(ILogger logger);
 	
 }

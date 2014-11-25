@@ -62,26 +62,26 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public void init(){
 		// TODO: Should be loaded from configuration
 		// HOG stuff
-		int imageSide = 240; // Integer.parseInt(configuration.get("Identification_imageSide").toString()); // From config
+		int imageSide = Integer.parseInt(configuration.get("Identification_imageSide").toString()); // From config
 		imageSize = new Size(imageSide, imageSide);
-		int blockSide = 16; // Integer.parseInt(configuration.get("Identification_hog_blockSide").toString());
-		int blockStrideSide = 8; //Integer.parseInt(configuration.get("Identification_hog_blockStrideSide").toString());
-		int cellSide = 8; // Integer.parseInt(configuration.get("Identification_hog_cellSide").toString());
-		int nbins = 9; //Integer.parseInt(configuration.get("Identification_hog_numberOfBins").toString());
+		int blockSide = Integer.parseInt(configuration.get("Identification_hog_blockSide").toString());
+		int blockStrideSide = Integer.parseInt(configuration.get("Identification_hog_blockStrideSide").toString());
+		int cellSide = Integer.parseInt(configuration.get("Identification_hog_cellSide").toString());
+		int nbins = Integer.parseInt(configuration.get("Identification_hog_numberOfBins").toString());
 		hog = new HOGDescriptor(imageSize,new Size(blockSide,blockSide),new Size(blockStrideSide,blockStrideSide),new Size(cellSide,cellSide),nbins);
 		
 		// SVM stuff
 		SVM = new svm();
 		model = new svm_model();
 		params = new svm_parameter();
-		params.kernel_type = 0; // Integer.parseInt(configuration.get("Identification_libsvm_kernelType").toString());
-		params.C = 16; // Integer.parseInt(configuration.get("Identification_libsvm_C").toString());
-		params.eps = 0.01; // Double.parseDouble(configuration.get("Identification_libsvm_eps").toString());
+		params.kernel_type = Integer.parseInt(configuration.get("Identification_libsvm_kernelType").toString());
+		params.C = Integer.parseInt(configuration.get("Identification_libsvm_C").toString());
+		params.eps = Double.parseDouble(configuration.get("Identification_libsvm_eps").toString());
 
-		numberOfClasses = 3; //Integer.parseInt(configuration.get("Identification_numberOfClasses").toString());
+		numberOfClasses = Integer.parseInt(configuration.get("Identification_numberOfClasses").toString());
 	    
 		// Load classifier if a configuration option exists
-		for(int i = 0; i <= numberOfClasses-1; i++)
+		for(int i = 0; i < numberOfClasses; i++)
 		{
 		if(configuration != null && configuration.containsKey("Identification_Classifier" + i))
 			loadPrimalVariableFromFile((configuration.get("Identification_Classifier" + i).toString()), i);

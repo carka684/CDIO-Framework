@@ -50,9 +50,8 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	Vector<Double> wRhinoOther = new Vector<Double>(); // Primal variable
 	Vector<Double> wRhinoHuman = new Vector<Double>(); // Primal variable
 	Vector<Double> w = new Vector<Double>(); // Primal variable
-	//int numOfClasses;
 	int numberOfClasses;
-	Vector<Double> v = new Vector<Double>();
+	Vector<Classes> v = new Vector<Classes>();
 	private EventDispatcher<IdentificationEvent> dispatcher =  new EventDispatcher<IdentificationEvent>();
 
 	@Override
@@ -64,23 +63,23 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public void init(){
 		// TODO: Should be loaded from configuration
 		// HOG stuff
-		int imageSide = Integer.parseInt(configuration.get("Identification_imageSide").toString()); // From config
+		int imageSide = 240; // Integer.parseInt(configuration.get("Identification_imageSide").toString()); // From config
 		imageSize = new Size(imageSide, imageSide);
-		int blockSide = Integer.parseInt(configuration.get("Identification_hog_blockSide").toString());
-		int blockStrideSide = Integer.parseInt(configuration.get("Identification_hog_blockStrideSide").toString());
-		int cellSide = Integer.parseInt(configuration.get("Identification_hog_cellSide").toString());
-		int nbins = Integer.parseInt(configuration.get("Identification_hog_numberOfBins").toString());
+		int blockSide = 16; // Integer.parseInt(configuration.get("Identification_hog_blockSide").toString());
+		int blockStrideSide = 8; //Integer.parseInt(configuration.get("Identification_hog_blockStrideSide").toString());
+		int cellSide = 8; // Integer.parseInt(configuration.get("Identification_hog_cellSide").toString());
+		int nbins = 9; //Integer.parseInt(configuration.get("Identification_hog_numberOfBins").toString());
 		hog = new HOGDescriptor(imageSize,new Size(blockSide,blockSide),new Size(blockStrideSide,blockStrideSide),new Size(cellSide,cellSide),nbins);
 		
 		// SVM stuff
 		SVM = new svm();
 		model = new svm_model();
 		params = new svm_parameter();
-		params.kernel_type = Integer.parseInt(configuration.get("Identification_libsvm_kernelType").toString());
-		params.C = Integer.parseInt(configuration.get("Identification_libsvm_C").toString());
-		params.eps = Double.parseDouble(configuration.get("Identification_libsvm_eps").toString());
+		params.kernel_type = 0; // Integer.parseInt(configuration.get("Identification_libsvm_kernelType").toString());
+		params.C = 16; // Integer.parseInt(configuration.get("Identification_libsvm_C").toString());
+		params.eps = 0.01; // Double.parseDouble(configuration.get("Identification_libsvm_eps").toString());
 
-		numberOfClasses = Integer.parseInt(configuration.get("Identification_numberOfClasses").toString());
+		numberOfClasses = 3; //Integer.parseInt(configuration.get("Identification_numberOfClasses").toString());
 	    
 		// Load classifier if a configuration option exists
 		for(int i = 0; i <= numberOfClasses-1; i++)
@@ -102,16 +101,16 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Mat features = extractFeatures(image);
 		
 		svm_node[] imageFeatureNodes = featureMat2svm_nodeArray(features.t(), 0); // features must be a row-vector
-		double res = svmPlanePredict(imageFeatureNodes); // classify using the plane
+		Classes resClass = svmPlanePredict(imageFeatureNodes); // classify using the plane
 		
-		Classes resClass;
+		/*Classes resClass;
 		if(res == 0)
 			 resClass = Classes.RHINO;
 		else if(res == 1)
 			resClass = Classes.HUMAN;
 		else
-			resClass = Classes.UNIDENTIFIED;
-		v.add(res);
+			resClass = Classes.UNIDENTIFIED;*/
+		v.add(resClass);
 		ClassificationResult result = new ClassificationResult(resClass, image);
 		dispatcher.dispatch(new IdentificationEvent(IdentificationEvent.NEW_IDENTIFICATION, result));
 		return resClass;
@@ -153,7 +152,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Mat classes = trainReader.getClasses();
 		Mat featureMat = extractFeaturesFromFiles(trainFiles);
 		svm_problem featureProblem = featureMat2svm_problem(featureMat, classes);	
-		model = SVM.svm_train(featureProblem, params);
+		model = svm.svm_train(featureProblem, params);
 			svm_model2primalVariable();
 		try {
 			savePrimalVariable2file(outputFile);
@@ -175,7 +174,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		Mat results = new Mat(featureMat.rows(), 1, CvType.CV_8S); // Must be signed
 		for(int row = 0; row < featureMat.rows(); row++) {
 				svm_node[] featureNodes = featureMat2svm_nodeArray(featureMat, row);
-				double sampleClass = svmPlanePredict(featureNodes);
+				double sampleClass = svm.svm_predict(model, featureNodes);
 				results.put(row, 0, sampleClass);
 		}
 		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
@@ -255,34 +254,31 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		return result;
 	}
 //////////////////FOR CLASSIFYING WITH PLANE/////////////////////
-	public double svmPlanePredict(svm_node[] features) {
+	public Classes svmPlanePredict(svm_node[] features) {
 		//get w from hashMap mapOfVectors and the classresult is the key in map
-		
-		double classResult = numberOfClasses-1;
+		Classes classResult = Classes.UNIDENTIFIED;
 		double scalarprodResult = 0;
-		for(int i = 0; i < numberOfClasses-1; i++)
+		for(Classes c : Classes.values())
 		{
-			w = mapOfvectors.get(i);
+			w = mapOfvectors.get(c.ordinal());
 			scalarprodResult += w.get(0); // biased weight
 			for(int index = 0; index < features.length; index++) {
 				scalarprodResult += w.get(index+1)*features[index].value;
 			}
 			
 			if (scalarprodResult >= 0) {
-				classResult = i;
-				if(classResult == 0 || classResult == 1) //Rhino or Human, check with RhinoHuman plane
-				{
+				classResult = c;
+				// Check also for the Rhino vs Human plane
 					scalarprodResult = 0;
 					w = mapOfvectors.get(2); //get RhinoHuman plane
 					scalarprodResult += w.get(0); // biased weight
 					for(int index = 0; index < features.length; index++) {
 						scalarprodResult += w.get(index+1)*features[index].value;
 					}
-					if (classResult == 0 && scalarprodResult <= 0 )
-						classResult = 1.0; //Changed from Rhino to Human by the RhinoHuman plane
-					else if(classResult == 1 && scalarprodResult >= 0)
-						classResult = 0.0; //Changed from Human to Rhino by the RhinoHuman plane					
-				}
+					if (classResult == Classes.RHINO && scalarprodResult <= 0 )
+						classResult = Classes.HUMAN; //Changed from Rhino to Human by the RhinoHuman plane
+					else if(classResult == Classes.HUMAN && scalarprodResult >= 0)
+						classResult = Classes.RHINO; //Changed from Human to Rhino by the RhinoHuman plane
 				return classResult;
 			}
 			scalarprodResult = 0;

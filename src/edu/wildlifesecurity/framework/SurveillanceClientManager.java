@@ -1,18 +1,12 @@
 package edu.wildlifesecurity.framework;
 
-import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Vector;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.opencv.core.Mat;
 
@@ -21,13 +15,10 @@ import edu.wildlifesecurity.framework.communicatorclient.ICommunicatorClient;
 import edu.wildlifesecurity.framework.detection.Detection;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
 import edu.wildlifesecurity.framework.detection.IDetection;
-import edu.wildlifesecurity.framework.identification.Classes;
-import edu.wildlifesecurity.framework.identification.IClassificationResult;
 import edu.wildlifesecurity.framework.identification.IIdentification;
 import edu.wildlifesecurity.framework.mediasource.IMediaSource;
 import edu.wildlifesecurity.framework.mediasource.MediaEvent;
 import edu.wildlifesecurity.framework.tracking.Capture;
-import edu.wildlifesecurity.framework.tracking.ITracking;
 import edu.wildlifesecurity.framework.tracking.TrackingEvent;
 import edu.wildlifesecurity.framework.tracking.impl.KalmanTracking;
 import edu.wildlifesecurity.framework.tracking.impl.SerializableCapture;
@@ -41,9 +32,10 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	private KalmanTracking tracker;
 	
 	private List<ISubscription> subscriptions;
+	private ILogger logger;
 	
 	public SurveillanceClientManager(IMediaSource mediaSource, IDetection detection, IIdentification identification,
-									 ICommunicatorClient communicator, KalmanTracking tracker){
+									 ICommunicatorClient communicator, KalmanTracking tracker, ILogger logger){
 		super();
 		
 		this.mediaSource = mediaSource;
@@ -53,6 +45,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		this.tracker = tracker;
 		
 		subscriptions = new LinkedList<ISubscription>();
+		this.logger = logger;
 	}
 	
 	/*
@@ -62,6 +55,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 	public void start(){
 		
 		// First, connect to backend server to fetch components' configuration
+		communicator.loadLogger(logger);
 		communicator.init();
 		subscriptions.add(communicator.addEventHandler(MessageEvent.getEventType(Commands.HANDSHAKE_ACK), new IEventHandler<MessageEvent>(){
 
@@ -69,9 +63,9 @@ public class SurveillanceClientManager extends SurveillanceManager {
 			public void handle(MessageEvent event) {
 				
 				// Set logger (CommunicatorClient instance)
-				mediaSource.loadLogger(communicator);
-				detection.loadLogger(communicator);
-				identification.loadLogger(communicator);
+				mediaSource.loadLogger(logger);
+				detection.loadLogger(logger);
+				identification.loadLogger(logger);
 					
 				// Load all components' configuration
 				loadComponentsConfigutation();

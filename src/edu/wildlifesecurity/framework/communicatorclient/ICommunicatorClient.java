@@ -26,6 +26,12 @@ public interface ICommunicatorClient extends IComponent, ILogger {
 	void sendMessage(Message message);
 
 	/**
+	 * Returns whether it is connected or not 
+	 * @return
+	 */
+	boolean isConnected();
+	
+	/**
 	 * Returns the configuration that has been loaded from the server
 	 * @return
 	 */

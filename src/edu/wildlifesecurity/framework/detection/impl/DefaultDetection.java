@@ -36,8 +36,8 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	@Override
 	public void init()
 	{
-		bgs = new BackgroundSubtractorMOG2(0, 20, false);
-		//InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
+		bgs = new BackgroundSubtractorMOG2(0, 20, true);
+		// InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
 	}
 	
 	public ISubscription addEventHandler(EventType type, IEventHandler<DetectionEvent> handler){
@@ -116,6 +116,8 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		{
 			bgs.apply(img, fgMask, 0.004);
 		}
+		
+		Imgproc.threshold(fgMask, fgMask, 127.0, 255.0, Imgproc.THRESH_TOZERO);
 		
 		Mat fgMaskMod = openAndClose(fgMask);
 		

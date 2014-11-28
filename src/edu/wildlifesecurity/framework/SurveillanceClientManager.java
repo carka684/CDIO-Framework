@@ -208,15 +208,15 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		
 		
 		/// TEMPORARY! Hardcoded configuration
-		/*Map<String, Object> mediaSourceConfig = new HashMap<String, Object>();
+		/*HashMap<String, Object> mediaSourceConfig = new HashMap<String, Object>();
 		mediaSourceConfig.put("MediaSource_FrameRate", 1000); // Sets the frame rate when the component should take pictures
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
-		Map<String, Object> detectionConfig = new HashMap<String, Object>();
+		HashMap<String, Object> detectionConfig = new HashMap<String, Object>();
 		detectionConfig.put("Detection_InitTime", 10);
 		detection.loadConfiguration(detectionConfig);
 		
-		Map<String, Object> identificationConfig = new HashMap<String, Object>();
+		HashMap<String, Object> identificationConfig = new HashMap<String, Object>();
 		identificationConfig.put("Identification_imageSide", 240); // Height and width of the resized image
 		identificationConfig.put("Identification_hog_blockSide", 16); // Side length of a block
 		identificationConfig.put("Identification_hog_blockStrideSide", 8); // Side length of block stride. Must be a multiple of cellSide
@@ -231,7 +231,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		identificationConfig.put("Identification_Classifier2", "/storage/sdcard0/wRhinoHuman.txt"); // Path to classifier plane for rhino vs human
 		identification.loadConfiguration(identificationConfig);
 		
-		Map<String, Object> trackingConfig = new HashMap<String, Object>();
+		HashMap<String, Object> trackingConfig = new HashMap<String, Object>();
 		trackingConfig.put("Tracking_max_predict_pos_error", 80); //Maximum distance between prediction and true center
 		trackingConfig.put("Tracking_max_predict_height_error", 0.5); //Minimum ratio between predicted height and true height allowed
 		trackingConfig.put("Tracking_max_predict_width_error", 0.5); //Minimum ratio between predicted width and true width allowed

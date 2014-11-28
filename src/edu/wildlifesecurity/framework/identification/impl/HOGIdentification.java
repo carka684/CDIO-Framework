@@ -40,17 +40,17 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	 * Extracts HOG features
 	 *
 	 */
-	Size imageSize;
-	HOGDescriptor hog;
-	svm SVM;
-	svm_model model;
-	svm_parameter params;
-	HashMap<Integer,Vector<Double>> mapOfvectors = new HashMap<Integer,Vector<Double>>();
-	Vector<Double> wHumanOther = new Vector<Double>(); // Primal variable
-	Vector<Double> wRhinoOther = new Vector<Double>(); // Primal variable
-	Vector<Double> wRhinoHuman = new Vector<Double>(); // Primal variable
-	Vector<Double> w = new Vector<Double>(); // Primal variable
-	int numberOfClasses;
+	private Size imageSize;
+	private HOGDescriptor hog;
+	private svm SVM;
+	private svm_model model;
+	private svm_parameter params;
+	private HashMap<Integer,Vector<Double>> mapOfvectors = new HashMap<Integer,Vector<Double>>();
+	private Vector<Double> wHumanOther = new Vector<Double>(); // Primal variable
+	private Vector<Double> wRhinoOther = new Vector<Double>(); // Primal variable
+	private Vector<Double> wRhinoHuman = new Vector<Double>(); // Primal variable
+	private Vector<Double> w = new Vector<Double>(); // Primal variable
+	private int numberOfClasses;
 	private EventDispatcher<IdentificationEvent> dispatcher =  new EventDispatcher<IdentificationEvent>();
 
 	@Override

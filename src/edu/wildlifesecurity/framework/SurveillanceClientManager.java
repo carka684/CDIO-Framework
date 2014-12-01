@@ -213,7 +213,14 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		mediaSource.loadConfiguration(mediaSourceConfig);
 		
 		HashMap<String, Object> detectionConfig = new HashMap<String, Object>();
+		detectionConfig.put("Detection_varThreshold", 20);
+		detectionConfig.put("Detection_bShadowDetection", true);
 		detectionConfig.put("Detection_InitTime", 10);
+		detectionConfig.put("Detection_highLearningRate", 0.01);
+		detectionConfig.put("Detection_lowLearningRate", 0.004);
+		detectionConfig.put("Detection_numOperationsInOpening", 1);
+		detectionConfig.put("Detection_numOperationsInClosing", 2);
+		detectionConfig.put("Detection_MinSizeOfDetectedObjects", 500);
 		detection.loadConfiguration(detectionConfig);
 		
 		HashMap<String, Object> identificationConfig = new HashMap<String, Object>();
@@ -238,7 +245,7 @@ public class SurveillanceClientManager extends SurveillanceManager {
 		trackingConfig.put("Tracking_num_of_missing_frames", 7);//Number of frames a kalmanfilter can be unmatched with a detection before removal
 		trackingConfig.put("Tracking_ratio_of_same_classification", 0.7);//Minimum ratio of the most common class for each kalman filter for a capture to be sent
 		trackingConfig.put("Tracking_num_of_seen_frames", 10);//Minimum frames the same detection has been seen for a capture to be sent.
-		tracker.loadConfiguration(trackingConfig);*/ 
+		tracker.loadConfiguration(trackingConfig);*/
 	}
 	
 	/**

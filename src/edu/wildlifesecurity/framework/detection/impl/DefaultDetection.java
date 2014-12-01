@@ -30,14 +30,15 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	private EventDispatcher<DetectionEvent> dispatcher = new EventDispatcher<DetectionEvent>();
 	
 	private BackgroundSubtractorMOG2 bgs;
-	private int InitTime;
 	private int age;
 
 	@Override
 	public void init()
 	{
-		bgs = new BackgroundSubtractorMOG2(0, 20, false);
-		//InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
+		float varThreshold = Float.parseFloat(configuration.get("Detection_varThreshold").toString());
+		Boolean bShadowDetection = Boolean.parseBoolean(configuration.get("Detection_bShadowDetection").toString());
+		bgs = new BackgroundSubtractorMOG2(0, varThreshold, bShadowDetection);
+		// InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
 	}
 	
 	public ISubscription addEventHandler(EventType type, IEventHandler<DetectionEvent> handler){
@@ -86,18 +87,24 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 		return rect;
 	}
 	
-	private Mat openAndClose(Mat binaryImage)
+	private Mat openAndClose(Mat binaryImage, int numOperationsInOpening, int numOperationsInClosing)
 	{
 		Mat morphKernel = new Mat();
-		Mat modifiedImage = new Mat();
+		Mat modifiedImage = binaryImage.clone();
 		morphKernel = Mat.ones(3, 3, CvType.CV_8U);
 		
-		Imgproc.erode(binaryImage, modifiedImage, morphKernel);
-		Imgproc.dilate(modifiedImage, modifiedImage, morphKernel);
-		Imgproc.dilate(modifiedImage, modifiedImage, morphKernel);
-		Imgproc.dilate(modifiedImage, modifiedImage, morphKernel);
-		Imgproc.erode(modifiedImage, modifiedImage, morphKernel);
-		Imgproc.erode(modifiedImage, modifiedImage, morphKernel);
+		// Opening
+		for(int i = 0; i < numOperationsInOpening; i++)
+			Imgproc.erode(modifiedImage, modifiedImage, morphKernel);
+		for(int i = 0; i < numOperationsInOpening; i++)	
+			Imgproc.dilate(modifiedImage, modifiedImage, morphKernel);
+		
+		// Closing
+		for(int i = 0; i < numOperationsInClosing; i++)
+			Imgproc.dilate(modifiedImage, modifiedImage, morphKernel);
+		for(int i = 0; i < numOperationsInClosing; i++)
+			Imgproc.erode(modifiedImage, modifiedImage, morphKernel);
+			
 		return modifiedImage;
 	}
 	
@@ -106,25 +113,33 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 	public DetectionResult getObjInImage(Mat img)
 	{
 		age++;
+		int InitTime = Integer.parseInt(configuration.get("Detection_InitTime").toString());
+		double highLearningRate = Double.parseDouble(configuration.get("Detection_highLearningRate").toString());
+		double lowLearningRate = Double.parseDouble(configuration.get("Detection_lowLearningRate").toString());
+				
 		DetectionResult result;
 		Mat fgMask = new Mat();
 		if(age < InitTime)	
 		{
-			bgs.apply(img, fgMask, 0.01);
+			bgs.apply(img, fgMask, highLearningRate);
 		}
 		else
 		{
-			bgs.apply(img, fgMask, 0.004);
+			bgs.apply(img, fgMask, lowLearningRate);
 		}
 		
-		Mat fgMaskMod = openAndClose(fgMask);
+		Imgproc.threshold(fgMask, fgMask, 127.0, 255.0, Imgproc.THRESH_TOZERO);
+		
+		int numOpen = Integer.parseInt(configuration.get("Detection_numOperationsInOpening").toString());
+		int numClose = Integer.parseInt(configuration.get("Detection_numOperationsInClosing").toString());		
+		Mat fgMaskMod = openAndClose(fgMask, numOpen, numClose);
 		
 		Vector <MatOfPoint> contours = new Vector <MatOfPoint>();
 		Mat contourHierarchy = new Mat();
 	
-		Imgproc.findContours(fgMaskMod, contours, contourHierarchy, 3, 1);
+		Imgproc.findContours(fgMaskMod, contours, contourHierarchy, Imgproc.RETR_TREE, Imgproc.CHAIN_APPROX_NONE);
 		
-		int MinimalSizeOfObjets = 500;
+		int MinimalSizeOfObjets = Integer.parseInt(configuration.get("Detection_MinSizeOfDetectedObjects").toString());
 		result = getImagesInsideContours(contours,img,fgMask, MinimalSizeOfObjets);
 		//result.rawDetection = fgMask;
 		

@@ -17,6 +17,11 @@ public abstract class AbstractComponent implements IComponent {
 	}
 	
 	@Override
+	public void setConfigOption(String key, String value){
+		configuration.put(key, value);
+	}
+	
+	@Override
 	public void loadLogger(ILogger logger){
 		log = logger;
 	}

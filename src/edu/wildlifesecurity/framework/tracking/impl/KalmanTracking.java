@@ -35,12 +35,12 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 	{
 		nextID = 0;
 		kalVec =  new Vector<KalmanFilter>();
-		errorDist = 80;//(int) configuration.get("Tracking_max_predict_pos_error"); // Read from config!!
-		errorHeight = 0.5;//(double) configuration.get("Tracking_max_predict_height_error");
-		errorWidth = 0.5;//(double) configuration.get("Tracking_max_predict_width_error");
-		numOfUnseen = 10;//(int) configuration.get("Tracking_num_of_missing_frames");
-		correctClassRatio = 0.7;//(double) configuration.get("Tracking_ratio_of_same_classification");
-		numOfSeen = 10;// (int) configuration.get("Tracking_num_of_seen_frames");
+		errorDist = Integer.parseInt(configuration.get("Tracking_max_predict_pos_error").toString()); // Read from config!!
+		errorHeight = Double.parseDouble(configuration.get("Tracking_max_predict_height_error").toString());
+		errorWidth = Double.parseDouble(configuration.get("Tracking_max_predict_width_error").toString());
+		numOfUnseen = Integer.parseInt(configuration.get("Tracking_num_of_missing_frames").toString());
+		correctClassRatio = Double.parseDouble(configuration.get("Tracking_ratio_of_same_classification").toString());
+		numOfSeen = Integer.parseInt(configuration.get("Tracking_num_of_seen_frames").toString());
 	}
 	public void trackRegions(DetectionResult detections)
 	{
@@ -106,6 +106,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 					bestKalman.correct(x,y,height,width);
 					bestKalman.addClass(classification);
 					sendEvent(bestKalman, detection, TrackingEvent.NEW_TRACK);
+					//System.out.println("Kalman id: " + bestKalman.getId());
 					if(bestKalman.isDone(numOfSeen,correctClassRatio) && !bestKalman.isSent())
 					{
 						System.out.println("Sent NEW_CAPTURE");

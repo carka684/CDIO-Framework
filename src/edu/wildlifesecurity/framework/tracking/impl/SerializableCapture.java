@@ -72,11 +72,6 @@ public class SerializableCapture implements Externalizable {
 		byte[] array = new byte[size];
 		in.readFully(array, 0, size);
 		
-		/*
-		PngImage decoder = new PngImage();
-		BufferedImage img = decoder.read(new ByteArrayInputStream(array), true);
-		Mat mat = new Mat(img.getHeight(), img.getWidth(), CvType.CV_8UC3);
-		mat.put(0, 0, ((DataBufferByte)img.getRaster().getDataBuffer()).getData());*/
 		capture.regionImage = decoder.decode(array);
 	}
 	

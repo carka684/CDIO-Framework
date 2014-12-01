@@ -65,22 +65,33 @@ public class KalmanFilter {
 	 */
 	public boolean isDone(int minSeen, double classRatio)
 	{
+		Vector<Classes> temp = new Vector<Classes>();
 		if(classVec.isEmpty())
 			return false;
-		Collections.sort(classVec);
-		int maxOcc = 0;
-		Classes maxClass;
-		for(Classes cl : classVec)
-		{
-			int tmpMax = Collections.frequency(classVec, cl);
-			if(tmpMax > maxOcc)
-			{
-				maxClass = cl;
-				maxOcc = tmpMax;
+		if(classVec.size() >= minSeen) {
+			for(int i = classVec.size()-10; i < classVec.size(); i++) {
+				temp.add(classVec.get(i));
 			}
 		}
-		System.out.println(numOfSeen + " " + (double) maxOcc/classVec.size());
-		if( (numOfSeen >= minSeen) && ((double) maxOcc/classVec.size() > classRatio))
+		else{
+			temp = classVec;
+		}
+		Collections.sort(temp);
+		int maxOcc = 0;
+		Classes maxClass;
+		
+			for(Classes cl : temp)
+			{
+				int tmpMax = Collections.frequency(temp, cl);
+				if(tmpMax > maxOcc)
+				{
+					maxClass = cl;
+					maxOcc = tmpMax;
+				}
+			}
+			
+		System.out.println(numOfSeen + " " + (double) maxOcc/temp.size());
+		if( (numOfSeen >= minSeen) && ((double) maxOcc/temp.size() > classRatio))
 			return true;
 		
 		return false;

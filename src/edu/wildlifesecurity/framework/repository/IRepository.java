@@ -65,16 +65,6 @@ public interface IRepository extends IComponent, ILogger {
 	 * @return Object
 	 */
 	Object getConfigOption(String option);
-
-	/**
-	 * Sets a config entry
-	 * 
-	 * @param option
-	 * @param value
-	 * @author lukas
-	 */
-	void setConfigOption(String option, Object value);
-	
 	
 	/**
 	 * Disposes the repository

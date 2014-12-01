@@ -40,18 +40,17 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	 * Extracts HOG features
 	 *
 	 */
-	Size imageSize;
-	HOGDescriptor hog;
-	svm SVM;
-	svm_model model;
-	svm_parameter params;
-	HashMap<Integer,Vector<Double>> mapOfvectors = new HashMap<Integer,Vector<Double>>();
-	Vector<Double> wHumanOther = new Vector<Double>(); // Primal variable
-	Vector<Double> wRhinoOther = new Vector<Double>(); // Primal variable
-	Vector<Double> wRhinoHuman = new Vector<Double>(); // Primal variable
-	Vector<Double> w = new Vector<Double>(); // Primal variable
-	int numberOfClasses;
-	Vector<Classes> v = new Vector<Classes>();
+	private Size imageSize;
+	private HOGDescriptor hog;
+	private svm SVM;
+	private svm_model model;
+	private svm_parameter params;
+	private HashMap<Integer,Vector<Double>> mapOfvectors = new HashMap<Integer,Vector<Double>>();
+	private Vector<Double> wHumanOther = new Vector<Double>(); // Primal variable
+	private Vector<Double> wRhinoOther = new Vector<Double>(); // Primal variable
+	private Vector<Double> wRhinoHuman = new Vector<Double>(); // Primal variable
+	private Vector<Double> w = new Vector<Double>(); // Primal variable
+	private int numberOfClasses;
 	private EventDispatcher<IdentificationEvent> dispatcher =  new EventDispatcher<IdentificationEvent>();
 
 	@Override
@@ -63,26 +62,26 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	public void init(){
 		// TODO: Should be loaded from configuration
 		// HOG stuff
-		int imageSide = 240; // Integer.parseInt(configuration.get("Identification_imageSide").toString()); // From config
+		int imageSide = Integer.parseInt(configuration.get("Identification_imageSide").toString()); // From config
 		imageSize = new Size(imageSide, imageSide);
-		int blockSide = 16; // Integer.parseInt(configuration.get("Identification_hog_blockSide").toString());
-		int blockStrideSide = 8; //Integer.parseInt(configuration.get("Identification_hog_blockStrideSide").toString());
-		int cellSide = 8; // Integer.parseInt(configuration.get("Identification_hog_cellSide").toString());
-		int nbins = 9; //Integer.parseInt(configuration.get("Identification_hog_numberOfBins").toString());
+		int blockSide = Integer.parseInt(configuration.get("Identification_hog_blockSide").toString());
+		int blockStrideSide = Integer.parseInt(configuration.get("Identification_hog_blockStrideSide").toString());
+		int cellSide = Integer.parseInt(configuration.get("Identification_hog_cellSide").toString());
+		int nbins = Integer.parseInt(configuration.get("Identification_hog_numberOfBins").toString());
 		hog = new HOGDescriptor(imageSize,new Size(blockSide,blockSide),new Size(blockStrideSide,blockStrideSide),new Size(cellSide,cellSide),nbins);
 		
 		// SVM stuff
 		SVM = new svm();
 		model = new svm_model();
 		params = new svm_parameter();
-		params.kernel_type = 0; // Integer.parseInt(configuration.get("Identification_libsvm_kernelType").toString());
-		params.C = 16; // Integer.parseInt(configuration.get("Identification_libsvm_C").toString());
-		params.eps = 0.01; // Double.parseDouble(configuration.get("Identification_libsvm_eps").toString());
+		params.kernel_type = Integer.parseInt(configuration.get("Identification_libsvm_kernelType").toString());
+		params.C = Integer.parseInt(configuration.get("Identification_libsvm_C").toString());
+		params.eps = Double.parseDouble(configuration.get("Identification_libsvm_eps").toString());
 
-		numberOfClasses = 3; //Integer.parseInt(configuration.get("Identification_numberOfClasses").toString());
+		numberOfClasses = Integer.parseInt(configuration.get("Identification_numberOfClasses").toString());
 	    
 		// Load classifier if a configuration option exists
-		for(int i = 0; i <= numberOfClasses-1; i++)
+		for(int i = 0; i < numberOfClasses; i++)
 		{
 		if(configuration != null && configuration.containsKey("Identification_Classifier" + i))
 			loadPrimalVariableFromFile((configuration.get("Identification_Classifier" + i).toString()), i);
@@ -99,22 +98,103 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	@Override
 	public Classes classify(Mat image) {
 		Mat features = extractFeatures(image);
-		
 		svm_node[] imageFeatureNodes = featureMat2svm_nodeArray(features.t(), 0); // features must be a row-vector
-		Classes resClass = svmPlanePredict(imageFeatureNodes); // classify using the plane
-		
-		/*Classes resClass;
-		if(res == 0)
-			 resClass = Classes.RHINO;
-		else if(res == 1)
-			resClass = Classes.HUMAN;
-		else
-			resClass = Classes.UNIDENTIFIED;*/
-		v.add(resClass);
+		Classes resClass = svmPlanePredict(imageFeatureNodes); // classify using the loaded planes
 		ClassificationResult result = new ClassificationResult(resClass, image);
 		dispatcher.dispatch(new IdentificationEvent(IdentificationEvent.NEW_IDENTIFICATION, result));
 		return resClass;
 	}
+	
+	//////////////////FOR CLASSIFYING WITH 3 PLANES/////////////////////
+	public Classes svmPlanePredict(svm_node[] features) {
+		// Get w from hashMap mapOfVectors 
+		Classes classResult = Classes.UNIDENTIFIED;
+		double dotProductResult;
+		for(Classes c : Classes.values()) {
+			w = mapOfvectors.get(c.ordinal());
+			dotProductResult = dotProductBiasedWeight(features, w); // Compute which side of the plane the sample is located
+			if (dotProductResult >= 0) {
+				classResult = c;
+				// Also check for the Rhino vs Human plane
+				w = mapOfvectors.get(2); // Get RhinoHuman plane
+				dotProductResult = dotProductBiasedWeight(features, w); // Compute which side of the plane the sample is located
+				if (classResult == Classes.RHINO && dotProductResult <= 0 )
+					classResult = Classes.HUMAN; // Changed from Rhino to Human by the RhinoHuman plane
+				else if(classResult == Classes.HUMAN && dotProductResult >= 0)
+					classResult = Classes.RHINO; // Changed from Human to Rhino by the RhinoHuman plane
+				return classResult;
+			}
+		}	
+		return classResult;
+	}
+	
+	public double dotProductBiasedWeight(svm_node[] features, Vector<Double> w)
+	{
+		double result = 0;
+		result += w.get(0); // biased weight
+		for(int index = 0; index < features.length; index++) {
+			result += w.get(index+1)*features[index].value;
+		}
+		return result;
+	}
+	
+	// Evaluate the result of the multiclass classifier
+	public void evaluateMultiClassClassifier(String valFolder)
+	{
+		ImageReader trainReader = new ImageReader();
+		trainReader.readImages(valFolder);
+		Vector<String> trainFiles = trainReader.getFilesVec();
+		Mat classes = trainReader.getClasses();
+		Mat results = new Mat(trainFiles.size(), 1, CvType.CV_8S); // Must be signed
+
+		int counter = 0;
+		for(String file : trainFiles)
+		{
+			Mat img = new Mat();
+			try {
+				img = Highgui.imread(file,Highgui.CV_LOAD_IMAGE_GRAYSCALE);
+			} catch (Exception e) {
+				System.out.println("Error loading: " + file);
+				e.printStackTrace();
+			}
+			Integer sampleClass = classify(img).ordinal();
+			results.put(counter, 0, sampleClass);
+			counter++;
+			img.release();
+		}
+		double[] res = getResult(classes, results, trainReader.getNumOfClasses(), trainReader.getNumOfEachClass());
+	}
+	
+//////////////////FOR CLASSIFYING WITH PLANE/////////////////////
+	@Override
+	public void loadPrimalVariableFromFile(String filepath, int classNum) {	
+		try {
+			Scanner input = new Scanner(new File(filepath));
+			String str = new String();
+			while(input.hasNext()) {
+				str = input.next();
+				if(classNum == 0)
+					wRhinoOther.add(Double.parseDouble(str));
+				else if(classNum == 1)
+					wHumanOther.add(Double.parseDouble(str));
+				else
+					wRhinoHuman.add(Double.parseDouble(str));
+			}
+			input.close();
+			System.out.println("Loaded classifier!");
+		}
+		catch (Exception e) {
+			System.out.println("Error loading file: " + filepath);
+		}
+		
+		if(classNum == 0)
+			mapOfvectors.put(classNum, wRhinoOther);
+		else if(classNum == 1)
+			mapOfvectors.put(classNum, wHumanOther);
+		else
+			mapOfvectors.put(classNum, wRhinoHuman);
+	}
+	
 ////////////////// FOR TRAINING /////////////////////
 	public Mat extractFeaturesFromFiles(Vector<String> trainFiles){ 
 		int cols  = (int) extractFeatures(Highgui.imread(trainFiles.elementAt(0),Highgui.CV_LOAD_IMAGE_GRAYSCALE)).size().height;
@@ -163,7 +243,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 	}
 	
-//////////////////FOR TRAINING EVALUTATION/////////////////////
+//////////////////FOR EVALUTATION OF TRAINING/////////////////////
 	@Override
 	public void evaluateClassifier(String valFolder, String UNUSED) {
 		ImageReader trainReader = new ImageReader();
@@ -183,7 +263,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	/*
 	 * TODO: How should the result be presented?
 	 */
-//////////////////FOR TRAINING EVALUATION/////////////////////
+//////////////////FOR EVALUTATION OF TRAINING/////////////////////
 	public static  double[] getResult(Mat classes, Mat results, int numOfClasses,int[] numOfEachClass)
 	{
 		int pos = 0;
@@ -201,17 +281,49 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 		return null;
 	}
-	/*
-	@Override
-	public void loadClassifierFromFile(String file) {
-		try {
-			model = svm.svm_load_model(file);
-		} catch (IOException e) {
-			System.out.println("Error in HOGIdentification: " + e.getMessage());
+	
+//////////////////FOR TRAINING /////////////////////
+	public void svm_model2primalVariable() {
+		w.clear();
+		w.add(-model.rho[0]);
+		if (model.label[1] == 0) {
+			w.set(0, -w.get(0));
+		}
+		for(int featureIndex = 0; featureIndex < model.SV[0].length; featureIndex++) {
+			w.add(0.0);
+			for(int svIndex = 0; svIndex < model.sv_coef[0].length; svIndex++) {
+				w.set(featureIndex+1, w.get(featureIndex+1) + model.SV[svIndex][featureIndex].value * model.sv_coef[0][svIndex]);
+			}
+			if (model.label[1] == 0) {
+				w.set(featureIndex+1, -w.get(featureIndex+1));
+			}
 		}
 	}
-	*/
+
+//////////////////FOR TRAINING TO SAVE PLANE /////////////////////
+	public void savePrimalVariable2file(String filePath) throws IOException
+	{
+		try {
+			File file = new File(filePath);
+			// if file does not exists, then create it
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+
+			for(int featureIndex = 0; featureIndex < w.size(); featureIndex++)
+			{
+				bw.write(w.get(featureIndex) + " ");
+			}
+			bw.close();
+			System.out.println("Primal variable Saved");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
+/////////// CONVERT FEATURES TO LIBSVM COMPATIBILITY ////////////////////// 	
 	// Convert from featureMatrix to svm_problem, which is required as input to svm_train
 	public svm_problem featureMat2svm_problem(Mat featureMat, Mat classes) {
 		svm_problem result = new svm_problem();
@@ -252,113 +364,5 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 
 		return result;
-	}
-//////////////////FOR CLASSIFYING WITH PLANE/////////////////////
-	public Classes svmPlanePredict(svm_node[] features) {
-		//get w from hashMap mapOfVectors and the classresult is the key in map
-		Classes classResult = Classes.UNIDENTIFIED;
-		double scalarprodResult = 0;
-		for(Classes c : Classes.values())
-		{
-			w = mapOfvectors.get(c.ordinal());
-			scalarprodResult += w.get(0); // biased weight
-			for(int index = 0; index < features.length; index++) {
-				scalarprodResult += w.get(index+1)*features[index].value;
-			}
-			
-			if (scalarprodResult >= 0) {
-				classResult = c;
-				// Check also for the Rhino vs Human plane
-					scalarprodResult = 0;
-					w = mapOfvectors.get(2); //get RhinoHuman plane
-					scalarprodResult += w.get(0); // biased weight
-					for(int index = 0; index < features.length; index++) {
-						scalarprodResult += w.get(index+1)*features[index].value;
-					}
-					if (classResult == Classes.RHINO && scalarprodResult <= 0 )
-						classResult = Classes.HUMAN; //Changed from Rhino to Human by the RhinoHuman plane
-					else if(classResult == Classes.HUMAN && scalarprodResult >= 0)
-						classResult = Classes.RHINO; //Changed from Human to Rhino by the RhinoHuman plane
-				return classResult;
-			}
-			scalarprodResult = 0;
-		}	
-		return classResult;
-	}
-
-//////////////////FOR TRAINING /////////////////////
-	public void svm_model2primalVariable() {
-		w.clear();
-		w.add(-model.rho[0]);
-		if (model.label[1] == 0) {
-			w.set(0, -w.get(0));
-		}
-		for(int featureIndex = 0; featureIndex < model.SV[0].length; featureIndex++) {
-			w.add(0.0);
-			for(int svIndex = 0; svIndex < model.sv_coef[0].length; svIndex++) {
-				w.set(featureIndex+1, w.get(featureIndex+1) + model.SV[svIndex][featureIndex].value * model.sv_coef[0][svIndex]);
-			}
-			if (model.label[1] == 0) {
-				w.set(featureIndex+1, -w.get(featureIndex+1));
-			}
-		}
-		
-	}
-	
-//////////////////FOR CLASSIFYING WITH PLANE/////////////////////
-	@Override
-	public void loadPrimalVariableFromFile(String filepath, int classNum) {
-		
-			try {
-				//w.clear();
-				Scanner input = new Scanner(new File(filepath));
-				String str = new String();
-				while(input.hasNext()) {
-					str = input.next();
-					if(classNum == 0)
-						wRhinoOther.add(Double.parseDouble(str));
-					
-					else if(classNum == 1)
-						wHumanOther.add(Double.parseDouble(str));
-					else
-						wRhinoHuman.add(Double.parseDouble(str));
-					}
-				input.close();
-				System.out.println("Loaded classifier!");
-				}
-			catch (Exception e) {
-				System.out.println("Error loading file: " + filepath);
-				}
-			if(classNum == 0)
-				mapOfvectors.put(classNum, wRhinoOther);
-			
-			else if(classNum == 1)
-				mapOfvectors.put(classNum, wHumanOther);
-			else
-				mapOfvectors.put(classNum, wRhinoHuman);
-				
-	}
-//////////////////FOR TRAINING TO SAVE PLANE /////////////////////
-	public void savePrimalVariable2file(String filePath) throws IOException
-	{
-		try {
-			File file = new File(filePath);
-			// if file does not exists, then create it
-			if (!file.exists()) {
-				file.createNewFile();
-			}
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-
-			for(int featureIndex = 0; featureIndex < w.size(); featureIndex++)
-			{
-				bw.write(w.get(featureIndex) + " ");
-			}
-			bw.close();
-			System.out.println("Primal variable Saved");
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
 	}
 }

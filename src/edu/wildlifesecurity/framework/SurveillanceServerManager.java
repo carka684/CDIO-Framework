@@ -91,6 +91,7 @@ public class SurveillanceServerManager extends SurveillanceManager {
 					capture = ((SerializableCapture) ois.readObject()).getCapture();
 					Integer newCaptureNumber=repository.getCaptureDefinitions().size() + 1;
 					capture.id=newCaptureNumber;
+					capture.trapDeviceId=event.getMessage().getSender();
 					
 				}catch(Exception e){
 					repository.error("Error in SurveillanceServerManager. Cannot deserialize capture: " + e.getMessage());

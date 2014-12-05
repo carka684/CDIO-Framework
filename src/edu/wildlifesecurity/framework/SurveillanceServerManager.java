@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Base64;
@@ -21,6 +23,8 @@ public class SurveillanceServerManager extends SurveillanceManager {
 	private IActuator actuator;
 	private IRepository repository;
 	private ICommunicatorServer communicator;
+	
+	private Map<Integer, LinkedList<Entry<String, Object>>> configChanges = new HashMap<Integer,LinkedList<Entry<String,Object>>>();
 
 	public SurveillanceServerManager(IActuator actuator, IRepository repository, ICommunicatorServer communicator) {
 
@@ -91,6 +95,7 @@ public class SurveillanceServerManager extends SurveillanceManager {
 					capture = ((SerializableCapture) ois.readObject()).getCapture();
 					Integer newCaptureNumber=repository.getCaptureDefinitions().size() + 1;
 					capture.id=newCaptureNumber;
+					capture.trapDeviceId=event.getMessage().getSender();
 					
 				}catch(Exception e){
 					repository.error("Error in SurveillanceServerManager. Cannot deserialize capture: " + e.getMessage());
@@ -105,7 +110,21 @@ public class SurveillanceServerManager extends SurveillanceManager {
 			}
 			
 		});
-		
+
+		// Store TrapDevice configuration changes to be able to know individual traps' config
+		communicator.addMessageEventHandler(MessageEvent.getEventType(Commands.SET_CONFIG), new IEventHandler<MessageEvent>(){
+
+			@Override
+			public void handle(MessageEvent event) {
+				// Store config change
+				if(!configChanges.containsKey(event.getMessage().getReceiver()))
+					configChanges.put(event.getMessage().getReceiver(), new LinkedList<Entry<String,Object>>());
+				
+				String[] messageParts = event.getMessage().getMessage().split(",");
+				configChanges.get(event.getMessage().getReceiver()).add(new MapEntry<String, Object>(messageParts[1], messageParts[2]));
+			}
+			
+		});
 	}
 	
 	@Override
@@ -113,6 +132,40 @@ public class SurveillanceServerManager extends SurveillanceManager {
 		
 		repository.dispose();
 		
+	}
+	
+	/**
+	 * Returns the configuration the given trap
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public Map<String, Object> getTrapDeviceConfiguration(int id){
+		// Load configuration from repository
+		Map<String, Object> conf = new HashMap<String,Object>();
+		repository.loadConfiguration(conf);
+		
+		// Remove non-trapdevice config options
+		/*for(Entry<String, Object> e : conf.entrySet()){
+			switch(e.getKey().split("_")[0]){
+			case "MediaSource":
+			case "Detection":
+			case "Identification":
+			case "Tracking":
+				break;
+			default:
+				conf.remove(e.getKey());
+				break;
+			}
+		}*/
+		
+		// Replay changes that has been made
+		if(configChanges.containsKey(id))
+			for(Entry<String, Object> e : configChanges.get(id)){
+				conf.put(e.getKey(), e.getValue());
+			}
+		
+		return conf;
 	}
 
 	/*

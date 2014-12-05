@@ -128,7 +128,7 @@ public class DefaultDetection extends AbstractComponent implements IDetection
 			bgs.apply(img, fgMask, lowLearningRate);
 		}
 		
-		Imgproc.threshold(fgMask, fgMask, 127.0, 255.0, Imgproc.THRESH_TOZERO);
+		Imgproc.threshold(fgMask, fgMask, 128.0, 255.0, Imgproc.THRESH_TOZERO);
 		
 		int numOpen = Integer.parseInt(configuration.get("Detection_numOperationsInOpening").toString());
 		int numClose = Integer.parseInt(configuration.get("Detection_numOperationsInClosing").toString());		

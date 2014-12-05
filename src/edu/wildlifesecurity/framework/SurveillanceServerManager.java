@@ -146,7 +146,7 @@ public class SurveillanceServerManager extends SurveillanceManager {
 		repository.loadConfiguration(conf);
 		
 		// Remove non-trapdevice config options
-		for(Entry<String, Object> e : conf.entrySet()){
+		/*for(Entry<String, Object> e : conf.entrySet()){
 			switch(e.getKey().split("_")[0]){
 			case "MediaSource":
 			case "Detection":
@@ -157,12 +157,13 @@ public class SurveillanceServerManager extends SurveillanceManager {
 				conf.remove(e.getKey());
 				break;
 			}
-		}
+		}*/
 		
 		// Replay changes that has been made
-		for(Entry<String, Object> e : configChanges.get(id)){
-			conf.put(e.getKey(), e.getValue());
-		}
+		if(configChanges.containsKey(id))
+			for(Entry<String, Object> e : configChanges.get(id)){
+				conf.put(e.getKey(), e.getValue());
+			}
 		
 		return conf;
 	}

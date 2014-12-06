@@ -165,7 +165,6 @@ public class SurveillanceServerManager extends SurveillanceManager {
 		
 		// Replay changes that has been made
 		if(configChanges.containsKey(id)){
-			System.out.println("was here");
 			for(Entry<String, Object> e : configChanges.get(id)){
 				conf.put(e.getKey(), e.getValue());
 			}

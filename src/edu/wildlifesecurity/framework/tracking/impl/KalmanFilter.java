@@ -52,7 +52,17 @@ public class KalmanFilter {
 		sentCapture = false;
 
 	}
-	
+	/*
+	 * Returns true if a capture should be sent. 
+	 * The kalmanfilter (this) need to fulfill two requirements:
+	 * 1. Been connected to a detection minSeen number of times.
+	 * 2. classRatio is the ratio the of the most common class in classVec.
+	 * 
+	 *  If 1 and 2 is fulfilled return true;
+	 *  This may need some improvements, maybe just look at the last 10-20 detections instead of all since
+	 *  the animals often is classified as UNIDENTIFIED when entering the scene which makes it hard 
+	 *  for the kalmanfilter to reach the necessary ratio. 
+	 */
 	public boolean isDone(int minSeen, double classRatio)
 	{
 		Vector<Classes> temp = new Vector<Classes>();

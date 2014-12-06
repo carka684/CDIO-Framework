@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -142,28 +143,33 @@ public class SurveillanceServerManager extends SurveillanceManager {
 	 */
 	public Map<String, Object> getTrapDeviceConfiguration(int id){
 		// Load configuration from repository
-		Map<String, Object> conf = new HashMap<String,Object>();
+		Map<String, Object> conf = new LinkedHashMap<String,Object>();
 		repository.loadConfiguration(conf);
 		
 		// Remove non-trapdevice config options
-		for(Entry<String, Object> e : conf.entrySet()){
-			switch(e.getKey().split("_")[0]){
+		int i = 0;
+		while(i<conf.size()){
+			switch(conf.keySet().toArray()[i].toString().split("_")[0]){
 			case "MediaSource":
 			case "Detection":
 			case "Identification":
 			case "Tracking":
 				break;
 			default:
-				conf.remove(e.getKey());
+				conf.remove(conf.keySet().toArray()[i].toString());
+				i--;
 				break;
 			}
+			i++;
 		}
 		
 		// Replay changes that has been made
-		for(Entry<String, Object> e : configChanges.get(id)){
-			conf.put(e.getKey(), e.getValue());
+		if(configChanges.containsKey(id)){
+			System.out.println("was here");
+			for(Entry<String, Object> e : configChanges.get(id)){
+				conf.put(e.getKey(), e.getValue());
+			}
 		}
-		
 		return conf;
 	}
 

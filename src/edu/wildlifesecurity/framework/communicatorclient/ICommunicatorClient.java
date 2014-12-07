@@ -24,6 +24,11 @@ public interface ICommunicatorClient extends IComponent, ILogger {
 	 * Sends a message to a recipient that is contained in the Message instance.
 	 */
 	void sendMessage(Message message);
+	
+	/**
+	 * Enables consumers to get notified when a server connection has been established or disconnected
+	 */
+	ISubscription addConnectionEventHandler(EventType type, IEventHandler<ConnectEvent> handler);
 
 	/**
 	 * Returns whether it is connected or not 

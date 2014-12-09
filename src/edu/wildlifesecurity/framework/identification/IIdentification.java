@@ -16,8 +16,6 @@ public interface IIdentification extends IComponent {
 	void evaluateClassifier(String pos, String neg);
 	
 	Classes classify(Mat image);
-	
-	//void loadClassifierFromFile(String file);
-	
+
 	void loadPrimalVariableFromFile(String file, int classNum);
 }

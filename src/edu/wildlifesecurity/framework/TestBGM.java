@@ -18,7 +18,6 @@ import edu.wildlifesecurity.framework.detection.impl.DefaultDetection;
 public class TestBGM {
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		int NrOfSavedIm = 0; 
 		Vector <Integer> imageHeight = new Vector <Integer>();
@@ -30,6 +29,13 @@ public class TestBGM {
 			File imgFolder = new File("imagesFileNr" + fileNr);
 			imgFolder.mkdir();
 			System.out.println(imgFolder.getName());
+			
+			File bgFolder = new File("bg" + fileNr);
+			bgFolder.mkdir();
+			
+			File orginalFlolder = new File("orginal" + fileNr);
+			orginalFlolder.mkdir();
+			
 			VideoCapture vc = new VideoCapture(file.getPath());
 	
 			Imshow window1 = new Imshow("Background model");
@@ -59,10 +65,9 @@ public class TestBGM {
 					{
 						 animalIm = detec.getObjInImage(img);
 						 System.out.println(frameNr + " ");
-						for(int i = 0; i < animalIm.size(); i++)
-						{
-							
-							if(frameNr % 20 == 0)
+						 if(frameNr % 20 == 0)
+						 {
+							for(int i = 0; i < animalIm.size(); i++)
 							{
 								NrOfSavedIm++;
 								imageHeight.add(animalIm.get(i).height());
@@ -70,7 +75,8 @@ public class TestBGM {
 								String imNr = String.format("%05d", NrOfSavedIm);
 								Highgui.imwrite(imgFolder.getName() + "/im" + imNr + ".jpg", animalIm.get(i));
 							}
-						
+							String imNr = String.format("%05d", NrOfSavedIm);
+							Highgui.imwrite(orginalFlolder.getName() + "/im" + imNr + ".jpg", img);
 						}
 					}
 				}

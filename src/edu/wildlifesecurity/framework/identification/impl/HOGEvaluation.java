@@ -20,12 +20,12 @@ public class HOGEvaluation {
 		
 		// Training and evaluating a classifier with two classes
 		//hogTest.trainClassifier("/Users/jonasforsner/Documents/Dataset/Training/", "", "wRhinoHuman.txt");
-		//hogTest.evaluateClassifier("/Users/jonasforsner/Documents/Dataset/Validation/", "");
+		//hogTest.evaluateTrainClassifier("/Users/jonasforsner/Documents/Dataset/Validation/", "");
 		
 		// Classify images using the multiclass classifier
 		hogTest.loadPrimalVariableFromFile("wRhinoOther.txt", 0);
-		hogTest.loadPrimalVariableFromFile("wHumanOther.txt", 1);
-		hogTest.loadPrimalVariableFromFile("wRhinoHuman.txt", 2);
-		hogTest.evaluateMultiClassClassifier("/Users/jonasforsner/Documents/Dataset/Validation/");
+		//hogTest.loadPrimalVariableFromFile("wHumanOther.txt", 1);
+		//hogTest.loadPrimalVariableFromFile("wRhinoHuman.txt", 2);
+		hogTest.evaluateClassifier("/Users/jonasforsner/Documents/Dataset/Validation/");
 	}
 }

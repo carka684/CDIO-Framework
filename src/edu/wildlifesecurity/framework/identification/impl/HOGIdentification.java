@@ -138,8 +138,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		return result;
 	}
 	
-	// Evaluate the result of the multiclass classifier
-	public void evaluateMultiClassClassifier(String valFolder)
+	// Evaluate the result of the combined 3-class classifier
+	@Override
+	public void evaluateClassifier(String valFolder)
 	{
 		ImageReader trainReader = new ImageReader();
 		trainReader.readImages(valFolder);
@@ -167,15 +168,15 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 	
 //////////////////FOR CLASSIFYING WITH PLANE/////////////////////
 	@Override
-	public void loadPrimalVariableFromFile(String filepath, int classNum) {	
+	public void loadPrimalVariableFromFile(String filepath, int wNum) {	
 		try {
 			Scanner input = new Scanner(new File(filepath));
 			String str = new String();
 			while(input.hasNext()) {
 				str = input.next();
-				if(classNum == 0)
+				if(wNum == 0)
 					wRhinoOther.add(Double.parseDouble(str));
-				else if(classNum == 1)
+				else if(wNum == 1)
 					wHumanOther.add(Double.parseDouble(str));
 				else
 					wRhinoHuman.add(Double.parseDouble(str));
@@ -187,12 +188,12 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 			System.out.println("Error loading file: " + filepath);
 		}
 		
-		if(classNum == 0)
-			mapOfvectors.put(classNum, wRhinoOther);
-		else if(classNum == 1)
-			mapOfvectors.put(classNum, wHumanOther);
+		if(wNum == 0)
+			mapOfvectors.put(wNum, wRhinoOther);
+		else if(wNum == 1)
+			mapOfvectors.put(wNum, wHumanOther);
 		else
-			mapOfvectors.put(classNum, wRhinoHuman);
+			mapOfvectors.put(wNum, wRhinoHuman);
 	}
 	
 ////////////////// FOR TRAINING /////////////////////
@@ -225,7 +226,7 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 
 //////////////////FOR TRAINING /////////////////////
 	@Override
-	public void trainClassifier(String trainFolder,String UNUSED, String outputFile) {
+	public void trainClassifier(String trainFolder, String outputFile) {
 		ImageReader trainReader = new ImageReader();
 		trainReader.readImages(trainFolder);
 		Vector<String> trainFiles = trainReader.getFilesVec();
@@ -243,9 +244,9 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		}
 	}
 	
-//////////////////FOR EVALUTATION OF TRAINING/////////////////////
-	@Override
-	public void evaluateClassifier(String valFolder, String UNUSED) {
+//////////////////FOR EVALUTATION OF TRAINING////////////////////
+	// Evaluates a classifier with one plane after it has been trained
+	public void evaluateTrainedClassifier(String valFolder) {
 		ImageReader trainReader = new ImageReader();
 		trainReader.readImages(valFolder);
 		Vector<String> trainFiles = trainReader.getFilesVec();
@@ -260,9 +261,6 @@ public class HOGIdentification extends AbstractComponent implements IIdentificat
 		double[] res = getResult(classes, results,trainReader.getNumOfClasses(),trainReader.getNumOfEachClass());
 	}
 	
-	/*
-	 * TODO: How should the result be presented?
-	 */
 //////////////////FOR EVALUTATION OF TRAINING/////////////////////
 	public static  double[] getResult(Mat classes, Mat results, int numOfClasses,int[] numOfEachClass)
 	{

@@ -36,7 +36,10 @@ public class SerializableCapture implements Externalizable {
 		out.writeInt(capture.trapDeviceId);
 		out.writeObject(capture.classification);
 		out.writeObject(capture.timeStamp);
-		out.writeUTF(capture.GPSPos);
+		out.writeDouble(capture.latitude);
+		out.writeDouble(capture.longitude);
+		out.writeInt(capture.heading);
+		
 
 		// Encode image Mat to png 
 		/*int type = BufferedImage.TYPE_3BYTE_BGR;
@@ -65,7 +68,9 @@ public class SerializableCapture implements Externalizable {
 		capture.trapDeviceId = in.readInt();
 		capture.classification = (Classes) in.readObject();
 		capture.timeStamp = (Date) in.readObject();
-		capture.GPSPos = in.readUTF();
+		capture.latitude = in.readDouble();
+		capture.longitude = in.readDouble();
+		capture.heading = in.readInt();
 		
 		// Read image
 		int size = in.readInt();

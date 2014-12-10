@@ -12,8 +12,6 @@ import edu.wildlifesecurity.framework.identification.Classes;
 
 
 public class KalmanFilter {
-	
-	
 	private JKalman kalman;
 	private Integer id;
 	private Integer numOfUnseen;
@@ -22,8 +20,6 @@ public class KalmanFilter {
 	Matrix predicted; 
 	Scalar colorKalman;
 	Vector<Classes> classVec;
-
-
 		
 	public KalmanFilter(Integer id,int x,int y, int height, int width)
 	{

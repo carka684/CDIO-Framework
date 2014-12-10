@@ -22,6 +22,7 @@ public class KalmanFilter {
 	Matrix predicted; 
 	Scalar colorKalman;
 	Vector<Classes> classVec;
+	Classes maxClass;
 
 
 		
@@ -78,7 +79,7 @@ public class KalmanFilter {
 		}
 		Collections.sort(temp);
 		int maxOcc = 0;
-		Classes maxClass;
+		
 		
 			for(Classes cl : temp)
 			{

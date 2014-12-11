@@ -19,13 +19,13 @@ public class LBPIdentification extends AbstractComponent implements IIdentificat
 	}
 
 	@Override
-	public void trainClassifier(String pos, String neg, String outputFile) {
+	public void trainClassifier(String trainFolder, String outputFile) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public void evaluateClassifier(String pos, String neg) {
+	public void evaluateClassifier(String valFolder) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -44,7 +44,7 @@ public class LBPIdentification extends AbstractComponent implements IIdentificat
 	}
 	
 	@Override
-	public void loadPrimalVariableFromFile(String file , int classes) {
+	public void loadPrimalVariableFromFile(String file , int wNum) {
 		// TODO Auto-generated method stub
 	}
 }

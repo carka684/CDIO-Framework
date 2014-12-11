@@ -1,12 +1,11 @@
 package edu.wildlifesecurity.framework.actuator.impl;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Vector;
 
 import edu.wildlifesecurity.framework.AbstractComponent;
 import edu.wildlifesecurity.framework.actuator.IActuator;
@@ -52,18 +51,50 @@ public class DefaultActuator extends AbstractComponent implements IActuator {
 	@Override
 	public void actOnCapture(Capture capture) {
 		if(capture.classification == Classes.RHINO){
-			//sendAlarmMessage();
+			Vector<String> numVec  = new Vector<>();
+			numVec.add("0722312561");
+			numVec.add("0762662802");
+			sendAlarmMessage_DEMO(numVec,capture);
 			System.out.println("Actuator Alarm! Rhino was captured! " + capture.timeStamp);
 		}else if(capture.classification == Classes.HUMAN){
 			System.out.println("Actuator Alarm! Human was captured! " + capture.timeStamp);
 		}
 	}
+	private void sendAlarmMessage_DEMO(Vector<String> numVec, Capture capture) {
+		String messasge_demo = "Rhino detected in Filtret from TrapDevice: " + capture.trapDeviceId;
+		for(String number : numVec)
+		{
+			try {
+				String URLmessage = URLEncoder.encode(message, "UTF-8");
+				String urlString = "http://" + IP + ":" + port + "/sendsms?phone=" + number + "&text=" +
+						URLmessage + "&password=" + password;
+				
+				URL url;
+				HttpURLConnection conn;
+				BufferedReader rd;
+				String line;
+				String result = "";
+				
+				url = new URL(urlString);
+				conn = (HttpURLConnection) url.openConnection();
+				conn.setRequestMethod("GET");
+				rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+				while ((line = rd.readLine()) != null) {
+					result += line;
+				}
+				rd.close();
+	
+			} catch (Exception e) {
+				log.error("Error in DefaultActuator. Could not send alarm sms message: " + e.getMessage());
+			}
+		}
+
+	}
 	
 	
 	private void sendAlarmMessage() {
-		String URLmessage = "no message";
 		try {
-			URLmessage = URLEncoder.encode(message, "UTF-8");
+			String URLmessage = URLEncoder.encode(message, "UTF-8");
 			String urlString = "http://" + IP + ":" + port + "/sendsms?phone=" + number + "&text=" +
 					URLmessage + "&password=" + password;
 			

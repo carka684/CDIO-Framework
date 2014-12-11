@@ -12,6 +12,7 @@ import edu.wildlifesecurity.framework.EventDispatcher;
 import edu.wildlifesecurity.framework.EventType;
 import edu.wildlifesecurity.framework.IEventHandler;
 import edu.wildlifesecurity.framework.ISubscription;
+import edu.wildlifesecurity.framework.SensorData;
 import edu.wildlifesecurity.framework.detection.Detection;
 import edu.wildlifesecurity.framework.detection.DetectionResult;
 import edu.wildlifesecurity.framework.identification.Classes;
@@ -35,7 +36,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 	{
 		nextID = 0;
 		kalVec =  new Vector<KalmanFilter>();
-		errorDist = Integer.parseInt(configuration.get("Tracking_max_predict_pos_error").toString()); // Read from config!!
+		errorDist = Integer.parseInt(configuration.get("Tracking_max_predict_pos_error").toString()); 
 		errorHeight = Double.parseDouble(configuration.get("Tracking_max_predict_height_error").toString());
 		errorWidth = Double.parseDouble(configuration.get("Tracking_max_predict_width_error").toString());
 		numOfUnseen = Integer.parseInt(configuration.get("Tracking_num_of_missing_frames").toString());
@@ -135,8 +136,8 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 	}
 	public void sendEvent(KalmanFilter kf,Detection detection, EventType type)
 	{
-		String GPSPos = "";
-		Capture capture = new Capture(new Date(),detection.getRegionImage(), kf.maxClass,GPSPos);
+		Capture capture = new Capture(new Date(),detection.getRegionImage(), detection.getClassification(),
+				SensorData.latitude,SensorData.longitude,SensorData.heading);
 		dispatcher.dispatch(new TrackingEvent(type, capture,detection.getRegion()));
 	} 
 

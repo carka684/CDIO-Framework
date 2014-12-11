@@ -13,24 +13,32 @@ public class Capture {
 	public Classes classification;
 	public Date timeStamp;
 	public Mat regionImage;
-	public String GPSPos = "";
+	public double longitude;
+	public double latitude;
+	public int heading;
 	
 	public Capture(){ }
 	
-	public Capture(Date timeStamp, Mat regionImage, Classes classification, String GPSPos) {
+	public Capture(Date timeStamp, Mat regionImage, Classes classification, double latitude, double longitude, int heading) {
 		this.timeStamp = timeStamp;
 		this.regionImage = regionImage;
 		this.classification = classification;
-		this.GPSPos = GPSPos;
+		this.longitude = longitude;
+		this.latitude  = latitude;
+		this.heading = heading;
 	}
 	
-	public Capture(Integer id,Integer trapDeviceId,Date timeStamp, Mat regionImage, Classes classification, String GPSPos) {
+	public Capture(Integer id,Integer trapDeviceId,Date timeStamp, Mat regionImage, Classes classification, double latitude, 
+			double longitude, int heading) {
 		this.id=id;
 		this.trapDeviceId=trapDeviceId;
 		this.timeStamp = timeStamp;
 		this.regionImage = regionImage;
 		this.classification = classification;
-		this.GPSPos = GPSPos;
+		this.longitude = longitude;
+		this.latitude  = latitude;
+		this.heading = heading;
+
 	}
 
 	

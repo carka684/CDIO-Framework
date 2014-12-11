@@ -108,7 +108,7 @@ public class KalmanTracking extends AbstractComponent implements ITracking {
 					bestKalman.addClass(classification);
 					sendEvent(bestKalman, detection, TrackingEvent.NEW_TRACK);
 					//System.out.println("Kalman id: " + bestKalman.getId());
-					if(bestKalman.isDone(numOfSeen,correctClassRatio) && !bestKalman.isSent() && classification != Classes.UNIDENTIFIED)
+					if(bestKalman.isDone(numOfSeen,correctClassRatio) && !bestKalman.isSent() && bestKalman.maxClass != Classes.UNIDENTIFIED)
 					{
 						System.out.println("Sent NEW_CAPTURE");
 						bestKalman.setSent();

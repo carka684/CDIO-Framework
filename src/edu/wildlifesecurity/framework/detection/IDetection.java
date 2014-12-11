@@ -11,8 +11,14 @@ import edu.wildlifesecurity.framework.ISubscription;
 //output: image of animal 
 public interface IDetection extends IComponent {
 	
+	/**
+	 * Enables subscription of DetectionEvent 
+	 */
 	ISubscription addEventHandler(EventType type, IEventHandler<DetectionEvent> handler);
 	 
+	/**
+	 *Returns a DetectionResult containing (among other things) the moving objects seen in image.    
+	 */
 	DetectionResult getObjInImage(Mat image);
 
 }

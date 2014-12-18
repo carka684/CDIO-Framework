@@ -11,21 +11,24 @@ import edu.wildlifesecurity.framework.MessageEvent;
 
 public interface ICommunicatorServer extends IComponent {
 	
-	/*
+	/**
 	 * Enables consumers to listen for messages. For example, a Repository implementation should listen to log messages.
 	 */
 	ISubscription addMessageEventHandler(EventType type, IEventHandler<MessageEvent> handler);
 	
-	/*
+	/**
 	 * Sends a message to a recipient that is contained in the Message instance.
 	 */
 	void sendMessage(Message message);
 	
-	/*
+	/**
 	 * Gets a list of currently connected trap devices
 	 */
 	List<TrapDevice> getConnectedTrapDevices();
 	
+	/**
+	 * Enables consumers to get notified when a new TrapDevice has connected is disconnected
+	 */
 	ISubscription addConnectEventHandler(EventType type, IEventHandler<ConnectEvent> handler);
 
 }

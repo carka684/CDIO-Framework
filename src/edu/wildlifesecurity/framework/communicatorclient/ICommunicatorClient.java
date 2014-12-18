@@ -21,7 +21,7 @@ public interface ICommunicatorClient extends IComponent, ILogger {
 	ISubscription addEventHandler(EventType type, IEventHandler<MessageEvent> handler);
 	
 	/**
-	 * Sends a message to a recipient that is contained in the Message instance.
+	 * Sends a message to the server.
 	 */
 	void sendMessage(Message message);
 	

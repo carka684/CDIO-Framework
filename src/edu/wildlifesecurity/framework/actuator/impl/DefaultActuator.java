@@ -29,7 +29,7 @@ public class DefaultActuator extends AbstractComponent implements IActuator {
 	 * 
 	 * Ex:
 	 * SMSSender sms = new SMSSender();
-	 * sms.sendMessage("130.236.227.213", "9090", "det här är ett sms med mellanslag", "0722312561", "123");
+	 * sms.sendMessage("130.236.227.213", "9090", "det hï¿½r ï¿½r ett sms med mellanslag", "0722312561", "123");
 	 */
 	
 	private String IP;
@@ -52,8 +52,9 @@ public class DefaultActuator extends AbstractComponent implements IActuator {
 	public void actOnCapture(Capture capture) {
 		if(capture.classification == Classes.RHINO){
 			Vector<String> numVec  = new Vector<>();
-			numVec.add("0722312561");
-			numVec.add("0762662802");
+			numVec.add("0706466565");
+			numVec.add("0730646489");
+			numVec.add("0723732399");
 			sendAlarmMessage_DEMO(numVec,capture);
 			System.out.println("Actuator Alarm! Rhino was captured! " + capture.timeStamp);
 		}else if(capture.classification == Classes.HUMAN){
